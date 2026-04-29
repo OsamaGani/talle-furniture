@@ -5,6 +5,7 @@ import Loader from '../../components/Loader';
 import { FiEdit2, FiTrash2, FiPlus, FiSearch, FiPackage, FiStar, FiAward, FiZap } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import QuickAddModal from '../../components/QuickAddModal';
+import { allSubCategoryNames } from '../../config/departments';
 
 const TAB_TO_COLLECTION = {
   newArrival: { key: 'newArrival', label: 'New Arrivals' },
@@ -20,7 +21,8 @@ const COLLECTION_TABS = [
   { id: 'featured',    label: 'Featured',      emoji: '🌟' },
 ];
 
-const QUICK_CATEGORIES = ['Books', 'Construction', 'Vehicles', 'Dolls', 'Action Figures', 'Wooden Toys', 'Outdoor Toys', 'Games'];
+const LEGACY_CATEGORIES = ['Books', 'Construction', 'Vehicles', 'Dolls', 'Action Figures', 'Wooden Toys', 'Outdoor Toys', 'Games'];
+const QUICK_CATEGORIES = Array.from(new Set([...LEGACY_CATEGORIES, ...allSubCategoryNames])).sort();
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);

@@ -4,8 +4,10 @@ import API from '../api/axios';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
 import { FiFilter, FiX } from 'react-icons/fi';
+import { allSubCategoryNames } from '../config/departments';
 
-const categories = ['Construction', 'Games', 'Pretend Play', 'Learning & Education', 'Vehicles', 'Active Play', 'Wooden Toys', 'Dolls', 'Action Figures', 'Ride Ons', 'Outdoor Toys', 'Books', 'Baby & Toddler'];
+const legacyCategories = ['Construction', 'Games', 'Pretend Play', 'Learning & Education', 'Vehicles', 'Active Play', 'Wooden Toys', 'Dolls', 'Action Figures', 'Ride Ons', 'Outdoor Toys', 'Books', 'Baby & Toddler'];
+const categories = Array.from(new Set([...legacyCategories, ...allSubCategoryNames])).sort();
 const brands = ['LEGO', 'Hot Wheels', 'Barbie', 'Nerf', 'Magna-Tiles', 'Crayola', 'Marvel', 'Transformers', 'Kinderkraft', 'Skillmatics', 'Bburago', 'Funskool'];
 const ages = ['0-2 Years', '2-4 Years', '4-6 Years', '6-8 Years', '8 Years+'];
 

@@ -52,8 +52,19 @@ const STATUS_TEMPLATES = {
   },
 };
 
+// Email clients can't follow relative paths, so /uploads/foo.jpg must be made absolute.
+// Falls back to a tiny inline placeholder if there's no image at all.
+const PLACEHOLDER_IMG = 'https://via.placeholder.com/64x64.png?text=Toy';
+function absoluteImage(image, apiBase) {
+  if (!image) return PLACEHOLDER_IMG;
+  if (/^https?:\/\//i.test(image)) return image;
+  if (!apiBase) return PLACEHOLDER_IMG;
+  return apiBase.replace(/\/$/, '') + (image.startsWith('/') ? image : '/' + image);
+}
+
 function buildHtml(order, template, customerName, adminNote, clientUrl) {
   const orderUrl = `${clientUrl}/order/${order._id}`;
+  const apiBase = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
   const trackingBlock = (order.status === 'shipped' || order.status === 'out_for_delivery') && order.trackingNumber
     ? `
       <div style="background:#f3f4f6;border-radius:8px;padding:12px;margin:16px 0;">
@@ -69,13 +80,23 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
     </div>
   ` : '';
 
-  const itemsList = order.items.slice(0, 4).map((it) => `
+  const itemsList = order.items.slice(0, 4).map((it) => {
+    const img = absoluteImage(it.image, apiBase);
+    const lineTotal = (Number(it.price) || 0) * (Number(it.qty) || 0);
+    return `
     <tr>
-      <td style="padding:6px 0;font-size:13px;">${it.name}</td>
-      <td style="padding:6px 0;font-size:13px;text-align:right;">×${it.qty}</td>
+      <td style="padding:8px 0;width:64px;vertical-align:middle;">
+        <img src="${img}" width="56" height="56" alt="${it.name || 'Product'}" style="display:block;width:56px;height:56px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;object-fit:contain;" />
+      </td>
+      <td style="padding:8px 12px;vertical-align:middle;">
+        <p style="margin:0;font-size:13px;font-weight:600;color:#111827;line-height:1.4;">${it.name || 'Product'}</p>
+        <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">Qty ${it.qty} × ₹${(Number(it.price) || 0).toFixed(2)}</p>
+      </td>
+      <td style="padding:8px 0;font-size:13px;font-weight:600;color:#111827;text-align:right;vertical-align:middle;white-space:nowrap;">₹${lineTotal.toFixed(2)}</td>
     </tr>
-  `).join('');
-  const moreItems = order.items.length > 4 ? `<p style="text-align:center;color:#6b7280;font-size:12px;margin:4px 0 0 0;">+${order.items.length - 4} more item(s)</p>` : '';
+  `;
+  }).join('');
+  const moreItems = order.items.length > 4 ? `<p style="text-align:center;color:#6b7280;font-size:12px;margin:8px 0 0 0;">+${order.items.length - 4} more item(s) — see full order online</p>` : '';
 
   return `
 <!DOCTYPE html>

@@ -112,6 +112,69 @@ const products = [
     newArrival: true, rating: 4.6, numReviews: 73,
   },
   {
+    name: 'Space Explorer Pack of 2 Pneumatic Gun Toy',
+    description: 'Air-powered pneumatic gun toy pack with safe foam darts. BIS approved, indoor/outdoor play for kids 5+. Develops hand-eye coordination.',
+    brand: 'Other', category: 'Action Figures', ageGroup: '4-6 Years',
+    price: 17.49, discount: 20, stock: 35,
+    image: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800',
+    images: ['https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800'],
+    bestSeller: true, rating: 4.5, numReviews: 88,
+  },
+  {
+    name: 'Street Viper Big Blaster Motorized Dart Gun (Blue)',
+    description: 'Motorized dart gun with rotating drum, soft foam darts, 60-foot firing range, rechargeable battery. Color: Blue.',
+    brand: 'Nerf', category: 'Action Figures', ageGroup: '8 Years+',
+    price: 39.99, discount: 55, stock: 22,
+    image: 'https://images.unsplash.com/photo-1595079676714-7ba11deef9bf?w=800',
+    images: ['https://images.unsplash.com/photo-1595079676714-7ba11deef9bf?w=800'],
+    featured: true, bestSeller: true, rating: 4.7, numReviews: 142,
+  },
+  {
+    name: 'High Performance Six Fire Toy Blaster',
+    description: 'Six-shot rotating-barrel toy blaster with soft darts. Realistic styling, kid-safe build. Indoor/outdoor target play.',
+    brand: 'Nerf', category: 'Action Figures', ageGroup: '6-8 Years',
+    price: 12.99, discount: 8, stock: 60,
+    image: 'https://images.unsplash.com/photo-1604079628040-94301bb21b91?w=800',
+    images: ['https://images.unsplash.com/photo-1604079628040-94301bb21b91?w=800'],
+    rating: 4.3, numReviews: 51,
+  },
+  {
+    name: 'Premium Metal Die-Cast Sports Racer Car (Red)',
+    description: 'Heavy metal die-cast 1:32 sports car with realistic engine sound, LED lights, opening doors. Color: Red.',
+    brand: 'Hot Wheels', category: 'Action Figures', ageGroup: '4-6 Years',
+    price: 9.99, discount: 50, stock: 70,
+    image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800',
+    images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800'],
+    bestSeller: true, rating: 4.6, numReviews: 96,
+  },
+  {
+    name: 'Gear Robot Car for Kids (Blue)',
+    description: 'Transforming gear robot car with realistic mechanical detailing. Switches between car and robot mode. Color: Blue.',
+    brand: 'Transformers', category: 'Action Figures', ageGroup: '6-8 Years',
+    price: 19.99, discount: 0, stock: 28,
+    image: 'https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=800',
+    images: ['https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=800'],
+    newArrival: true, rating: 4.4, numReviews: 37,
+  },
+  {
+    name: 'Mini Football Tabletop Portable Soccer Flicker',
+    description: 'Compact desktop soccer flicker game for two players. Portable, perfect for travel and quick action breaks.',
+    brand: 'Funskool', category: 'Action Figures', ageGroup: '8 Years+',
+    price: 19.99, discount: 50, stock: 32,
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800',
+    images: ['https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800'],
+    rating: 4.5, numReviews: 64,
+  },
+  {
+    name: 'Cat Bubble Machine Toy with Glowing Lights',
+    description: 'Cat-shaped bubble blaster with LED glowing lights. Continuous bubble action — perfect for outdoor parties.',
+    brand: 'Other', category: 'Action Figures', ageGroup: '2-4 Years',
+    price: 8.49, discount: 0, stock: 80,
+    image: 'https://images.unsplash.com/photo-1560743173-567a3b5658b1?w=800',
+    images: ['https://images.unsplash.com/photo-1560743173-567a3b5658b1?w=800'],
+    newArrival: true, rating: 4.2, numReviews: 28,
+  },
+  {
     name: 'Skillmatics Guess in 10 Card Game',
     description: 'Trivia card game that develops critical thinking. Perfect for family game night.',
     brand: 'Skillmatics', category: 'Games', ageGroup: '6-8 Years',
@@ -176,12 +239,82 @@ const products = [
   },
 ];
 
+// Toyzone-style hierarchy. Mirrors frontend/src/config/departments.js.
+// Each item is a sub-category Product.category can match. Kept here so the
+// backend can upsert them as Category records without importing frontend code.
+const TOYZONE_SUBCATEGORIES = [
+  // Ride-On & Cycles
+  'Kick Scooters', 'Magic Car', 'Ride On', 'Tricycle', 'Wave Roller',
+  // Pretend & Play
+  'Doll House', 'Kitchen Sets', 'Tent House', 'Swords',
+  // Push & Pull Toy
+  'Friction Toys', 'Pull Along', 'Pull String',
+  // Action Games
+  'Toy Guns', 'Frog Games', 'Bump N Go',
+  // Baby Gear & Utility
+  'Infants', 'Bath Tub', 'Baby Walker', 'Potty Seats', 'Musical Toys', 'Kids Furniture',
+  // Sports & Outdoor
+  'Pop Catch', 'Cricket Set', 'Bowling Set', 'Basket Ball', 'Sports Toys',
+  // Toys & Games
+  'Bubble Toys', 'Walkie Talkie', 'Chairs', 'Educational Toys', 'Drum',
+  // Wooden Toys
+  'Board Games', 'Carroms', 'Tables',
+  // Rechargeable
+  'Rechargeable',
+  // Construction & Building
+  'Building Blocks', 'Cubes',
+];
+
 async function ensureDefaults() {
   // Always make sure "General" category and "Other" brand exist as fallbacks for quick-add
   const generalCat = await Category.findOne({ name: 'General' });
   if (!generalCat) await Category.create({ name: 'General', image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600' });
   const otherBrand = await Brand.findOne({ name: 'Other' });
   if (!otherBrand) await Brand.create({ name: 'Other', logo: '' });
+
+  // Upsert each toyzone-style sub-category so admin sees the full list in
+  // /admin/categories and the dropdowns. Only inserts what's missing.
+  // IMPORTANT: insertMany() skips pre('save') hooks, so we set slug explicitly
+  // — otherwise every new doc has slug=undefined and the unique index rejects
+  // the second insert with E11000 (which crashes backend startup).
+  const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  // Backfill any pre-existing categories that ended up with a missing/empty slug
+  // (eg. created via a prior buggy insertMany). Without this, a unique-index
+  // collision on the null/empty slug blocks every new insert below.
+  const broken = await Category.find({
+    $or: [{ slug: { $exists: false } }, { slug: null }, { slug: '' }],
+  }).select('name slug');
+  for (const doc of broken) {
+    if (!doc.name) continue;
+    let candidate = slugify(doc.name);
+    if (!candidate) continue;
+    // Ensure uniqueness against existing slugs
+    let n = 1;
+    let unique = candidate;
+    while (await Category.findOne({ slug: unique, _id: { $ne: doc._id } })) {
+      unique = `${candidate}-${n++}`;
+    }
+    await Category.updateOne({ _id: doc._id }, { $set: { slug: unique } });
+  }
+  if (broken.length) console.log(`🔧 Backfilled slugs on ${broken.length} category record(s)`);
+
+  const existing = new Set(
+    (await Category.find({ name: { $in: TOYZONE_SUBCATEGORIES } }).select('name')).map((c) => c.name)
+  );
+  const toAdd = TOYZONE_SUBCATEGORIES.filter((n) => !existing.has(n));
+  if (toAdd.length) {
+    try {
+      await Category.insertMany(
+        toAdd.map((name) => ({ name, slug: slugify(name) })),
+        { ordered: false } // keep going if a single doc collides on an existing slug
+      );
+      console.log(`🌱 Added ${toAdd.length} new sub-categories`);
+    } catch (err) {
+      // Don't bring the server down for a seed hiccup — log and move on.
+      console.warn('⚠️  Sub-category seed had conflicts, continuing:', err.message);
+    }
+  }
 
   // Seed default Hot Wholesale Categories tiles if none exist yet
   const wcCount = await WholesaleCategory.countDocuments();

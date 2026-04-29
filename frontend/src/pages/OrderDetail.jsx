@@ -1,27 +1,69 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Navigate, useParams, Link } from 'react-router-dom';
 import API from '../api/axios';
 import Loader from '../components/Loader';
 import OrderTimeline from '../components/OrderTimeline';
+import { useAuth } from '../context/AuthContext';
 import { FiMapPin, FiCreditCard, FiPhone } from 'react-icons/fi';
 
 export default function OrderDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const isAdmin = !!user?.isAdmin;
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // { status, message }
 
   useEffect(() => {
+    // Skip the customer-facing fetch if we're about to redirect this admin away.
+    if (isAdmin) { setLoading(false); return; }
     (async () => {
       try {
         const { data } = await API.get(`/orders/${id}`);
         setOrder(data);
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
+      } catch (e) {
+        setError({
+          status: e.response?.status,
+          message: e.response?.data?.message || 'Could not load order',
+        });
+      } finally { setLoading(false); }
     })();
-  }, [id]);
+  }, [id, isAdmin]);
+
+  // Admins shouldn't see the customer-facing order page — send them straight
+  // to the admin equivalent which has status updates, tracking, invoice, etc.
+  if (isAdmin) {
+    return <Navigate to={`/admin/orders/${id}`} replace />;
+  }
 
   if (loading) return <Loader />;
-  if (!order) return <p className="text-center py-20">Order not found</p>;
+  if (error || !order) {
+    const status = error?.status;
+    const isForbidden = status === 403;
+    const isNotFound = status === 404 || !error;
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center">
+        <div className="bg-white border rounded-xl p-8 shadow-sm">
+          <div className="text-5xl mb-3">{isForbidden ? '🔒' : '🔍'}</div>
+          <h1 className="text-xl font-bold mb-2">
+            {isForbidden ? 'This order isn\'t yours' : isNotFound ? 'Order not found' : 'Something went wrong'}
+          </h1>
+          <p className="text-gray-600 text-sm mb-5">
+            {isForbidden
+              ? 'You can only view orders placed from your own account. Sign in with the account that placed this order to see its details.'
+              : isNotFound
+                ? 'We couldn\'t find this order. It may have been removed, or the link you followed is invalid.'
+                : (error?.message || 'Please try again in a moment.')}
+          </p>
+          <div className="flex justify-center gap-2">
+            <Link to="/orders" className="btn-primary">View My Orders</Link>
+            <Link to="/" className="border px-5 py-2.5 rounded hover:bg-gray-50">Home</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">

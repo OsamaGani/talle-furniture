@@ -4,36 +4,7 @@ import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChev
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-
-const categoryGroups = [
-  {
-    title: 'By Type',
-    items: [
-      { name: 'Construction', img: 'https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=200' },
-      { name: 'Vehicles', img: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=200' },
-      { name: 'Action Figures', img: 'https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?w=200' },
-      { name: 'Dolls', img: 'https://images.unsplash.com/photo-1606503153255-59d8b8b6a9ec?w=200' },
-    ],
-  },
-  {
-    title: 'For Learning',
-    items: [
-      { name: 'Learning & Education', img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200' },
-      { name: 'Wooden Toys', img: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=200' },
-      { name: 'Books', img: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200' },
-      { name: 'Pretend Play', img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=200' },
-    ],
-  },
-  {
-    title: 'Active & Outdoor',
-    items: [
-      { name: 'Outdoor Toys', img: 'https://images.unsplash.com/photo-1560859251-d563a49c5e4a?w=200' },
-      { name: 'Ride Ons', img: 'https://images.unsplash.com/photo-1597007051304-15387f9e0a18?w=200' },
-      { name: 'Active Play', img: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=200' },
-      { name: 'Games', img: 'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=200' },
-    ],
-  },
-];
+import { departments } from '../config/departments';
 
 // Scrolling announcements shown in the top marquee strip.
 const announcements = [
@@ -304,6 +275,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center gap-1 text-sm font-semibold">
             <NavItem to="/shop" label="All Toys" />
+            <NavItem to="/action-toys" label="🎯 Action Toys" />
             <NavItem to="/shop?discount=true" label="🔥 Up to 70% Off" highlight />
             <DropdownTrigger label="Brands" active={openDropdown === 'brands'} onHover={() => setOpenDropdown('brands')} />
             <DropdownTrigger label="Category" active={openDropdown === 'category'} onHover={() => setOpenDropdown('category')} />
@@ -346,26 +318,44 @@ export default function Navbar() {
 
         {openDropdown === 'category' && (
           <div className="absolute left-0 right-0 top-full bg-white shadow-xl border-t z-40 animate-fadeIn">
-            <div className="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-3 gap-6">
-              {categoryGroups.map((g) => (
-                <div key={g.title}>
-                  <h3 className="font-bold mb-3 text-primary-500 uppercase text-xs">{g.title}</h3>
-                  <ul className="space-y-3">
-                    {g.items.map((it) => (
-                      <li key={it.name}>
-                        <Link
-                          to={`/shop?category=${encodeURIComponent(it.name)}`}
-                          onClick={() => setOpenDropdown(null)}
-                          className="flex items-center gap-3 group"
-                        >
-                          <img src={it.img} alt="" className="w-10 h-10 rounded-md object-cover group-hover:scale-110 transition" />
-                          <span className="text-sm group-hover:text-primary-500">{it.name}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="max-w-7xl mx-auto px-4 py-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-gray-900 text-lg">Shop By Department</h3>
+                <Link
+                  to="/shop"
+                  onClick={() => setOpenDropdown(null)}
+                  className="text-primary-500 hover:underline text-sm font-medium"
+                >
+                  View all toys →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-5">
+                {departments.map((d) => (
+                  <div key={d.slug}>
+                    <Link
+                      to={`/dept/${d.slug}`}
+                      onClick={() => setOpenDropdown(null)}
+                      className="flex items-center gap-2 font-bold text-gray-900 hover:text-primary-500 transition mb-2"
+                    >
+                      <span className="text-base">{d.emoji}</span>
+                      <span className="text-sm leading-tight">{d.name}</span>
+                    </Link>
+                    <ul className="space-y-1.5 pl-1">
+                      {d.items.map((it) => (
+                        <li key={it.slug}>
+                          <Link
+                            to={`/category/${it.slug}`}
+                            onClick={() => setOpenDropdown(null)}
+                            className="text-xs text-gray-600 hover:text-primary-500 hover:underline transition"
+                          >
+                            {it.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -433,6 +423,7 @@ export default function Navbar() {
           <div className="flex-1 overflow-y-auto overscroll-contain">
             <ul className="px-4 py-3 space-y-1">
               <li><Link to="/shop" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded font-semibold hover:bg-gray-50 transition">All Toys</Link></li>
+              <li><Link to="/action-toys" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded font-semibold hover:bg-gray-50 transition">🎯 Action Toys</Link></li>
               <li><Link to="/shop?discount=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded text-primary-500 font-semibold hover:bg-primary-50 transition">🔥 Up to 70% Off</Link></li>
               <li><Link to="/shop?bestSeller=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded hover:bg-gray-50 transition">⭐ Best Sellers</Link></li>
               <li><Link to="/shop?newArrival=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded hover:bg-gray-50 transition">✨ New Arrivals</Link></li>
@@ -450,20 +441,33 @@ export default function Navbar() {
                   <FiChevronDown size={18} className={`transition-transform duration-300 ease-out ${openMobileSection === 'categories' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
                 </button>
                 <div className={`grid transition-all duration-300 ease-out ${openMobileSection === 'categories' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                  <ul className="overflow-hidden pl-2 space-y-0.5">
-                    {categoryGroups.flatMap((g) => g.items).map((c) => (
-                      <li key={c.name}>
+                  <div className="overflow-hidden pl-2 space-y-3 pt-1">
+                    {departments.map((d) => (
+                      <div key={d.slug}>
                         <Link
-                          to={`/shop?category=${encodeURIComponent(c.name)}`}
+                          to={`/dept/${d.slug}`}
                           onClick={closeMobileMenu}
-                          className="flex items-center gap-2 py-2 px-2 rounded text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition"
+                          className="flex items-center gap-2 py-1.5 px-2 rounded font-semibold text-sm text-gray-900 hover:bg-primary-50 hover:text-primary-600 transition"
                         >
-                          <img src={c.img} alt="" className="w-7 h-7 rounded object-cover" />
-                          <span>{c.name}</span>
+                          <span>{d.emoji}</span>
+                          <span>{d.name}</span>
                         </Link>
-                      </li>
+                        <ul className="pl-7 mt-0.5">
+                          {d.items.map((it) => (
+                            <li key={it.slug}>
+                              <Link
+                                to={`/category/${it.slug}`}
+                                onClick={closeMobileMenu}
+                                className="block py-1 text-xs text-gray-600 hover:text-primary-500 transition"
+                              >
+                                {it.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               </li>
 

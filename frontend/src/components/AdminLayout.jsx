@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { FiHome, FiBox, FiShoppingBag, FiUsers, FiTag, FiAward, FiPackage, FiMenu, FiX, FiBriefcase } from 'react-icons/fi';
+import { FiHome, FiBox, FiShoppingBag, FiUsers, FiTag, FiAward, FiPackage, FiMenu, FiX, FiBriefcase, FiTarget } from 'react-icons/fi';
 
 const links = [
   { to: '/admin', label: 'Dashboard', icon: <FiHome />, end: true },
   { to: '/admin/products', label: 'Products', icon: <FiBox /> },
+  { to: '/admin/action-toys', label: 'Action Toys', icon: <FiTarget /> },
   { to: '/admin/products/bulk', label: 'Bulk Add', icon: <FiPackage />, accent: true },
   { to: '/admin/orders', label: 'Orders', icon: <FiShoppingBag /> },
   { to: '/admin/users', label: 'Users', icon: <FiUsers /> },

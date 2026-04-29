@@ -8,9 +8,20 @@ const { seedIfEmpty } = require('./utils/seedData');
 const app = express();
 
 (async () => {
-  await connectDB();
-  await seedIfEmpty();
+  try {
+    await connectDB();
+    await seedIfEmpty();
+  } catch (err) {
+    // A seeding hiccup must never silently kill the API. Log loudly and keep listening.
+    console.error('⚠️  Startup seed/connect error:', err.message);
+  }
 })();
+
+// Last-resort safety net so an unhandled rejection (eg. mongo unique-index race)
+// can't terminate Node and take the API down with it.
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️  unhandledRejection:', err?.message || err);
+});
 
 app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));

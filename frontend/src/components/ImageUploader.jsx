@@ -23,29 +23,53 @@ export default function ImageUploader({ value, onChange, multiple = false, onMai
 
   const images = multiple ? (Array.isArray(value) ? value : []) : (value ? [value] : []);
 
+  const MAX_BYTES = 5 * 1024 * 1024; // mirrors the backend multer limit
+
   const uploadFiles = async (files) => {
-    const valid = Array.from(files).filter((f) => f.type.startsWith('image/'));
-    if (valid.length === 0) return toast.error('Please select image files only');
+    const arr = Array.from(files);
+    const nonImage = arr.filter((f) => !f.type.startsWith('image/'));
+    if (nonImage.length) {
+      return toast.error(`Not an image: ${nonImage[0].name}. Only JPG, PNG, WEBP allowed.`);
+    }
+    const tooBig = arr.find((f) => f.size > MAX_BYTES);
+    if (tooBig) {
+      const mb = (tooBig.size / 1024 / 1024).toFixed(1);
+      return toast.error(`"${tooBig.name}" is ${mb} MB — max 5 MB per image. Compress and try again.`);
+    }
+    const valid = arr;
 
     setUploading(true);
     try {
       if (valid.length === 1) {
         const fd = new FormData();
         fd.append('image', valid[0]);
-        const { data } = await API.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        // Don't set Content-Type manually — letting axios/browser add the multipart boundary.
+        const { data } = await API.post('/upload', fd);
         if (multiple) onChange([...images, data.url]);
         else onChange(data.url);
         toast.success('Uploaded!');
       } else {
         const fd = new FormData();
         valid.forEach((f) => fd.append('images', f));
-        const { data } = await API.post('/upload/multiple', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        const { data } = await API.post('/upload/multiple', fd);
         if (multiple) onChange([...images, ...data.urls]);
         else onChange(data.urls[0]);
         toast.success(`${data.urls.length} images uploaded`);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload failed');
+      // Log full server response so persistent issues are diagnosable in DevTools.
+      console.error('Upload failed:', err.response?.status, err.response?.data || err.message);
+      const status = err.response?.status;
+      const serverMsg = err.response?.data?.message;
+      let msg = serverMsg;
+      if (!msg) {
+        if (status === 401) msg = 'Session expired — please log in again';
+        else if (status === 403) msg = 'Admin access required to upload';
+        else if (status === 413) msg = 'File too large (max 5 MB)';
+        else if (!err.response) msg = 'Cannot reach server — is the backend running?';
+        else msg = `Upload failed (HTTP ${status})`;
+      }
+      toast.error(msg);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';

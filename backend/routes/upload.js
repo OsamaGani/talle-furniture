@@ -27,14 +27,45 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-router.post('/', protect, admin, upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-  res.json({ url: `/uploads/${req.file.filename}` });
-});
+// Translates multer's terse codes ("LIMIT_FILE_SIZE") into messages users can act on.
+function multerError(err, _req, res, next) {
+  if (!err) return next();
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ message: 'Image is too large. Max size is 5 MB per file.' });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({ message: 'Unexpected file field. Please retry.' });
+    }
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ message: 'Too many files at once (max 6).' });
+    }
+    return res.status(400).json({ message: err.message || 'Upload failed' });
+  }
+  // Custom fileFilter rejection bubbles up here ("Only image files allowed")
+  return res.status(400).json({ message: err.message || 'Upload failed' });
+}
 
-router.post('/multiple', protect, admin, upload.array('images', 6), (req, res) => {
-  if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files' });
-  res.json({ urls: req.files.map((f) => `/uploads/${f.filename}`) });
-});
+router.post(
+  '/',
+  protect,
+  admin,
+  (req, res, next) => upload.single('image')(req, res, (err) => multerError(err, req, res, next)),
+  (req, res) => {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    res.json({ url: `/uploads/${req.file.filename}` });
+  }
+);
+
+router.post(
+  '/multiple',
+  protect,
+  admin,
+  (req, res, next) => upload.array('images', 6)(req, res, (err) => multerError(err, req, res, next)),
+  (req, res) => {
+    if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files' });
+    res.json({ urls: req.files.map((f) => `/uploads/${f.filename}`) });
+  }
+);
 
 module.exports = router;

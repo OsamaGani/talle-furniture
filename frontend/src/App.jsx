@@ -9,6 +9,9 @@ import AdminRoute from './components/AdminRoute';
 
 import Home from './pages/Home';
 import Shop from './pages/Shop';
+import ActionToys from './pages/ActionToys';
+import Department from './pages/Department';
+import Category from './pages/Category';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -32,6 +35,7 @@ import NotFound from './pages/NotFound';
 
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
+import AdminActionToys from './pages/admin/ActionToys';
 import AdminProductForm from './pages/admin/ProductForm';
 import AdminBulkAdd from './pages/admin/BulkAdd';
 import AdminOrders from './pages/admin/Orders';
@@ -55,6 +59,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/action-toys" element={<ActionToys />} />
+          <Route path="/dept/:slug" element={<Department />} />
+          <Route path="/category/:slug" element={<Category />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
@@ -81,6 +88,7 @@ export default function App() {
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/action-toys" element={<AdminActionToys />} />
             <Route path="/admin/products/bulk" element={<AdminBulkAdd />} />
             <Route path="/admin/products/new" element={<AdminProductForm />} />
             <Route path="/admin/products/:id/edit" element={<AdminProductForm />} />
