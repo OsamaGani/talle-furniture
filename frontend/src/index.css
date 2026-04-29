@@ -129,6 +129,20 @@ body {
 }
 .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
 
+/* Subtle full-page entrance — fires on every route change in App.jsx so
+   navigating from one page to another no longer feels jarring. */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-pageEnter {
+  animation: pageEnter 0.35s cubic-bezier(0.21, 1, 0.36, 1) both;
+}
+/* Respect users who prefer reduced motion — skip the animation entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pageEnter { animation: none; }
+}
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(40px); }
   to { opacity: 1; transform: translateY(0); }

@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import VerifyEmailBanner from './components/VerifyEmailBanner';
 import ScrollToTop from './components/ScrollToTop';
+import RouteLoader from './components/RouteLoader';
 import FloatingActions from './components/FloatingActions';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -53,9 +54,13 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-white overflow-x-clip">
       <ScrollToTop />
+      {!isInvoice && <RouteLoader duration={700} />}
       {!isInvoice && <Navbar />}
       {!isInvoice && <VerifyEmailBanner />}
-      <main className="flex-1">
+      {/* `key={pathname}` re-mounts the wrapper on each route change so the
+           CSS keyframe restarts and every page gets a soft fade-in instead
+           of popping in instantly. */}
+      <main key={pathname} className="flex-1 animate-pageEnter">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
