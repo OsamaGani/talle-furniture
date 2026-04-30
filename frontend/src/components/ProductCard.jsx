@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiStar, FiHeart, FiTruck } from 'react-icons/fi';
+import { FiShoppingCart, FiStar, FiHeart, FiTruck, FiEye } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { resolveImage } from '../utils/imageUrl';
@@ -131,15 +131,33 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* CTA — single full-width Add button */}
+        {/* Mobile: single full-width Add button (small screens, taps are easier) */}
         <button
           disabled={product.stock === 0}
           onClick={() => addToCart(product)}
-          className="mt-2 sm:mt-3 w-full bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-bold py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 transition active:scale-95"
+          className="sm:hidden mt-2 w-full bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-bold py-1.5 rounded flex items-center justify-center gap-1.5 transition active:scale-95"
         >
-          <FiShoppingCart size={13} />
+          <FiShoppingCart size={12} />
           {product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
         </button>
+
+        {/* Desktop: View + Add side by side */}
+        <div className="hidden sm:flex gap-2 mt-3">
+          <Link
+            to={`/product/${product._id}`}
+            className="flex-1 border border-gray-300 hover:border-primary-500 hover:text-primary-500 text-xs font-semibold py-2 rounded text-center inline-flex items-center justify-center gap-1 transition"
+          >
+            <FiEye size={12} /> View
+          </Link>
+          <button
+            disabled={product.stock === 0}
+            onClick={() => addToCart(product)}
+            className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded flex items-center justify-center gap-1 transition active:scale-95"
+          >
+            <FiShoppingCart size={12} />
+            {product.stock === 0 ? 'Sold Out' : 'Add'}
+          </button>
+        </div>
       </div>
     </div>
   );
