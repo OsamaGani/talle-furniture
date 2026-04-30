@@ -12,7 +12,7 @@ export default function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [paymentMethod, setPaymentMethod] = useState('Razorpay');
   const [addr, setAddr] = useState({
     fullName: user?.name || '',
     phone: user?.phone || '',
@@ -129,26 +129,37 @@ export default function Checkout() {
           <section className="bg-white border rounded-lg p-5">
             <h2 className="font-bold text-lg mb-4">Payment Method</h2>
             <div className="space-y-2">
-              <label className="flex items-center gap-3 border rounded p-3 cursor-pointer hover:border-primary-500">
-                <input type="radio" name="pm" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} className="accent-primary-500" />
-                <div>
-                  <p className="font-semibold">Cash on Delivery</p>
-                  <p className="text-xs text-gray-500">Pay when you receive the order</p>
-                </div>
-              </label>
-              <label className="flex items-center gap-3 border rounded p-3 cursor-pointer hover:border-primary-500">
-                <input type="radio" name="pm" checked={paymentMethod === 'Stripe'} onChange={() => setPaymentMethod('Stripe')} className="accent-primary-500" />
-                <div>
-                  <p className="font-semibold">Credit/Debit Card (Stripe)</p>
-                  <p className="text-xs text-gray-500">Secure online payment</p>
-                </div>
-              </label>
-              <label className="flex items-center gap-3 border rounded p-3 cursor-pointer hover:border-primary-500">
+              {/* Razorpay first — primary for Indian customers (UPI, GPay, etc.) */}
+              <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${paymentMethod === 'Razorpay' ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'}`}>
                 <input type="radio" name="pm" checked={paymentMethod === 'Razorpay'} onChange={() => setPaymentMethod('Razorpay')} className="accent-primary-500" />
-                <div>
-                  <p className="font-semibold">Razorpay</p>
-                  <p className="text-xs text-gray-500">UPI, Netbanking, Cards & Wallets</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold flex items-center gap-2">
+                    Razorpay
+                    <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Recommended</span>
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">UPI · GPay · PhonePe · Paytm · Cards · Netbanking</p>
                 </div>
+                <span className="text-2xl flex-shrink-0">📱</span>
+              </label>
+
+              {/* Stripe — international cards */}
+              <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${paymentMethod === 'Stripe' ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'}`}>
+                <input type="radio" name="pm" checked={paymentMethod === 'Stripe'} onChange={() => setPaymentMethod('Stripe')} className="accent-primary-500" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">Credit/Debit Card (Stripe)</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Visa · Mastercard · Amex · International cards</p>
+                </div>
+                <span className="text-2xl flex-shrink-0">💳</span>
+              </label>
+
+              {/* COD last */}
+              <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${paymentMethod === 'COD' ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'}`}>
+                <input type="radio" name="pm" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} className="accent-primary-500" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">Cash on Delivery</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Pay in cash when the order is delivered</p>
+                </div>
+                <span className="text-2xl flex-shrink-0">💵</span>
               </label>
             </div>
           </section>

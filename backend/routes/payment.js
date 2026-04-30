@@ -139,15 +139,24 @@ router.post(
       return res.status(400).json({ message: `Payment status is ${session.payment_status}` });
     }
 
+    // Fetch the underlying PaymentIntent + latest Charge so we can show the
+    // customer what method/card actually paid (the bare session lacks this).
+    let pi = null;
+    let charge = null;
+    try {
+      if (session.payment_intent) {
+        pi = await stripe.paymentIntents.retrieve(session.payment_intent, { expand: ['latest_charge'] });
+        charge = pi.latest_charge;
+      }
+    } catch (err) {
+      console.warn('Could not fetch Stripe payment intent:', err.message);
+    }
+
+    const stripePR = mapStripeChargeToPaymentResult({ session, pi, charge });
     order.isPaid = true;
-    order.paidAt = new Date();
+    order.paidAt = stripePR.capturedAt || new Date();
     order.paymentMethod = 'Stripe';
-    order.paymentResult = {
-      id: session.payment_intent || session.id,
-      status: 'COMPLETED',
-      updateTime: new Date().toISOString(),
-      email: session.customer_email || session.customer_details?.email || '',
-    };
+    order.paymentResult = stripePR;
     // If still 'pending', auto-advance to 'confirmed' since payment succeeded
     if (order.status === 'pending') {
       order.status = 'confirmed';
@@ -158,6 +167,31 @@ router.post(
     res.json(order);
   })
 );
+
+// Shared mapper: turns a Stripe checkout session + payment intent + charge
+// into the unified paymentResult shape we store on the order.
+function mapStripeChargeToPaymentResult({ session, pi, charge }) {
+  const pmd = charge?.payment_method_details || {};
+  const card = pmd.card || pi?.payment_method_options?.card || {};
+  const method = pmd.type || pi?.payment_method_types?.[0] || 'card'; // card / klarna / etc.
+  return {
+    id: session.payment_intent || session.id,
+    status: 'COMPLETED',
+    updateTime: new Date().toISOString(),
+    email: session.customer_email || session.customer_details?.email || charge?.billing_details?.email || '',
+    provider: 'Stripe',
+    method,
+    cardLast4: card.last4,
+    cardBrand: card.brand,
+    cardNetwork: card.network,
+    cardType: card.funding, // credit / debit / prepaid
+    bank: pmd.us_bank_account?.bank_name || pmd.au_becs_debit?.bank_code || '',
+    amount: charge?.amount,
+    fee: charge?.balance_transaction?.fee,
+    orderId: session.id,
+    capturedAt: charge?.created ? new Date(charge.created * 1000) : new Date(),
+  };
+}
 
 // ------------------------------------------------------------------
 // POST /api/payment/webhook  (raw body required — see server.js mount)
@@ -191,15 +225,23 @@ router.post(
       if (orderId) {
         const order = await Order.findById(orderId);
         if (order && !order.isPaid) {
+          // Pull payment intent + charge to capture rich card / method details
+          let pi = null;
+          let charge = null;
+          try {
+            if (session.payment_intent) {
+              pi = await stripe.paymentIntents.retrieve(session.payment_intent, { expand: ['latest_charge'] });
+              charge = pi.latest_charge;
+            }
+          } catch (err) {
+            console.warn('Webhook: could not fetch Stripe payment intent:', err.message);
+          }
+
+          const stripePR = mapStripeChargeToPaymentResult({ session, pi, charge });
           order.isPaid = true;
-          order.paidAt = new Date();
+          order.paidAt = stripePR.capturedAt || new Date();
           order.paymentMethod = 'Stripe';
-          order.paymentResult = {
-            id: session.payment_intent || session.id,
-            status: 'COMPLETED',
-            updateTime: new Date().toISOString(),
-            email: session.customer_email || session.customer_details?.email || '',
-          };
+          order.paymentResult = stripePR;
           if (order.status === 'pending') {
             order.status = 'confirmed';
             order.statusHistory.push({ status: 'confirmed', note: 'Stripe webhook payment received', at: new Date() });
