@@ -3,15 +3,28 @@ import { Link } from 'react-router-dom';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
-import { FiHeart, FiTrash2 } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { FiHeart, FiTrash2, FiShoppingCart } from 'react-icons/fi';
 
 export default function Wishlist() {
   const { user } = useAuth();
   const { ids, count, clear } = useWishlist();
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const moveAllToCart = () => {
+    const inStock = products.filter((p) => p.stock > 0);
+    if (inStock.length === 0) {
+      toast.error('None of the wishlist items are in stock right now.');
+      return;
+    }
+    inStock.forEach((p) => addToCart(p, 1));
+    toast.success(`${inStock.length} item${inStock.length === 1 ? '' : 's'} added to cart`);
+  };
 
   useEffect(() => {
     (async () => {
@@ -45,12 +58,21 @@ export default function Wishlist() {
           </p>
         </div>
         {count > 0 && (
-          <button
-            onClick={() => { if (confirm('Remove all items from wishlist?')) clear(); }}
-            className="text-sm text-red-500 hover:text-red-700 inline-flex items-center gap-1"
-          >
-            <FiTrash2 size={14} /> Clear all
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={moveAllToCart}
+              className="bg-primary-500 hover:bg-primary-600 text-white text-xs sm:text-sm font-bold px-3 py-2 rounded inline-flex items-center gap-1.5 transition shadow-sm"
+            >
+              <FiShoppingCart size={14} />
+              <span className="hidden sm:inline">Move all to</span> Cart
+            </button>
+            <button
+              onClick={() => { if (confirm('Remove all items from wishlist?')) clear(); }}
+              className="text-sm text-red-500 hover:text-red-700 inline-flex items-center gap-1"
+            >
+              <FiTrash2 size={14} /> <span className="hidden sm:inline">Clear all</span>
+            </button>
+          </div>
         )}
       </div>
 

@@ -83,19 +83,64 @@ export default function Cart() {
           })}
         </div>
 
-        <aside className="bg-white border rounded-lg p-5 h-fit lg:sticky lg:top-32">
-          <h2 className="font-bold text-lg mb-4">Order Summary</h2>
-          <Row label={`Subtotal (${items.length} items)`} value={`₹${subtotal.toFixed(2)}`} />
-          <Row label="Shipping" value={shipping === 0 ? <span className="text-green-600 font-semibold">FREE</span> : `₹${shipping.toFixed(2)}`} />
-          <Row label="Tax (5%)" value={`₹${tax.toFixed(2)}`} />
-          <hr className="my-3" />
-          <Row label="Total" value={`₹${total.toFixed(2)}`} bold />
-          <button onClick={() => navigate('/checkout')} className="btn-primary w-full mt-4">
-            Proceed to Checkout
-          </button>
-          <Link to="/shop" className="block text-center text-sm text-primary-500 hover:underline mt-3">
-            Continue Shopping
-          </Link>
+        <aside className="lg:sticky lg:top-32 h-fit space-y-4">
+          <div className="bg-white border rounded-lg overflow-hidden">
+            <div className="px-5 py-3 border-b bg-gray-50">
+              <h2 className="font-bold text-lg">Order Summary</h2>
+            </div>
+            <div className="px-5 py-4 space-y-2">
+              <Row label={`Item Total (${items.length} ${items.length === 1 ? 'item' : 'items'})`} value={`₹${subtotal.toFixed(2)}`} />
+              <Row label="Delivery" value={shipping === 0 ? <span className="text-emerald-600 font-bold">FREE</span> : `₹${shipping.toFixed(2)}`} />
+              <Row label="GST (18%)" value={`₹${tax.toFixed(2)}`} />
+              <hr className="my-2" />
+              <Row label="Total Amount" value={`₹${total.toFixed(2)}`} bold />
+              {subtotal > 0 && (
+                <p className="text-xs text-emerald-700 font-semibold pt-1">
+                  You will save ₹{items.reduce((s, it) => {
+                    if (!it.originalPrice || it.originalPrice <= it.price) return s;
+                    return s + (it.originalPrice - it.price) * it.qty;
+                  }, 0).toFixed(0) || '0'} on this order
+                </p>
+              )}
+            </div>
+            <div className="px-5 py-3 border-t bg-gray-50">
+              <button
+                onClick={() => navigate('/checkout')}
+                className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white font-bold py-3 rounded-lg shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2"
+              >
+                Proceed to Checkout →
+              </button>
+              <Link to="/shop" className="block text-center text-xs text-gray-500 hover:text-primary-500 mt-2">
+                or continue shopping
+              </Link>
+            </div>
+          </div>
+
+          {/* Trust badges */}
+          <div className="bg-white border rounded-lg p-3 grid grid-cols-3 gap-2 text-center text-xs">
+            <div>
+              <FiTruck className="mx-auto text-primary-500 mb-1" size={18} />
+              <p className="font-semibold">Fast</p>
+              <p className="text-[10px] text-gray-500">Pan-India</p>
+            </div>
+            <div>
+              <span className="text-lg">🛡</span>
+              <p className="font-semibold">Secure</p>
+              <p className="text-[10px] text-gray-500">SSL encrypted</p>
+            </div>
+            <div>
+              <span className="text-lg">🔄</span>
+              <p className="font-semibold">7-day</p>
+              <p className="text-[10px] text-gray-500">Easy returns</p>
+            </div>
+          </div>
+
+          {/* Help line */}
+          <div className="bg-white border rounded-lg p-3 text-xs text-gray-600">
+            <p className="font-semibold text-gray-900 mb-1">Need help?</p>
+            <a href="tel:+918655787075" className="block hover:text-primary-500">📞 +91 86557 87075</a>
+            <a href="mailto:Huraira735@gmail.com" className="block hover:text-primary-500">✉ Huraira735@gmail.com</a>
+          </div>
         </aside>
       </div>
     </div>

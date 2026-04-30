@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/axios';
 import Loader from '../components/Loader';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiPackage, FiClock, FiCheckCircle, FiXCircle, FiTruck } from 'react-icons/fi';
 import { resolveImage } from '../utils/imageUrl';
 
 const statusColor = {
@@ -28,6 +28,7 @@ const statusLabel = {
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all'); // all / active / delivered / cancelled
 
   useEffect(() => {
     (async () => {
@@ -39,19 +40,75 @@ export default function MyOrders() {
     })();
   }, []);
 
+  const counts = useMemo(() => ({
+    all: orders.length,
+    active: orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
+    cancelled: orders.filter(o => o.status === 'cancelled').length,
+  }), [orders]);
+
+  const filtered = useMemo(() => {
+    if (filter === 'active') return orders.filter(o => !['delivered', 'cancelled'].includes(o.status));
+    if (filter === 'delivered') return orders.filter(o => o.status === 'delivered');
+    if (filter === 'cancelled') return orders.filter(o => o.status === 'cancelled');
+    return orders;
+  }, [orders, filter]);
+
   if (loading) return <Loader />;
+
+  const FILTERS = [
+    { id: 'all',       label: 'All Orders',  icon: <FiPackage />,    count: counts.all },
+    { id: 'active',    label: 'Active',      icon: <FiTruck />,      count: counts.active },
+    { id: 'delivered', label: 'Delivered',   icon: <FiCheckCircle />,count: counts.delivered },
+    { id: 'cancelled', label: 'Cancelled',   icon: <FiXCircle />,    count: counts.cancelled },
+  ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">My Orders</h1>
+      <h1 className="text-2xl md:text-3xl font-bold mb-2">My Orders</h1>
+      <p className="text-sm text-gray-500 mb-6">Track, manage, and review your past purchases</p>
+
       {orders.length === 0 ? (
         <div className="text-center py-16 bg-white border rounded-lg">
-          <p className="text-gray-600">You haven't placed any orders yet.</p>
-          <Link to="/shop" className="btn-primary inline-block mt-4">Start Shopping</Link>
+          <FiPackage size={56} className="mx-auto text-gray-300 mb-3" />
+          <h2 className="text-lg font-bold mb-1">No orders yet</h2>
+          <p className="text-gray-600 text-sm mb-4">Looks like you haven't placed any orders. Browse our toy collection and find something special.</p>
+          <Link to="/shop" className="btn-primary inline-block">Start Shopping →</Link>
         </div>
       ) : (
+        <>
+          {/* Filter tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1">
+            {FILTERS.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`whitespace-nowrap inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border-2 transition ${
+                  filter === f.id
+                    ? 'bg-primary-500 text-white border-primary-500 shadow'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-primary-400 hover:text-primary-500'
+                }`}
+              >
+                {f.icon}
+                {f.label}
+                {f.count > 0 && (
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                    filter === f.id ? 'bg-white/30' : 'bg-gray-100'
+                  }`}>
+                    {f.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center py-12 bg-gray-50 border-2 border-dashed rounded-lg">
+              <p className="text-gray-500">No orders in this category</p>
+            </div>
+          )}
         <div className="space-y-3">
-          {orders.map((o) => (
+          {filtered.map((o) => (
             <Link to={`/order/${o._id}`} key={o._id} className="block bg-white border rounded-lg p-4 hover:shadow-md hover:border-primary-300 transition group">
               <div className="flex justify-between items-start mb-3">
                 <div>
@@ -82,6 +139,7 @@ export default function MyOrders() {
             </Link>
           ))}
         </div>
+        </>
       )}
     </div>
   );
