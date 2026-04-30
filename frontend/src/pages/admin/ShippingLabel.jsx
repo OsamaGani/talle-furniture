@@ -48,7 +48,12 @@ export default function ShippingLabel() {
             <span className="bg-yellow-400 text-black px-3 py-1 text-sm font-extrabold rounded">COD ₹{order.totalPrice.toFixed(2)}</span>
           )}
           {!isCOD && (
-            <span className="bg-green-500 text-white px-3 py-1 text-sm font-extrabold rounded">PREPAID</span>
+            <span className="bg-green-500 text-white px-3 py-1 text-sm font-extrabold rounded inline-flex items-center gap-1">
+              PREPAID
+              {order.paymentResult?.method && (
+                <span className="text-[10px] font-semibold opacity-90 uppercase">· {order.paymentResult.method}</span>
+              )}
+            </span>
           )}
         </div>
 
@@ -129,6 +134,12 @@ export default function ShippingLabel() {
                 <td colSpan={2} className="pt-1.5 text-xs font-extrabold uppercase">Total</td>
                 <td className="pt-1.5 text-right text-sm font-extrabold">₹{order.totalPrice.toFixed(2)}</td>
               </tr>
+              {order.isPaid && order.paymentResult?.id && !isCOD && (
+                <tr>
+                  <td colSpan={2} className="text-[9px] text-gray-600 pt-1">Txn ID</td>
+                  <td className="text-right text-[9px] font-mono text-gray-700 truncate max-w-[140px]">{order.paymentResult.id}</td>
+                </tr>
+              )}
             </tfoot>
           </table>
         </div>

@@ -6,6 +6,7 @@ import OrderTimeline from '../../components/OrderTimeline';
 import toast from 'react-hot-toast';
 import { FiPrinter, FiTag, FiArrowLeft, FiUser, FiMapPin, FiPhone, FiMail, FiCreditCard, FiTruck, FiBriefcase } from 'react-icons/fi';
 import { resolveImage } from '../../utils/imageUrl';
+import PaymentDetails from '../../components/PaymentDetails';
 
 const STATUSES = ['pending', 'confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
 
@@ -191,12 +192,7 @@ export default function AdminOrderDetail() {
         </div>
 
         <aside className="space-y-4">
-          <div className="bg-white border rounded-lg p-5">
-            <h2 className="font-bold mb-3 flex items-center gap-2"><FiCreditCard /> Payment</h2>
-            <Row label="Method" value={order.paymentMethod} />
-            <Row label="Status" value={order.isPaid ? <span className="text-green-600 font-semibold">Paid ✓</span> : <span className="text-orange-600 font-semibold">Pending</span>} />
-            {order.paidAt && <Row label="Paid At" value={new Date(order.paidAt).toLocaleString()} />}
-          </div>
+          <PaymentDetails order={order} compact />
 
           <div className="bg-white border rounded-lg p-5">
             <h2 className="font-bold mb-3">Bill Summary</h2>

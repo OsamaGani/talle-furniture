@@ -319,14 +319,40 @@ router.post(
       return res.status(400).json({ message: 'Invalid payment signature — payment cannot be confirmed' });
     }
 
+    // Fetch the full payment object from Razorpay so we can store rich
+    // metadata (UPI handle, card last 4, RRN, etc.) for the receipt.
+    let p = {};
+    try {
+      const razorpay = getRazorpay();
+      if (razorpay) p = await razorpay.payments.fetch(razorpay_payment_id);
+    } catch (err) {
+      console.warn('Could not fetch Razorpay payment details:', err.message);
+    }
+
     order.isPaid = true;
-    order.paidAt = new Date();
+    order.paidAt = p.captured_at ? new Date(p.captured_at * 1000) : new Date();
     order.paymentMethod = 'Razorpay';
     order.paymentResult = {
       id: razorpay_payment_id,
       status: 'COMPLETED',
       updateTime: new Date().toISOString(),
-      email: req.user.email,
+      email: p.email || req.user.email,
+      provider: 'Razorpay',
+      method: p.method,                    // upi / card / netbanking / wallet
+      vpa: p.vpa,
+      bank: p.bank,
+      wallet: p.wallet,
+      cardLast4: p.card?.last4,
+      cardBrand: p.card?.network,
+      cardNetwork: p.card?.network,
+      cardType: p.card?.type,
+      rrn: p.acquirer_data?.rrn,
+      acquirerData: p.acquirer_data,
+      amount: p.amount,
+      fee: p.fee,
+      tax: p.tax,
+      orderId: razorpay_order_id,
+      capturedAt: p.captured_at ? new Date(p.captured_at * 1000) : new Date(),
     };
     if (order.status === 'pending') {
       order.status = 'confirmed';
@@ -361,19 +387,35 @@ router.post(
 
     const event = JSON.parse(body.toString('utf8'));
     if (event.event === 'payment.captured') {
-      const payment = event.payload?.payment?.entity;
-      const orderId = payment?.notes?.orderId;
+      const p = event.payload?.payment?.entity || {};
+      const orderId = p.notes?.orderId;
       if (orderId) {
         const order = await Order.findById(orderId);
         if (order && !order.isPaid) {
           order.isPaid = true;
-          order.paidAt = new Date();
+          order.paidAt = p.captured_at ? new Date(p.captured_at * 1000) : new Date();
           order.paymentMethod = 'Razorpay';
           order.paymentResult = {
-            id: payment.id,
+            id: p.id,
             status: 'COMPLETED',
             updateTime: new Date().toISOString(),
-            email: payment.email || '',
+            email: p.email || '',
+            provider: 'Razorpay',
+            method: p.method,
+            vpa: p.vpa,
+            bank: p.bank,
+            wallet: p.wallet,
+            cardLast4: p.card?.last4,
+            cardBrand: p.card?.network,
+            cardNetwork: p.card?.network,
+            cardType: p.card?.type,
+            rrn: p.acquirer_data?.rrn,
+            acquirerData: p.acquirer_data,
+            amount: p.amount,
+            fee: p.fee,
+            tax: p.tax,
+            orderId: p.order_id,
+            capturedAt: p.captured_at ? new Date(p.captured_at * 1000) : new Date(),
           };
           if (order.status === 'pending') {
             order.status = 'confirmed';

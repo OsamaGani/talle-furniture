@@ -33,10 +33,29 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: { type: String, default: 'COD' },
     paymentResult: {
+      // Generic identifier (Razorpay payment_id, Stripe payment_intent, COD-...)
       id: String,
       status: String,
       updateTime: String,
       email: String,
+      // Razorpay-specific payment metadata for the customer-facing receipt.
+      // All optional — populated when the gateway returns enough info.
+      provider: String,         // 'Razorpay' | 'Stripe' | 'COD'
+      method: String,           // 'upi' | 'card' | 'netbanking' | 'wallet'
+      vpa: String,              // UPI handle (e.g. 9876543210@ybl)
+      bank: String,             // bank name for netbanking / UPI
+      wallet: String,           // wallet name (Paytm, PhonePe wallet, etc.)
+      cardLast4: String,        // last 4 digits of card
+      cardBrand: String,        // Visa / MasterCard / Rupay / Amex
+      cardNetwork: String,      // network printed on card
+      cardType: String,         // credit / debit
+      rrn: String,              // Bank reference number (UPI)
+      acquirerData: { type: Object },
+      amount: Number,           // amount captured (in paise)
+      fee: Number,              // gateway fee (paise)
+      tax: Number,              // GST on fee (paise)
+      orderId: String,          // razorpay order id
+      capturedAt: Date,
     },
     accountType: { type: String, enum: ['retail', 'wholesale'], default: 'retail' },
     itemsPrice: Number,

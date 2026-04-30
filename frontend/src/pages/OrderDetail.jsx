@@ -6,6 +6,7 @@ import OrderTimeline from '../components/OrderTimeline';
 import { useAuth } from '../context/AuthContext';
 import { resolveImage } from '../utils/imageUrl';
 import { openRazorpayCheckout } from '../utils/razorpay';
+import PaymentDetails from '../components/PaymentDetails';
 import toast from 'react-hot-toast';
 import { FiMapPin, FiCreditCard, FiPhone } from 'react-icons/fi';
 
@@ -158,10 +159,7 @@ export default function OrderDetail() {
         </div>
 
         <aside className="space-y-3">
-          <Card title={<span className="flex items-center gap-2"><FiCreditCard /> Payment</span>}>
-            <p className="text-sm">Method: <span className="font-semibold">{order.paymentMethod}</span></p>
-            <p className="text-sm">Status: {order.isPaid ? <span className="text-green-600 font-semibold">Paid {order.paidAt && '✓'}</span> : <span className="text-orange-600 font-semibold">Pending</span>}</p>
-          </Card>
+          <PaymentDetails order={order} compact />
           <Card title="Bill Summary">
             <Row label="Subtotal" value={`₹${order.itemsPrice.toFixed(2)}`} />
             <Row label="Shipping" value={order.shippingPrice === 0 ? <span className="text-green-600 font-semibold">FREE</span> : `₹${order.shippingPrice.toFixed(2)}`} />

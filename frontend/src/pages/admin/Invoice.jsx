@@ -71,11 +71,48 @@ export default function Invoice() {
         </div>
 
         {/* Order info — 3 cols stays even on mobile (compact data) */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 bg-gray-50 p-3 rounded text-[11px] sm:text-xs">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 bg-gray-50 p-3 rounded text-[11px] sm:text-xs">
           <div><p className="text-gray-500">Payment Method</p><p className="font-semibold">{order.paymentMethod}</p></div>
           <div><p className="text-gray-500">Payment Status</p><p className="font-semibold">{order.isPaid ? 'PAID' : 'PENDING'}</p></div>
           <div><p className="text-gray-500">Order Status</p><p className="font-semibold uppercase">{order.status.replace(/_/g, ' ')}</p></div>
         </div>
+
+        {/* Detailed payment receipt block — appears on the printed invoice
+            so the customer sees exactly what was charged and how. */}
+        {order.isPaid && order.paymentResult && (order.paymentResult.id || order.paymentResult.method) && (
+          <div className="mb-6 border-2 border-emerald-200 bg-emerald-50/40 rounded-lg p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs uppercase font-bold text-emerald-700">Payment Details</p>
+              <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">PAID ✓</span>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+              {order.paymentResult.provider && (
+                <PRow label="Gateway" value={order.paymentResult.provider} />
+              )}
+              {order.paymentResult.method && (
+                <PRow label="Method" value={order.paymentResult.method.toUpperCase()} />
+              )}
+              {order.paymentResult.vpa && (
+                <PRow label="UPI ID" value={order.paymentResult.vpa} mono />
+              )}
+              {order.paymentResult.cardLast4 && (
+                <PRow label="Card" value={`•••• ${order.paymentResult.cardLast4}${order.paymentResult.cardBrand ? ` (${order.paymentResult.cardBrand})` : ''}`} mono />
+              )}
+              {order.paymentResult.bank && order.paymentResult.method === 'netbanking' && (
+                <PRow label="Bank" value={order.paymentResult.bank} />
+              )}
+              {order.paymentResult.id && (
+                <PRow label="Transaction ID" value={order.paymentResult.id} mono />
+              )}
+              {order.paymentResult.rrn && (
+                <PRow label="Bank Ref. No." value={order.paymentResult.rrn} mono />
+              )}
+              {(order.paymentResult.capturedAt || order.paidAt) && (
+                <PRow label="Paid On" value={new Date(order.paymentResult.capturedAt || order.paidAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })} />
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Items — desktop table */}
         <table className="hidden sm:table w-full text-sm mb-6">
@@ -146,4 +183,11 @@ export default function Invoice() {
 
 const Row = ({ label, value }) => (
   <div className="flex justify-between"><span className="text-gray-700">{label}</span><span className="font-semibold">{value}</span></div>
+);
+
+const PRow = ({ label, value, mono }) => (
+  <div className="flex justify-between gap-2 py-1 border-b border-emerald-100 last:border-0">
+    <span className="text-emerald-700/70">{label}</span>
+    <span className={`font-semibold text-gray-900 break-all text-right ${mono ? 'font-mono' : ''}`}>{value}</span>
+  </div>
 );
