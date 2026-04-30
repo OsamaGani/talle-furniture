@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import API from '../api/axios';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiX, FiImage, FiLink } from 'react-icons/fi';
+import { resolveImage } from '../utils/imageUrl';
 
 /**
  * Reusable image uploader.
@@ -99,7 +100,9 @@ export default function ImageUploader({ value, onChange, multiple = false, onMai
     setShowUrl(false);
   };
 
-  const fullUrl = (img) => img?.startsWith('http') ? img : img;
+  // Use the shared resolver so admin-side previews show backend-hosted
+  // /uploads/... images via their absolute URL (cross-origin in production).
+  const fullUrl = (img) => resolveImage(img);
 
   return (
     <div>

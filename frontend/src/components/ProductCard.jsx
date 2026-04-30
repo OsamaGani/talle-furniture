@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FiShoppingCart, FiEye, FiStar, FiHeart } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { resolveImage } from '../utils/imageUrl';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -31,7 +32,7 @@ export default function ProductCard({ product }) {
       </button>
       <Link to={`/product/${product._id}`} className="block h-28 sm:h-44 md:h-48 overflow-hidden bg-gradient-to-br from-gray-50 to-white p-1.5 sm:p-3">
         <img
-          src={product.image || product.images?.[0] || '/placeholder.png'}
+          src={resolveImage(product.image || product.images?.[0])}
           alt={product.name}
           className="w-full h-full object-contain group-hover:scale-110 transition duration-300"
           onError={(e) => { e.target.src = 'https://via.placeholder.com/400?text=Toy'; }}

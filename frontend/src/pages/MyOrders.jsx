@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import API from '../api/axios';
 import Loader from '../components/Loader';
 import { FiArrowRight } from 'react-icons/fi';
+import { resolveImage } from '../utils/imageUrl';
 
 const statusColor = {
   pending: 'bg-yellow-100 text-yellow-700',
@@ -63,7 +64,7 @@ export default function MyOrders() {
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {o.items.slice(0, 4).map((it) => (
-                  <img key={it._id} src={it.image} alt={it.name} className="w-14 h-14 rounded border bg-gray-50 object-contain p-1 flex-shrink-0" />
+                  <img key={it._id} src={resolveImage(it.image)} alt={it.name} className="w-14 h-14 rounded border bg-gray-50 object-contain p-1 flex-shrink-0" />
                 ))}
                 {o.items.length > 4 && (
                   <div className="w-14 h-14 rounded border bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">+{o.items.length - 4}</div>

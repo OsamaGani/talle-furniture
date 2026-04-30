@@ -46,6 +46,14 @@ function multerError(err, _req, res, next) {
   return res.status(400).json({ message: err.message || 'Upload failed' });
 }
 
+// Absolute URL so the frontend (which lives on a different origin in production)
+// can load uploaded images without needing a proxy. Falls back to a relative
+// path in pure local dev where API_BASE_URL isn't set.
+const buildImageUrl = (req, filename) => {
+  const base = process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}`;
+  return `${base.replace(/\/$/, '')}/uploads/${filename}`;
+};
+
 router.post(
   '/',
   protect,
@@ -53,7 +61,7 @@ router.post(
   (req, res, next) => upload.single('image')(req, res, (err) => multerError(err, req, res, next)),
   (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-    res.json({ url: `/uploads/${req.file.filename}` });
+    res.json({ url: buildImageUrl(req, req.file.filename) });
   }
 );
 
@@ -64,7 +72,7 @@ router.post(
   (req, res, next) => upload.array('images', 6)(req, res, (err) => multerError(err, req, res, next)),
   (req, res) => {
     if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files' });
-    res.json({ urls: req.files.map((f) => `/uploads/${f.filename}`) });
+    res.json({ urls: req.files.map((f) => buildImageUrl(req, f.filename)) });
   }
 );
 

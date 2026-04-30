@@ -6,6 +6,7 @@ import { FiEdit2, FiTrash2, FiPlus, FiSearch, FiPackage, FiStar, FiAward, FiZap 
 import toast from 'react-hot-toast';
 import QuickAddModal from '../../components/QuickAddModal';
 import { allSubCategoryNames } from '../../config/departments';
+import { resolveImage } from '../../utils/imageUrl';
 
 const TAB_TO_COLLECTION = {
   newArrival: { key: 'newArrival', label: 'New Arrivals' },
@@ -171,7 +172,7 @@ export default function AdminProducts() {
               {products.map((p) => (
                 <tr key={p._id} className="border-b last:border-0 hover:bg-gray-50">
                   <td className="p-3">
-                    <img src={p.image || p.images?.[0] || 'https://via.placeholder.com/60'} className="w-12 h-12 rounded object-contain bg-gray-50 p-1" alt="" />
+                    <img src={resolveImage(p.image || p.images?.[0])} className="w-12 h-12 rounded object-contain bg-gray-50 p-1" alt="" />
                   </td>
                   <td>
                     <p className="font-medium max-w-xs truncate">{p.name}</p>

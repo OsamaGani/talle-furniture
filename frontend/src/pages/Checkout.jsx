@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
 import toast from 'react-hot-toast';
+import { resolveImage } from '../utils/imageUrl';
 
 export default function Checkout() {
   const { items, subtotal, shipping, tax, total, clearCart } = useCart();
@@ -132,7 +133,7 @@ export default function Checkout() {
           <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
             {items.map((i) => (
               <div key={i.product} className="flex gap-2 text-sm">
-                <img src={i.image} className="w-12 h-12 rounded object-cover" alt="" />
+                <img src={resolveImage(i.image)} className="w-12 h-12 rounded object-cover" alt="" />
                 <div className="flex-1 min-w-0">
                   <p className="line-clamp-1">{i.name}</p>
                   <p className="text-gray-500 text-xs">Qty: {i.qty} × ₹{i.price}</p>

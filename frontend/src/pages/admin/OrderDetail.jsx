@@ -5,6 +5,7 @@ import Loader from '../../components/Loader';
 import OrderTimeline from '../../components/OrderTimeline';
 import toast from 'react-hot-toast';
 import { FiPrinter, FiTag, FiArrowLeft, FiUser, FiMapPin, FiPhone, FiMail, FiCreditCard, FiTruck, FiBriefcase } from 'react-icons/fi';
+import { resolveImage } from '../../utils/imageUrl';
 
 const STATUSES = ['pending', 'confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
 
@@ -148,7 +149,7 @@ export default function AdminOrderDetail() {
                     <tr key={it._id} className="border-b last:border-0">
                       <td className="py-2">
                         <div className="flex items-center gap-2">
-                          <img src={it.image} className="w-10 h-10 rounded border bg-gray-50 object-contain p-1" alt="" />
+                          <img src={resolveImage(it.image)} className="w-10 h-10 rounded border bg-gray-50 object-contain p-1" alt="" />
                           <Link to={`/product/${it.product}`} className="hover:text-primary-500">
                             {it.name}
                             {it.isWholesalePrice && <span className="ml-2 bg-purple-100 text-purple-700 text-[10px] px-1 py-0.5 rounded font-bold">W</span>}

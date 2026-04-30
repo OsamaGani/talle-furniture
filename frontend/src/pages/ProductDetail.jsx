@@ -7,6 +7,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { FiShoppingCart, FiHeart, FiStar, FiTruck, FiShield, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useWishlist } from '../context/WishlistContext';
+import { resolveImage } from '../utils/imageUrl';
 import toast from 'react-hot-toast';
 
 export default function ProductDetail() {
@@ -78,13 +79,13 @@ export default function ProductDetail() {
         {/* Images */}
         <div className="md:sticky md:top-32 md:self-start">
           <div className="aspect-square max-h-[280px] sm:max-h-[400px] md:max-h-[520px] border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4">
-            <img src={activeImg || 'https://via.placeholder.com/600?text=Toy'} alt={product.name} className="max-w-full max-h-full object-contain" />
+            <img src={resolveImage(activeImg)} alt={product.name} className="max-w-full max-h-full object-contain" />
           </div>
           {product.images?.length > 1 && (
             <div className="flex gap-2 mt-3 overflow-x-auto">
               {product.images.map((img, i) => (
                 <button key={i} onClick={() => setActiveImg(img)} className={`w-20 h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white ${activeImg === img ? 'border-primary-500' : 'border-gray-200'}`}>
-                  <img src={img} className="w-full h-full object-contain p-1" alt="" />
+                  <img src={resolveImage(img)} className="w-full h-full object-contain p-1" alt="" />
                 </button>
               ))}
             </div>

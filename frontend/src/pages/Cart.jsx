@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { FiTrash2, FiShoppingBag, FiTruck } from 'react-icons/fi';
+import { resolveImage } from '../utils/imageUrl';
 
 export default function Cart() {
   const { items, removeFromCart, updateQty, subtotal, shipping, tax, total, amountToFreeShipping, FREE_SHIPPING_THRESHOLD, isWholesale } = useCart();
@@ -52,7 +53,7 @@ export default function Cart() {
             return (
               <div key={it.product} className="bg-white border rounded-lg p-3 sm:p-4 flex gap-3 sm:gap-4">
                 <Link to={`/product/${it.product}`} className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-gray-50 border rounded overflow-hidden p-1.5 sm:p-2">
-                  <img src={it.image || 'https://via.placeholder.com/100'} alt={it.name} className="w-full h-full object-contain" />
+                  <img src={resolveImage(it.image)} alt={it.name} className="w-full h-full object-contain" />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link to={`/product/${it.product}`} className="font-medium text-sm sm:text-base hover:text-primary-500 line-clamp-2">{it.name}</Link>

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import API from '../api/axios';
 import toast from 'react-hot-toast';
 import { FiX, FiUpload, FiCheck } from 'react-icons/fi';
+import { resolveImage } from '../utils/imageUrl';
 
 /**
  * Quick add — minimal form to drop a product into a specific collection.
@@ -100,7 +101,7 @@ export default function QuickAddModal({ open, onClose, onSaved, collection, coll
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => uploadFile(e.target.files[0])} />
             {image ? (
               <div className="relative aspect-square max-h-48 mx-auto">
-                <img src={image} className="w-full h-full object-contain p-2 rounded-lg" alt="" />
+                <img src={resolveImage(image)} className="w-full h-full object-contain p-2 rounded-lg" alt="" />
                 <button type="button" onClick={(e) => { e.stopPropagation(); setImage(''); }}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600">
                   <FiX size={14} />

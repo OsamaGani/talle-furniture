@@ -4,6 +4,7 @@ import API from '../api/axios';
 import Loader from '../components/Loader';
 import OrderTimeline from '../components/OrderTimeline';
 import { useAuth } from '../context/AuthContext';
+import { resolveImage } from '../utils/imageUrl';
 import { FiMapPin, FiCreditCard, FiPhone } from 'react-icons/fi';
 
 export default function OrderDetail() {
@@ -91,7 +92,7 @@ export default function OrderDetail() {
             {order.items.map((it) => (
               <div key={it._id} className="flex gap-3 py-3 border-b last:border-0">
                 <Link to={`/product/${it.product}`} className="w-20 h-20 bg-gray-50 border rounded overflow-hidden p-2 flex-shrink-0">
-                  <img src={it.image} className="w-full h-full object-contain" alt={it.name} />
+                  <img src={resolveImage(it.image)} className="w-full h-full object-contain" alt={it.name} />
                 </Link>
                 <div className="flex-1">
                   <Link to={`/product/${it.product}`} className="font-medium hover:text-primary-500">{it.name}</Link>
