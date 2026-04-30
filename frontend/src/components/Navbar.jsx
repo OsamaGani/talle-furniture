@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -331,6 +331,7 @@ export default function Navbar() {
       <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center gap-1 text-sm font-semibold">
+            <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
             <NavItem to="/shop" label="All Toys" />
             <NavItem to="/action-toys" label="🎯 Action Toys" />
             <NavItem to="/shop?discount=true" label="🔥 Up to 70% Off" highlight />
@@ -479,6 +480,7 @@ export default function Navbar() {
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
             <ul className="px-4 py-3 space-y-1">
+              <li><Link to="/" onClick={closeMobileMenu} className="flex items-center gap-2 py-2.5 px-2 rounded font-semibold hover:bg-gray-50 transition"><FiHome size={16} /> Home</Link></li>
               <li><Link to="/shop" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded font-semibold hover:bg-gray-50 transition">All Toys</Link></li>
               <li><Link to="/action-toys" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded font-semibold hover:bg-gray-50 transition">🎯 Action Toys</Link></li>
               <li><Link to="/shop?discount=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded text-primary-500 font-semibold hover:bg-primary-50 transition">🔥 Up to 70% Off</Link></li>
@@ -597,10 +599,10 @@ export default function Navbar() {
   );
 }
 
-function NavItem({ to, label, highlight }) {
+function NavItem({ to, label, highlight, end }) {
   return (
     <li>
-      <NavLink to={to} className={({ isActive }) =>
+      <NavLink to={to} end={end} className={({ isActive }) =>
         `inline-block px-3 py-3 hover:text-primary-500 transition ${isActive ? 'text-primary-500' : ''} ${highlight ? 'text-primary-500' : ''}`
       }>
         {label}
