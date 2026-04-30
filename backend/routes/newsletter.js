@@ -76,41 +76,59 @@ router.post(
     if (subscriber && subscriber.unsubscribed) {
       // Re-enable a previously unsubscribed email
       subscriber.unsubscribed = false;
+      subscriber.welcomeSent = false; // re-send the welcome
       await subscriber.save();
-      return res.json({ message: 'Welcome back! You\'re subscribed again.', alreadySubscribed: true });
+    } else if (!subscriber) {
+      subscriber = await Subscriber.create({ email: cleanEmail, source });
     }
+    // If we land here with welcomeSent === true, customer already got the
+    // welcome email previously — don't send again (avoids spam-loop reports).
 
-    if (subscriber) {
-      return res.json({
-        message: 'You\'re already subscribed — check your inbox for past offers.',
-        alreadySubscribed: true,
-      });
-    }
-
-    // Brand-new subscriber
-    subscriber = await Subscriber.create({ email: cleanEmail, source });
-
-    // Fire the welcome email — never block the response on email success
-    try {
-      const promo = subscriber.promoCode || 'WELCOME10';
-      const { html, text } = buildWelcomeEmail(cleanEmail, promo, clientUrl);
-      const result = await sendEmail({
-        to: cleanEmail,
-        subject: '🎉 Welcome to Toy Mall — 10% off your first order',
-        html,
-        text,
-      });
-      if (result.sent) {
-        subscriber.welcomeSent = true;
-        await subscriber.save();
+    let attemptedSend = false;
+    let sendOk = false;
+    if (!subscriber.welcomeSent) {
+      attemptedSend = true;
+      try {
+        const promo = subscriber.promoCode || 'WELCOME10';
+        const { html, text } = buildWelcomeEmail(cleanEmail, promo, clientUrl);
+        const result = await sendEmail({
+          to: cleanEmail,
+          subject: '🎉 Welcome to Toy Mall — 10% off your first order',
+          html,
+          text,
+        });
+        if (result.sent) {
+          sendOk = true;
+          subscriber.welcomeSent = true;
+          await subscriber.save();
+          console.log(`📧 Newsletter welcome email -> ${cleanEmail}`);
+        } else if (result.dev) {
+          console.log(`📧 Newsletter welcome email (dev mode log only) -> ${cleanEmail}`);
+        } else {
+          console.error(`Newsletter welcome to ${cleanEmail} failed:`, result.error || 'unknown');
+        }
+      } catch (err) {
+        console.error('Newsletter welcome email failed:', err.message);
       }
-    } catch (err) {
-      console.error('Newsletter welcome email failed:', err.message);
     }
 
-    res.status(201).json({
-      message: 'Subscribed! Check your inbox for a 10% off code.',
+    const newlyCreated = !subscriber.createdAt || (Date.now() - new Date(subscriber.createdAt).getTime() < 5000);
+    let message;
+    if (newlyCreated && sendOk) {
+      message = 'Subscribed! Check your inbox for a 10% off code.';
+    } else if (newlyCreated && attemptedSend && !sendOk) {
+      message = 'Subscribed! We couldn\'t deliver the welcome email — check spam, or contact us.';
+    } else if (sendOk) {
+      message = 'Welcome back! We\'ve resent your 10% off code — check your inbox.';
+    } else {
+      message = 'You\'re already on our list — check your inbox (and spam folder) for past offers.';
+    }
+
+    res.status(newlyCreated ? 201 : 200).json({
+      message,
       promoCode: subscriber.promoCode,
+      alreadySubscribed: !newlyCreated,
+      welcomeSent: sendOk,
     });
   })
 );
