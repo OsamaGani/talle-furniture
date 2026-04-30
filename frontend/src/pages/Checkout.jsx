@@ -85,8 +85,13 @@ export default function Checkout() {
           });
           return;
         } catch (err) {
-          const msg = err.response?.data?.message || 'Could not start Razorpay checkout';
-          toast.error(`${msg} — your order is saved, retry from order details.`);
+          // Long, persistent toast so the customer (and you, while testing)
+          // can clearly see what went wrong instead of it flashing past.
+          const msg = err.response?.data?.message || 'Could not start online payment';
+          toast.error(
+            `${msg}. Your order is saved as unpaid — open order details to retry payment.`,
+            { duration: 8000 }
+          );
           clearCart();
           navigate(`/order/${order._id}`);
           return;

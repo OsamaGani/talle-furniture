@@ -70,6 +70,23 @@ export async function openRazorpayCheckout({
       order_id: razorpayOrderId,
       prefill,
       theme: { color: '#e53935' },
+      // Tell Razorpay which methods to surface most prominently.
+      // UPI is shown first because Indian customers prefer it (GPay,
+      // PhonePe, Paytm all appear inside the UPI tab automatically).
+      method: { upi: true, card: true, netbanking: true, wallet: true },
+      config: {
+        display: {
+          // Curate the tab order — UPI front and centre.
+          blocks: {
+            upi: {
+              name: 'Pay using UPI',
+              instruments: [{ method: 'upi' }],
+            },
+          },
+          sequence: ['block.upi'],
+          preferences: { show_default_blocks: true },
+        },
+      },
       // After successful payment Razorpay returns these three values —
       // verify them on the server before flipping the order to paid.
       handler: async (response) => {
