@@ -3,6 +3,7 @@ const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Brand = require('../models/Brand');
 const WholesaleCategory = require('../models/WholesaleCategory');
+const Order = require('../models/Order');
 
 const categories = [
   { name: 'General', image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600' },
@@ -314,6 +315,17 @@ async function ensureDefaults() {
       // Don't bring the server down for a seed hiccup — log and move on.
       console.warn('⚠️  Sub-category seed had conflicts, continuing:', err.message);
     }
+  }
+
+  // One-time backfill: any COD order that's already been marked delivered but
+  // somehow stayed isPaid=false should be flipped — without this the revenue
+  // dashboard would forever underreport on existing orders.
+  const codBackfill = await Order.updateMany(
+    { paymentMethod: 'COD', status: 'delivered', isPaid: false },
+    [{ $set: { isPaid: true, paidAt: { $ifNull: ['$deliveredAt', '$$NOW'] } } }]
+  );
+  if (codBackfill.modifiedCount > 0) {
+    console.log(`💰 Backfilled isPaid on ${codBackfill.modifiedCount} delivered COD order(s)`);
   }
 
   // Seed default Hot Wholesale Categories tiles if none exist yet

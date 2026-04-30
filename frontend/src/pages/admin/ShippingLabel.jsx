@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import API from '../../api/axios';
 import Loader from '../../components/Loader';
+import Barcode from '../../components/Barcode';
 import { FiPrinter, FiPackage } from 'react-icons/fi';
 
 export default function ShippingLabel() {
@@ -24,8 +25,7 @@ export default function ShippingLabel() {
 
   const isCOD = order.paymentMethod === 'COD' && !order.isPaid;
   const totalQty = order.items.reduce((s, i) => s + i.qty, 0);
-  // Simple barcode look from order number
-  const bars = (order.orderNumber || order._id).slice(-12).split('').map((c) => c.charCodeAt(0) % 4);
+  const orderNumber = order.orderNumber || String(order._id).slice(-12).toUpperCase();
 
   return (
     <div className="bg-gray-200 min-h-screen py-6 px-4 print:bg-white print:py-0 print:px-0">
@@ -133,14 +133,11 @@ export default function ShippingLabel() {
           </table>
         </div>
 
-        {/* Barcode-style strip */}
-        <div className="px-3 py-3 border-b-2 border-black bg-white text-center">
-          <div className="flex justify-center items-end h-12 gap-px">
-            {[...bars, ...bars, ...bars].map((b, i) => (
-              <div key={i} className="bg-black" style={{ width: b === 0 ? 1 : b === 1 ? 2 : b === 2 ? 3 : 1, height: '100%' }}></div>
-            ))}
-          </div>
-          <p className="font-mono text-[11px] mt-1 tracking-widest">{order.orderNumber || order._id.slice(-12).toUpperCase()}</p>
+        {/* Real scannable Code 128 barcode — decodes to the order number so
+            warehouse staff can scan packages with a USB barcode scanner */}
+        <div className="px-3 py-3 border-b-2 border-black bg-white">
+          <Barcode value={orderNumber} height={60} width={1.6} />
+          <p className="text-[9px] text-gray-500 uppercase tracking-wider text-center mt-1">Scan to look up order</p>
         </div>
 
         {/* Footer */}

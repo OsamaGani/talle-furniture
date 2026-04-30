@@ -89,6 +89,24 @@ router.put('/:id/status', protect, admin, asyncHandler(async (req, res) => {
   if (newStatus === 'delivered') {
     order.isDelivered = true;
     order.deliveredAt = Date.now();
+    // COD: cash is collected on delivery, so flip the order to paid the
+    // moment it's marked delivered. Revenue dashboard now reflects reality.
+    if (!order.isPaid && order.paymentMethod === 'COD') {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentResult = {
+        ...(order.paymentResult || {}),
+        id: 'COD-' + (order.orderNumber || order._id),
+        status: 'COMPLETED',
+        updateTime: new Date().toISOString(),
+      };
+    }
+  }
+  // Cancelling a previously-paid COD order should revert isPaid so the
+  // revenue total stays accurate.
+  if (newStatus === 'cancelled' && order.paymentMethod === 'COD' && order.isPaid && !order.deliveredAt) {
+    order.isPaid = false;
+    order.paidAt = null;
   }
   const updated = await order.save();
 
