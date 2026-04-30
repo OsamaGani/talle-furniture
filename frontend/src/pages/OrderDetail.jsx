@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useParams, Link } from 'react-router-dom';
+import { Navigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import API from '../api/axios';
 import Loader from '../components/Loader';
 import OrderTimeline from '../components/OrderTimeline';
 import { useAuth } from '../context/AuthContext';
 import { resolveImage } from '../utils/imageUrl';
+import toast from 'react-hot-toast';
 import { FiMapPin, FiCreditCard, FiPhone } from 'react-icons/fi';
 
 export default function OrderDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const isAdmin = !!user?.isAdmin;
+  const [params, setParams] = useSearchParams();
+  const stripeSession = params.get('stripe_session');
+  const stripeCancelled = params.get('stripe_cancelled');
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,6 +25,31 @@ export default function OrderDetail() {
     if (isAdmin) { setLoading(false); return; }
     (async () => {
       try {
+        // If we just came back from Stripe with a session id, confirm
+        // the payment before fetching — this flips isPaid + paidAt server-side.
+        if (stripeSession) {
+          try {
+            await API.post('/payment/confirm', { sessionId: stripeSession, orderId: id });
+            toast.success('Payment received — thank you!');
+          } catch (err) {
+            // Non-fatal — the order itself loads fine. Webhook may still
+            // confirm asynchronously if the user closed the redirect tab.
+            console.warn('Stripe confirm failed:', err.response?.data);
+            toast.error(err.response?.data?.message || 'Payment confirmation pending');
+          } finally {
+            // Clean the URL so refresh doesn't re-confirm.
+            const np = new URLSearchParams(params);
+            np.delete('stripe_session');
+            setParams(np, { replace: true });
+          }
+        }
+        if (stripeCancelled) {
+          toast('Payment cancelled — your order is still pending. You can pay later.', { icon: '⚠️' });
+          const np = new URLSearchParams(params);
+          np.delete('stripe_cancelled');
+          setParams(np, { replace: true });
+        }
+
         const { data } = await API.get(`/orders/${id}`);
         setOrder(data);
       } catch (e) {
@@ -30,6 +59,7 @@ export default function OrderDetail() {
         });
       } finally { setLoading(false); }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isAdmin]);
 
   // Admins shouldn't see the customer-facing order page — send them straight
@@ -86,6 +116,11 @@ export default function OrderDetail() {
         trackingNumber={order.trackingNumber}
       />
 
+      {/* Retry-payment banner for unpaid Stripe orders. */}
+      {!order.isPaid && order.paymentMethod === 'Stripe' && order.status !== 'cancelled' && (
+        <PayNowBanner orderId={order._id} total={order.totalPrice} />
+      )}
+
       <div className="grid lg:grid-cols-[1fr_320px] gap-6 mt-6">
         <div className="space-y-4">
           <Card title={`Items (${order.items.length})`}>
@@ -129,6 +164,37 @@ export default function OrderDetail() {
           </Card>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function PayNowBanner({ orderId, total }) {
+  const [loading, setLoading] = useState(false);
+  const handleRetry = async () => {
+    setLoading(true);
+    try {
+      const { data } = await API.post('/payment/create-checkout-session', { orderId });
+      window.location.href = data.url;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not start payment. Try again in a moment.');
+      setLoading(false);
+    }
+  };
+  return (
+    <div className="mt-5 bg-gradient-to-r from-primary-500 to-pink-500 text-white rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg">
+      <div className="flex-1">
+        <p className="font-extrabold text-lg flex items-center gap-2">💳 Complete your payment</p>
+        <p className="text-sm text-white/90 mt-1">
+          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via Stripe to confirm.
+        </p>
+      </div>
+      <button
+        onClick={handleRetry}
+        disabled={loading}
+        className="bg-white text-primary-600 hover:bg-yellow-300 hover:text-gray-900 font-bold px-5 py-3 rounded-lg shadow disabled:opacity-60 disabled:cursor-not-allowed transition whitespace-nowrap"
+      >
+        {loading ? 'Loading…' : 'Pay Now →'}
+      </button>
     </div>
   );
 }

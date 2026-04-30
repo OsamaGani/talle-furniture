@@ -60,15 +60,18 @@ export default function Checkout() {
 
       if (paymentMethod === 'Stripe') {
         try {
-          const { data: session } = await API.post('/payment/create-checkout-session', {
-            items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image })),
-            orderId: order._id,
-          });
+          const { data: session } = await API.post('/payment/create-checkout-session', { orderId: order._id });
           clearCart();
-          window.location.href = session.url;
+          window.location.href = session.url; // hand off to Stripe
           return;
         } catch (err) {
-          toast.error('Stripe not configured. Order saved as COD.');
+          // Order is created (still unpaid). Land the user on the order page
+          // where they can retry payment, instead of stranding them on /checkout.
+          const msg = err.response?.data?.message || 'Could not start Stripe checkout';
+          toast.error(`${msg} — your order is saved, you can retry payment from order details.`);
+          clearCart();
+          navigate(`/order/${order._id}`);
+          return;
         }
       }
 
