@@ -1,13 +1,12 @@
-import { FiMail, FiFacebook, FiInstagram, FiLinkedin, FiYoutube } from 'react-icons/fi';
+import { FiMail, FiFacebook, FiInstagram, FiYoutube } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const socials = [
   { Icon: FiMail,       href: 'mailto:Huraira735@gmail.com', label: 'Email' },
-  { Icon: FiFacebook,   href: 'https://facebook.com',     label: 'Facebook' },
-  { Icon: FiInstagram,  href: 'https://instagram.com',    label: 'Instagram' },
-  { Icon: FiLinkedin,   href: 'https://linkedin.com',     label: 'LinkedIn' },
+  { Icon: FiFacebook,   href: 'https://facebook.com',       label: 'Facebook' },
+  { Icon: FiInstagram,  href: 'https://instagram.com',      label: 'Instagram' },
   { Icon: FaWhatsapp,   href: 'https://wa.me/918655787075', label: 'WhatsApp' },
-  { Icon: FiYoutube,    href: 'https://youtube.com',      label: 'YouTube' },
+  { Icon: FiYoutube,    href: 'https://youtube.com',        label: 'YouTube' },
 ];
 
 export default function FollowUs({ dark = false }) {
