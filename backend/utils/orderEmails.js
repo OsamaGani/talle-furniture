@@ -65,11 +65,14 @@ function absoluteImage(image, apiBase) {
 function buildHtml(order, template, customerName, adminNote, clientUrl) {
   const orderUrl = `${clientUrl}/order/${order._id}`;
   const apiBase = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-  const trackingBlock = (order.status === 'shipped' || order.status === 'out_for_delivery') && order.trackingNumber
+  // Show tracking whenever it's set on the order — admin may fill it on
+  // 'confirmed' or 'packed' status updates, and customers want to see it
+  // in every status email going forward, not only on shipped/out_for_delivery.
+  const trackingBlock = order.trackingNumber
     ? `
-      <div style="background:#f3f4f6;border-radius:8px;padding:12px;margin:16px 0;">
-        <p style="margin:0;font-size:12px;color:#6b7280;">TRACKING NUMBER</p>
-        <p style="margin:4px 0 0 0;font-family:monospace;font-size:16px;font-weight:bold;color:#111827;">${order.trackingNumber}</p>
+      <div style="background:#f3f4f6;border-radius:8px;padding:14px;margin:16px 0;">
+        <p style="margin:0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:0.5px;">📦 TRACKING NUMBER</p>
+        <p style="margin:6px 0 0 0;font-family:monospace;font-size:18px;font-weight:bold;color:#111827;letter-spacing:1px;">${order.trackingNumber}</p>
       </div>
     ` : '';
 
@@ -162,7 +165,7 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
 
 function buildText(order, template, customerName, adminNote) {
   let text = `Hi ${customerName},\n\n${template.headline}\n\n${template.message}\n\nOrder Number: ${order.orderNumber}\n`;
-  if (order.trackingNumber && (order.status === 'shipped' || order.status === 'out_for_delivery')) {
+  if (order.trackingNumber) {
     text += `Tracking Number: ${order.trackingNumber}\n`;
   }
   if (adminNote) text += `\nNote: ${adminNote}\n`;
