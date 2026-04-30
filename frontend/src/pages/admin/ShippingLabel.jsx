@@ -91,19 +91,45 @@ export default function ShippingLabel() {
           </div>
         </div>
 
-        {/* Items mini list */}
+        {/* Items mini list with prices — handy for COD verification & courier reference */}
         <div className="px-3 py-2 border-b-2 border-black">
-          <p className="text-gray-500 text-[9px] uppercase font-bold mb-1">Package Contents</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-gray-500 text-[9px] uppercase font-bold">Package Contents</p>
+            <p className="text-gray-500 text-[9px] uppercase font-bold">Amount</p>
+          </div>
           <table className="w-full text-xs">
             <tbody>
               {order.items.map((it, i) => (
-                <tr key={it._id} className="border-b last:border-0">
+                <tr key={it._id} className="border-b last:border-0 align-top">
                   <td className="py-1 w-6">{i + 1}.</td>
-                  <td className="py-1 truncate max-w-[200px]">{it.name}</td>
-                  <td className="py-1 text-right font-bold w-10">×{it.qty}</td>
+                  <td className="py-1 pr-2">
+                    <p className="truncate max-w-[180px] font-medium">{it.name}</p>
+                    <p className="text-[10px] text-gray-600">×{it.qty} @ ₹{it.price.toFixed(2)}</p>
+                  </td>
+                  <td className="py-1 text-right font-bold whitespace-nowrap">₹{(it.qty * it.price).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-black">
+                <td colSpan={2} className="pt-1.5 text-[10px] text-gray-600">Subtotal</td>
+                <td className="pt-1.5 text-right font-semibold">₹{order.itemsPrice.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colSpan={2} className="text-[10px] text-gray-600">Shipping</td>
+                <td className="text-right font-semibold">{order.shippingPrice === 0 ? 'FREE' : `₹${order.shippingPrice.toFixed(2)}`}</td>
+              </tr>
+              {order.taxPrice > 0 && (
+                <tr>
+                  <td colSpan={2} className="text-[10px] text-gray-600">Tax</td>
+                  <td className="text-right font-semibold">₹{order.taxPrice.toFixed(2)}</td>
+                </tr>
+              )}
+              <tr className="border-t border-black">
+                <td colSpan={2} className="pt-1.5 text-xs font-extrabold uppercase">Total</td>
+                <td className="pt-1.5 text-right text-sm font-extrabold">₹{order.totalPrice.toFixed(2)}</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
 
