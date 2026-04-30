@@ -33,9 +33,10 @@ export default function About() {
             <div>
               <h2 className="text-2xl md:text-3xl font-extrabold mb-4">Our Story</h2>
               <p className="text-gray-700 leading-relaxed">
-                Toy Mall began as a small storefront near Dargah Gate in Amrut Nagar, Mumbra — a place where parents
-                could discover quality toys without travelling all the way to the city. What started with a few shelves
-                of building blocks and dolls has grown into an online catalogue of hundreds of carefully chosen toys
+                Toy Mall began as a small storefront in Mobin Apartment, Amrut Nagar, Mumbra — founded by
+                <strong> Abu Huraira Khan</strong> as a place where parents could discover quality toys
+                without travelling all the way to the city. What started with a few shelves of building
+                blocks and dolls has grown into an online catalogue of hundreds of carefully chosen toys
                 from brands kids love around the world.
               </p>
               <p className="text-gray-700 leading-relaxed mt-3">
@@ -43,6 +44,13 @@ export default function About() {
                 care, whether it&apos;s a single toy car for a birthday gift or a wholesale carton headed for a partner
                 shop in another city.
               </p>
+              <div className="mt-5 inline-flex items-center gap-3 bg-primary-50 border border-primary-200 rounded-xl px-4 py-3">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-pink-500 text-white font-extrabold flex items-center justify-center">A</span>
+                <div>
+                  <p className="font-bold text-sm text-gray-900">Abu Huraira Khan</p>
+                  <p className="text-xs text-gray-500">Founder &amp; Owner</p>
+                </div>
+              </div>
             </div>
             <div className="aspect-square rounded-2xl overflow-hidden shadow-xl">
               <img src="https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=800" alt="Toy Mall store" className="w-full h-full object-cover" />

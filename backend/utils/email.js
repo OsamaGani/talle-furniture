@@ -72,7 +72,7 @@ async function sendVerificationOTP(email, otp, name = '') {
       <div style="background:#fff5f5;border:2px dashed #e53935;padding:16px;text-align:center;font-size:32px;letter-spacing:8px;font-weight:bold;color:#b71c1c;border-radius:8px;margin:16px 0;">${otp}</div>
       <p style="color:#666;font-size:13px">This code expires in 10 minutes. If you didn't create an account, just ignore this email.</p>
       <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
-      <p style="color:#999;font-size:12px;text-align:center">Toy Mall · Near Dargah Gate, Amrut Nagar, Mumbra, Thane — 400612</p>
+      <p style="color:#999;font-size:12px;text-align:center">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</p>
     </div>
   `;
   return sendEmail({ to: email, subject, html, text });

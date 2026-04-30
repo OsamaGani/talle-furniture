@@ -54,8 +54,8 @@ export default function Footer() {
           </form>
           <ul className="mt-4 space-y-2 text-sm">
             <li className="flex items-center gap-2"><FiPhone /> +91 98000 00000</li>
-            <li className="flex items-center gap-2"><FiMail /> hello@toymall.com</li>
-            <li className="flex items-start gap-2"><FiMapPin className="mt-1" /> Near Dargah Gate, Amrut Nagar, Mumbra, Thane — 400612</li>
+            <li className="flex items-center gap-2"><FiMail /> Huraira735@gmail.com</li>
+            <li className="flex items-start gap-2"><FiMapPin className="mt-1 flex-shrink-0" /> <span>Toy Mall, Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</span></li>
           </ul>
         </div>
       </div>

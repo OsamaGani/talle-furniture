@@ -56,7 +56,8 @@ export default function ShippingLabel() {
         <div className="px-3 py-2 border-b-2 border-black text-xs">
           <p className="font-bold text-gray-500 uppercase text-[10px]">From / Pickup Address</p>
           <p className="font-bold text-sm">Toy Mall</p>
-          <p>Near Dargah Gate, Amrut Nagar</p>
+          <p>Mobin Apartment A Wing, Shop No. 4</p>
+          <p>Amrut Nagar, Near Dargah Road</p>
           <p>Mumbra, Thane — 400612</p>
           <p>📞 +91 98000 00000</p>
         </div>
@@ -119,7 +120,7 @@ export default function ShippingLabel() {
         {/* Footer */}
         <div className="px-3 py-2 text-[10px] text-center bg-gray-100">
           <p className="font-semibold">📦 Handle with care · Fragile toys</p>
-          <p className="text-gray-600">Returns to: Near Dargah Gate, Mumbra, Thane — within 7 days</p>
+          <p className="text-gray-600">Returns to: Toy Mall, Mobin Apartment A Wing, Shop No. 4, Mumbra, Thane — within 7 days</p>
         </div>
       </div>
 

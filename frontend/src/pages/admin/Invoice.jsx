@@ -39,10 +39,11 @@ export default function Invoice() {
               <span className="text-3xl font-extrabold text-primary-500">Toy</span>
               <span className="text-3xl font-extrabold text-gray-900">Mall</span>
             </div>
-            <p className="text-xs text-gray-600 mt-1">Near Dargah Gate, Amrut Nagar, Mumbra</p>
-            <p className="text-xs text-gray-600">Thane — 400612, Maharashtra, India</p>
-            <p className="text-xs text-gray-600">+91 98000 00000 · hello@toymall.com</p>
-            <p className="text-xs text-gray-600">GSTIN: 27AAAAA0000A1Z5</p>
+            <p className="text-xs text-gray-600 mt-1">Mobin Apartment A Wing, Shop No. 4</p>
+            <p className="text-xs text-gray-600">Amrut Nagar, Near Dargah Road</p>
+            <p className="text-xs text-gray-600">Mumbra, Thane — 400612, Maharashtra, India</p>
+            <p className="text-xs text-gray-600">+91 98000 00000 · Huraira735@gmail.com</p>
+            <p className="text-xs text-gray-600">Owner: Abu Huraira Khan · GSTIN: 27AAAAA0000A1Z5</p>
           </div>
           <div className="text-right">
             <h1 className="text-3xl font-extrabold uppercase text-gray-900">Invoice</h1>
@@ -119,7 +120,7 @@ export default function Invoice() {
         {/* Footer */}
         <div className="mt-10 pt-4 border-t text-center text-xs text-gray-500">
           <p className="font-semibold">Thank you for shopping with Toy Mall!</p>
-          <p className="mt-1">For returns or questions, contact hello@toymall.com within 7 days of delivery.</p>
+          <p className="mt-1">For returns or questions, contact Huraira735@gmail.com within 7 days of delivery.</p>
           <p className="mt-2">This is a computer-generated invoice and does not require a signature.</p>
         </div>
       </div>

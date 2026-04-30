@@ -2,7 +2,7 @@ import { FiMail, FiFacebook, FiInstagram, FiLinkedin, FiYoutube } from 'react-ic
 import { FaWhatsapp } from 'react-icons/fa';
 
 const socials = [
-  { Icon: FiMail,       href: 'mailto:hello@toymall.com', label: 'Email' },
+  { Icon: FiMail,       href: 'mailto:Huraira735@gmail.com', label: 'Email' },
   { Icon: FiFacebook,   href: 'https://facebook.com',     label: 'Facebook' },
   { Icon: FiInstagram,  href: 'https://instagram.com',    label: 'Instagram' },
   { Icon: FiLinkedin,   href: 'https://linkedin.com',     label: 'LinkedIn' },

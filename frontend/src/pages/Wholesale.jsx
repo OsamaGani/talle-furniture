@@ -181,7 +181,7 @@ export default function Wholesale() {
           )}
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-gray-300">
             <span className="flex items-center gap-2"><FiPhone /> +91 98000 00000</span>
-            <span className="flex items-center gap-2"><FiMail /> wholesale@toymall.com</span>
+            <span className="flex items-center gap-2"><FiMail /> Huraira735@gmail.com</span>
           </div>
         </div>
       </section>

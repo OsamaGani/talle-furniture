@@ -14,7 +14,7 @@ export default function Contact() {
     // No backend route for contact yet — this opens a mailto fallback
     setTimeout(() => {
       const body = encodeURIComponent(`Name: ${form.name}\nPhone: ${form.phone}\n\n${form.message}`);
-      window.location.href = `mailto:hello@toymall.com?subject=${encodeURIComponent(form.subject || 'Toy Mall enquiry')}&body=${body}`;
+      window.location.href = `mailto:Huraira735@gmail.com?subject=${encodeURIComponent(form.subject || 'Toy Mall enquiry')}&body=${body}`;
       toast.success('Opening your email client...');
       setSending(false);
     }, 400);
@@ -34,8 +34,19 @@ export default function Contact() {
           <InfoCard
             icon={<FiMapPin />}
             title="Visit Us"
-            lines={['Toy Mall', 'Near Dargah Gate', 'Amrut Nagar, Mumbra', 'Thane — 400612, Maharashtra']}
+            lines={[
+              'Toy Mall',
+              'Mobin Apartment, A Wing, Shop No. 4',
+              'Amrut Nagar, Near Dargah Road',
+              'Mumbra, Thane — 400612, Maharashtra',
+            ]}
             color="text-red-500 bg-red-50"
+          />
+          <InfoCard
+            icon={<FiMail />}
+            title="Owner"
+            lines={['Abu Huraira Khan', <span className="text-sm text-gray-600">Founder, Toy Mall</span>]}
+            color="text-amber-500 bg-amber-50"
           />
           <InfoCard
             icon={<FiPhone />}
@@ -47,8 +58,8 @@ export default function Contact() {
             icon={<FiMail />}
             title="Email Us"
             lines={[
-              <a href="mailto:hello@toymall.com" className="hover:text-primary-500">hello@toymall.com</a>,
-              <a href="mailto:wholesale@toymall.com" className="hover:text-primary-500 text-sm text-gray-600">wholesale@toymall.com (for bulk)</a>,
+              <a href="mailto:Huraira735@gmail.com" className="hover:text-primary-500">Huraira735@gmail.com</a>,
+              <a href="mailto:Huraira735@gmail.com?subject=Bulk%20order%20enquiry" className="hover:text-primary-500 text-sm text-gray-600">Same address for bulk / wholesale</a>,
             ]}
             color="text-purple-500 bg-purple-50"
           />
