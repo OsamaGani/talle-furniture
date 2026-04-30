@@ -5,6 +5,7 @@ import Loader from '../components/Loader';
 import OrderTimeline from '../components/OrderTimeline';
 import { useAuth } from '../context/AuthContext';
 import { resolveImage } from '../utils/imageUrl';
+import { openRazorpayCheckout } from '../utils/razorpay';
 import toast from 'react-hot-toast';
 import { FiMapPin, FiCreditCard, FiPhone } from 'react-icons/fi';
 
@@ -116,9 +117,14 @@ export default function OrderDetail() {
         trackingNumber={order.trackingNumber}
       />
 
-      {/* Retry-payment banner for unpaid Stripe orders. */}
-      {!order.isPaid && order.paymentMethod === 'Stripe' && order.status !== 'cancelled' && (
-        <PayNowBanner orderId={order._id} total={order.totalPrice} />
+      {/* Retry-payment banner for unpaid online orders (Stripe or Razorpay). */}
+      {!order.isPaid && (order.paymentMethod === 'Stripe' || order.paymentMethod === 'Razorpay') && order.status !== 'cancelled' && (
+        <PayNowBanner
+          orderId={order._id}
+          total={order.totalPrice}
+          method={order.paymentMethod}
+          onPaid={(updated) => setOrder(updated)}
+        />
       )}
 
       <div className="grid lg:grid-cols-[1fr_320px] gap-6 mt-6">
@@ -168,15 +174,27 @@ export default function OrderDetail() {
   );
 }
 
-function PayNowBanner({ orderId, total }) {
+function PayNowBanner({ orderId, total, method, onPaid }) {
   const [loading, setLoading] = useState(false);
   const handleRetry = async () => {
     setLoading(true);
     try {
-      const { data } = await API.post('/payment/create-checkout-session', { orderId });
-      window.location.href = data.url;
+      if (method === 'Razorpay') {
+        const { data: session } = await API.post('/payment/razorpay/create-order', { orderId });
+        const result = await openRazorpayCheckout({
+          ...session,
+          onSuccess: (updated) => onPaid?.(updated),
+          onDismiss: () => setLoading(false),
+        });
+        if (result) onPaid?.(result);
+      } else {
+        // Stripe
+        const { data } = await API.post('/payment/create-checkout-session', { orderId });
+        window.location.href = data.url;
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Could not start payment. Try again in a moment.');
+    } finally {
       setLoading(false);
     }
   };
@@ -185,7 +203,7 @@ function PayNowBanner({ orderId, total }) {
       <div className="flex-1">
         <p className="font-extrabold text-lg flex items-center gap-2">💳 Complete your payment</p>
         <p className="text-sm text-white/90 mt-1">
-          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via Stripe to confirm.
+          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via {method} to confirm.
         </p>
       </div>
       <button

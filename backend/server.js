@@ -25,10 +25,11 @@ process.on('unhandledRejection', (err) => {
 
 app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
 
-// Stripe webhook MUST read the raw body for signature verification.
-// Mount it before express.json() — otherwise the body is parsed and
-// stripe.webhooks.constructEvent() can't compute the signature.
-app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+// Webhooks MUST read the raw body for signature verification.
+// Mount before express.json() — otherwise the body is parsed and
+// the HMAC can't be recomputed correctly.
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' })); // Stripe
+app.use('/api/payment/razorpay/webhook', express.raw({ type: 'application/json' })); // Razorpay
 
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

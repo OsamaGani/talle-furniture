@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
 import toast from 'react-hot-toast';
 import { resolveImage } from '../utils/imageUrl';
+import { openRazorpayCheckout } from '../utils/razorpay';
 
 export default function Checkout() {
   const { items, subtotal, shipping, tax, total, clearCart } = useCart();
@@ -65,10 +66,27 @@ export default function Checkout() {
           window.location.href = session.url; // hand off to Stripe
           return;
         } catch (err) {
-          // Order is created (still unpaid). Land the user on the order page
-          // where they can retry payment, instead of stranding them on /checkout.
           const msg = err.response?.data?.message || 'Could not start Stripe checkout';
           toast.error(`${msg} — your order is saved, you can retry payment from order details.`);
+          clearCart();
+          navigate(`/order/${order._id}`);
+          return;
+        }
+      }
+
+      if (paymentMethod === 'Razorpay') {
+        try {
+          const { data: session } = await API.post('/payment/razorpay/create-order', { orderId: order._id });
+          clearCart(); // cart is reserved in the order — safe to empty client-side
+          await openRazorpayCheckout({
+            ...session,
+            onSuccess: () => navigate(`/order/${order._id}`),
+            onDismiss: () => navigate(`/order/${order._id}`),
+          });
+          return;
+        } catch (err) {
+          const msg = err.response?.data?.message || 'Could not start Razorpay checkout';
+          toast.error(`${msg} — your order is saved, retry from order details.`);
           clearCart();
           navigate(`/order/${order._id}`);
           return;
