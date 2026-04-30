@@ -24,6 +24,9 @@ const userSchema = new mongoose.Schema(
     verificationOTP: { type: String, default: '' },
     otpExpiresAt: { type: Date },
     otpAttempts: { type: Number, default: 0 },
+    // Password reset — server stores a hashed token to defend against DB leak.
+    resetPasswordToken: { type: String, default: '' },
+    resetPasswordExpiresAt: { type: Date },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   },
   { timestamps: true }
