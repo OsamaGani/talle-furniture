@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useParams, Link, useSearchParams } from 'react-router-dom';
+import { Navigate, useParams, Link } from 'react-router-dom';
 import API from '../api/axios';
 import Loader from '../components/Loader';
 import OrderTimeline from '../components/OrderTimeline';
@@ -14,10 +14,6 @@ export default function OrderDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const isAdmin = !!user?.isAdmin;
-  const [params, setParams] = useSearchParams();
-  const stripeSession = params.get('stripe_session');
-  const stripeCancelled = params.get('stripe_cancelled');
-
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); // { status, message }
@@ -27,31 +23,6 @@ export default function OrderDetail() {
     if (isAdmin) { setLoading(false); return; }
     (async () => {
       try {
-        // If we just came back from Stripe with a session id, confirm
-        // the payment before fetching — this flips isPaid + paidAt server-side.
-        if (stripeSession) {
-          try {
-            await API.post('/payment/confirm', { sessionId: stripeSession, orderId: id });
-            toast.success('Payment received — thank you!');
-          } catch (err) {
-            // Non-fatal — the order itself loads fine. Webhook may still
-            // confirm asynchronously if the user closed the redirect tab.
-            console.warn('Stripe confirm failed:', err.response?.data);
-            toast.error(err.response?.data?.message || 'Payment confirmation pending');
-          } finally {
-            // Clean the URL so refresh doesn't re-confirm.
-            const np = new URLSearchParams(params);
-            np.delete('stripe_session');
-            setParams(np, { replace: true });
-          }
-        }
-        if (stripeCancelled) {
-          toast('Payment cancelled — your order is still pending. You can pay later.', { icon: '⚠️' });
-          const np = new URLSearchParams(params);
-          np.delete('stripe_cancelled');
-          setParams(np, { replace: true });
-        }
-
         const { data } = await API.get(`/orders/${id}`);
         setOrder(data);
       } catch (e) {
@@ -61,7 +32,6 @@ export default function OrderDetail() {
         });
       } finally { setLoading(false); }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isAdmin]);
 
   // Admins shouldn't see the customer-facing order page — send them straight
@@ -119,12 +89,11 @@ export default function OrderDetail() {
         carrier={order.carrier}
       />
 
-      {/* Retry-payment banner for unpaid online orders (Stripe or Razorpay). */}
-      {!order.isPaid && (order.paymentMethod === 'Stripe' || order.paymentMethod === 'Razorpay') && order.status !== 'cancelled' && (
+      {/* Retry-payment banner for unpaid Razorpay orders. */}
+      {!order.isPaid && order.paymentMethod === 'Razorpay' && order.status !== 'cancelled' && (
         <PayNowBanner
           orderId={order._id}
           total={order.totalPrice}
-          method={order.paymentMethod}
           onPaid={(updated) => setOrder(updated)}
         />
       )}
@@ -173,24 +142,18 @@ export default function OrderDetail() {
   );
 }
 
-function PayNowBanner({ orderId, total, method, onPaid }) {
+function PayNowBanner({ orderId, total, onPaid }) {
   const [loading, setLoading] = useState(false);
   const handleRetry = async () => {
     setLoading(true);
     try {
-      if (method === 'Razorpay') {
-        const { data: session } = await API.post('/payment/razorpay/create-order', { orderId });
-        const result = await openRazorpayCheckout({
-          ...session,
-          onSuccess: (updated) => onPaid?.(updated),
-          onDismiss: () => setLoading(false),
-        });
-        if (result) onPaid?.(result);
-      } else {
-        // Stripe
-        const { data } = await API.post('/payment/create-checkout-session', { orderId });
-        window.location.href = data.url;
-      }
+      const { data: session } = await API.post('/payment/razorpay/create-order', { orderId });
+      const result = await openRazorpayCheckout({
+        ...session,
+        onSuccess: (updated) => onPaid?.(updated),
+        onDismiss: () => setLoading(false),
+      });
+      if (result) onPaid?.(result);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Could not start payment. Try again in a moment.');
     } finally {
@@ -202,7 +165,7 @@ function PayNowBanner({ orderId, total, method, onPaid }) {
       <div className="flex-1">
         <p className="font-extrabold text-lg flex items-center gap-2">💳 Complete your payment</p>
         <p className="text-sm text-white/90 mt-1">
-          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via {method} to confirm.
+          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via Razorpay to confirm.
         </p>
       </div>
       <button

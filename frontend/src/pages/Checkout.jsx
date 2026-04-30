@@ -59,21 +59,6 @@ export default function Checkout() {
         totalPrice: total,
       });
 
-      if (paymentMethod === 'Stripe') {
-        try {
-          const { data: session } = await API.post('/payment/create-checkout-session', { orderId: order._id });
-          clearCart();
-          window.location.href = session.url; // hand off to Stripe
-          return;
-        } catch (err) {
-          const msg = err.response?.data?.message || 'Could not start Stripe checkout';
-          toast.error(`${msg} — your order is saved, you can retry payment from order details.`);
-          clearCart();
-          navigate(`/order/${order._id}`);
-          return;
-        }
-      }
-
       if (paymentMethod === 'Razorpay') {
         try {
           const { data: session } = await API.post('/payment/razorpay/create-order', { orderId: order._id });
@@ -142,15 +127,6 @@ export default function Checkout() {
                 <span className="text-2xl flex-shrink-0">📱</span>
               </label>
 
-              {/* Stripe — international cards */}
-              <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${paymentMethod === 'Stripe' ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'}`}>
-                <input type="radio" name="pm" checked={paymentMethod === 'Stripe'} onChange={() => setPaymentMethod('Stripe')} className="accent-primary-500" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold">Credit/Debit Card (Stripe)</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Visa · Mastercard · Amex · International cards</p>
-                </div>
-                <span className="text-2xl flex-shrink-0">💳</span>
-              </label>
 
               {/* COD last */}
               <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${paymentMethod === 'COD' ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'}`}>
