@@ -4,9 +4,11 @@ import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
-const SHIPPING_FEE = 50;
-const FREE_SHIPPING_THRESHOLD = 999;
-const TAX_RATE = 0.05;
+// TEMP — shipping + tax disabled while testing Razorpay live payments.
+// Restore SHIPPING_FEE = 50 and TAX_RATE = 0.05 once testing is done.
+const SHIPPING_FEE = 0;
+const FREE_SHIPPING_THRESHOLD = 0;
+const TAX_RATE = 0;
 
 const computeUnitPrice = (product, qty, isWholesaleAccount) => {
   const base = product.discount > 0
