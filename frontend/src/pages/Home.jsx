@@ -10,6 +10,7 @@ import BrandMarquee from '../components/BrandMarquee';
 import VideoShowcase from '../components/VideoShowcase';
 import Reveal from '../components/Reveal';
 import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight, FiPhone, FiPackage, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+// FiShield, FiRefreshCw, FiHeadphones used in the USP trust strip below
 
 const heroSlides = [
   {
@@ -187,12 +188,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3 promo cards (toycra style) */}
-      <section className="border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PromoStrip icon={<FiTruck />} title="Free Shipping" desc="On orders above ₹999" link="/shop" cta="Shop Now" color="bg-blue-50 text-blue-600" />
-          <PromoStrip icon={<FiPhone />} title="Give Us A Call" desc="+91 86557 87075" link="tel:+918655787075" cta="Talk to us" color="bg-green-50 text-green-600" />
-          <PromoStrip icon={<FiPackage />} title="Bulk Inquiry" desc="Wholesale prices for shops" link="/wholesale" cta="Learn more" color="bg-purple-50 text-purple-600" />
+      {/* USP strip — Amazon/Flipkart style trust signals right under hero */}
+      <section className="border-b bg-gradient-to-r from-gray-50 via-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5 grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+          <UspBadge icon={<FiTruck />}      title="Free Shipping"  desc="On orders ₹999+"      color="bg-blue-50 text-blue-600" />
+          <UspBadge icon={<FiShield />}     title="100% Authentic" desc="Top-brand products"  color="bg-emerald-50 text-emerald-600" />
+          <UspBadge icon={<FiRefreshCw />}  title="Easy Returns"   desc="7-day hassle-free"   color="bg-orange-50 text-orange-600" />
+          <UspBadge icon={<FiHeadphones />} title="Help Anytime"   desc="+91 86557 87075"      color="bg-purple-50 text-purple-600" />
+          <UspBadge icon={<FiPackage />}    title="Bulk Inquiry"   desc="Wholesale prices"    color="bg-pink-50 text-pink-600" link="/wholesale" />
         </div>
       </section>
 
@@ -361,6 +364,24 @@ export default function Home() {
       </section>
     </div>
   );
+}
+
+function UspBadge({ icon, title, desc, color, link }) {
+  const inner = (
+    <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-white rounded-lg transition cursor-default">
+      <div className={`${color} w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-base sm:text-xl flex-shrink-0`}>
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="font-bold text-[11px] sm:text-sm leading-tight truncate">{title}</p>
+        <p className="text-[10px] sm:text-xs text-gray-500 leading-tight truncate">{desc}</p>
+      </div>
+    </div>
+  );
+  if (link) {
+    return <Link to={link} className="cursor-pointer">{inner}</Link>;
+  }
+  return inner;
 }
 
 function PromoStrip({ icon, title, desc, link, cta, color }) {
