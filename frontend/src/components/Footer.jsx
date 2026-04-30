@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import FollowUs from './FollowUs';
 
 export default function Footer() {
   return (
@@ -12,6 +13,9 @@ export default function Footer() {
             <span className="text-2xl font-extrabold text-white">Mall</span>
           </div>
           <p className="text-sm">Your one-stop shop for the best toys from top global brands. Bringing smiles to children since day one.</p>
+          <div className="mt-5">
+            <FollowUs dark />
+          </div>
         </div>
 
         <div>
