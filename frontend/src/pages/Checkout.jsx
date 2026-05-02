@@ -52,6 +52,14 @@ export default function Checkout() {
   const [savingAddr, setSavingAddr] = useState(false);
   const [pinLookup, setPinLookup] = useState({ loading: false, error: '' });
 
+  // Show validation errors only after the user has interacted with a field
+  // (blurred away from it) or tried to submit. Keeps the form clean on
+  // first render — nobody likes a wall of red before they've typed anything.
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
+  const showError = (field) => (touched[field] || submitAttempted);
+
   // ---- Load saved addresses on mount ----
   useEffect(() => {
     let cancelled = false;
@@ -136,21 +144,30 @@ export default function Checkout() {
       phone: cleanPhone(user?.phone || ''),
     });
     setSaveAddress(true);
+    setTouched({});
+    setSubmitAttempted(false);
   };
 
   const openEdit = (addr) => {
     setEditingId(addr._id);
     setFormMode('edit');
     setForm({ ...addr });
+    // Editing existing data — pre-mark fields as touched so any validation
+    // issue surfaces immediately (the user already entered these values).
+    setTouched({ fullName: true, phone: true, street: true, city: true, state: true, zip: true });
+    setSubmitAttempted(false);
   };
 
   const closeForm = () => {
     setFormMode('closed');
     setEditingId(null);
     setForm(EMPTY_ADDR);
+    setTouched({});
+    setSubmitAttempted(false);
   };
 
   const submitAddressForm = async () => {
+    setSubmitAttempted(true);
     if (!formValid) {
       toast.error(Object.values(validation)[0]);
       return;
@@ -250,6 +267,7 @@ export default function Checkout() {
     let shippingAddress = null;
     if (formMode === 'new' || formMode === 'edit') {
       // The form is open. Validate first.
+      setSubmitAttempted(true);
       if (!formValid) {
         toast.error(Object.values(validation)[0]);
         return;
@@ -392,6 +410,8 @@ export default function Checkout() {
                       form={form}
                       setForm={setForm}
                       validation={validation}
+                      showError={showError}
+                      markTouched={markTouched}
                       pinLookup={pinLookup}
                       lookupPin={lookupPin}
                       isEdit={formMode === 'edit'}
@@ -605,17 +625,46 @@ function SavedAddressCard({ address: a, selected, onSelect, onEdit, onDelete, on
   );
 }
 
-function AddressForm({ form, setForm, validation, pinLookup, lookupPin, isEdit, isGuest, saveAddress, setSaveAddress, onCancel, onSubmit, saving }) {
+function AddressForm({ form, setForm, validation, showError, markTouched, pinLookup, lookupPin, isEdit, isGuest, saveAddress, setSaveAddress, onCancel, onSubmit, saving }) {
+  // err(field) returns the validation error for that field — but only when
+  // it should be visible (after blur or submit). Keeps the form quiet on
+  // first render.
+  const err = (field) => (showError(field) ? validation[field] : '');
   return (
     <div className="space-y-3 bg-gray-50/60 border-2 border-dashed border-gray-200 rounded-lg p-3 sm:p-4">
       <h3 className="font-bold text-sm flex items-center gap-2">
         <FiMapPin /> {isEdit ? 'Edit address' : 'Add a new address'}
       </h3>
       <div className="grid sm:grid-cols-2 gap-3">
-        <Field label="Full Name" value={form.fullName} onChange={(v) => setForm({ ...form, fullName: v })} error={validation.fullName} required />
-        <Field label="Mobile Number" value={form.phone} onChange={(v) => setForm({ ...form, phone: cleanPhone(v) })} placeholder="10-digit (starts with 6/7/8/9)" prefix="+91" maxLength={10} error={validation.phone} required />
+        <Field
+          label="Full Name"
+          value={form.fullName}
+          onChange={(v) => setForm({ ...form, fullName: v })}
+          onBlur={() => markTouched('fullName')}
+          error={err('fullName')}
+          required
+        />
+        <Field
+          label="Mobile Number"
+          value={form.phone}
+          onChange={(v) => setForm({ ...form, phone: cleanPhone(v) })}
+          onBlur={() => markTouched('phone')}
+          placeholder="9876543210"
+          prefix="+91"
+          maxLength={10}
+          error={err('phone')}
+          required
+        />
       </div>
-      <Field label="Flat / House / Building, Street" value={form.street} onChange={(v) => setForm({ ...form, street: v })} placeholder="e.g. Flat 4, Mobin Apt, Amrut Nagar" error={validation.street} required />
+      <Field
+        label="Flat / House / Building, Street"
+        value={form.street}
+        onChange={(v) => setForm({ ...form, street: v })}
+        onBlur={() => markTouched('street')}
+        placeholder="Flat 4, Mobin Apt, Amrut Nagar"
+        error={err('street')}
+        required
+      />
       <div className="grid sm:grid-cols-3 gap-3">
         <Field
           label="PIN Code"
@@ -625,12 +674,29 @@ function AddressForm({ form, setForm, validation, pinLookup, lookupPin, isEdit, 
             setForm({ ...form, zip: z });
             if (PIN_RE.test(z)) lookupPin(z);
           }}
-          placeholder="400612" maxLength={6} error={validation.zip}
+          onBlur={() => markTouched('zip')}
+          placeholder="400612"
+          maxLength={6}
+          error={err('zip')}
           hint={pinLookup.loading ? 'Looking up…' : pinLookup.error}
           required
         />
-        <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} error={validation.city} required />
-        <Field label="State" value={form.state} onChange={(v) => setForm({ ...form, state: v })} error={validation.state} required />
+        <Field
+          label="City"
+          value={form.city}
+          onChange={(v) => setForm({ ...form, city: v })}
+          onBlur={() => markTouched('city')}
+          error={err('city')}
+          required
+        />
+        <Field
+          label="State"
+          value={form.state}
+          onChange={(v) => setForm({ ...form, state: v })}
+          onBlur={() => markTouched('state')}
+          error={err('state')}
+          required
+        />
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <Field label="Label (optional)" value={form.label} onChange={(v) => setForm({ ...form, label: v.slice(0, 20) })} placeholder="Home, Office, Mom…" />
@@ -726,7 +792,7 @@ function SectionCard({ n, title, icon, active, done, children }) {
   );
 }
 
-function Field({ label, value, onChange, required, placeholder, prefix, maxLength, error, hint }) {
+function Field({ label, value, onChange, onBlur, required, placeholder, prefix, maxLength, error, hint }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -744,6 +810,7 @@ function Field({ label, value, onChange, required, placeholder, prefix, maxLengt
           className="flex-1 min-w-0 px-3 py-2.5 text-sm bg-transparent outline-none rounded-md"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           required={required}
           maxLength={maxLength}
