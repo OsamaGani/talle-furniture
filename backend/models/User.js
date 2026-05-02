@@ -48,6 +48,13 @@ const userSchema = new mongoose.Schema(
     // Password reset — server stores a hashed token to defend against DB leak.
     resetPasswordToken: { type: String, default: '' },
     resetPasswordExpiresAt: { type: Date },
+    // Per-account brute-force protection. The IP-based rate limit catches a
+    // single attacker hammering the login endpoint, but a determined one
+    // could rotate IPs to brute-force a specific account. Tracking failed
+    // attempts on the user record itself caps that at LOCKOUT_THRESHOLD
+    // failures regardless of where the requests originate from.
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockedUntil: { type: Date },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   },
   { timestamps: true }

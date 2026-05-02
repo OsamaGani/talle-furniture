@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 const { protect, admin } = require('../middleware/auth');
 const { sendStatusEmail } = require('../utils/orderEmails');
+const { audit } = require('../utils/audit');
 
 const router = express.Router();
 
@@ -355,6 +356,7 @@ router.put('/:id/status', protect, admin, asyncHandler(async (req, res) => {
     }
   }
 
+  audit(req, 'order.status-change', order._id, { from: oldStatus, to: newStatus, note });
   res.json({ ...updated.toObject(), emailSent: emailResult.sent });
 }));
 
@@ -362,6 +364,7 @@ router.delete('/:id', protect, admin, asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ message: 'Order not found' });
   await order.deleteOne();
+  audit(req, 'order.delete', order._id, { orderNumber: order.orderNumber, totalPrice: order.totalPrice });
   res.json({ message: 'Deleted' });
 }));
 

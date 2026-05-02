@@ -40,9 +40,31 @@ process.on('unhandledRejection', (err) => {
 });
 
 // Security headers — XSS, clickjacking, MIME-sniffing, HSTS.
-// crossOriginResourcePolicy=cross-origin so the frontend on a different
-// origin can still load /uploads/* images.
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+// API doesn't need a CSP itself (it returns JSON, not HTML), but every other
+// helmet header still applies. crossOriginResourcePolicy=cross-origin so the
+// frontend on a different origin can still load /uploads/* images.
+// referrerPolicy=no-referrer hides the API URL when this server happens to
+// emit links elsewhere.
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  // Disable the default CSP — Helmet's HTML-focused policy doesn't help a
+  // pure JSON API and leaks misleading directives if it ever did serve
+  // HTML by accident. The frontend (Cloudflare Pages) serves its own
+  // tighter CSP for the actual app shell.
+  contentSecurityPolicy: false,
+  referrerPolicy: { policy: 'no-referrer' },
+}));
+// Prevent the browser from caching authenticated API responses on shared /
+// proxy caches (e.g. ISP transparent proxies). The product list endpoints
+// override this back to public/max-age=60 themselves.
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/auth') || req.path.startsWith('/api/orders') ||
+      req.path.startsWith('/api/users') || req.path.startsWith('/api/addresses') ||
+      req.path.startsWith('/api/payment')) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+  next();
+});
 
 // Strict CORS allowlist. CLIENT_URL can be a comma-separated list to support
 // the production domain plus a staging / preview URL.

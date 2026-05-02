@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/auth');
+const { audit } = require('../utils/audit');
 
 const router = express.Router();
 
@@ -155,6 +156,7 @@ router.delete(
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     await product.deleteOne();
+    audit(req, 'product.delete', product._id, { name: product.name, brand: product.brand });
     res.json({ message: 'Product deleted' });
   })
 );

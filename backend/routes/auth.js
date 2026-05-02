@@ -136,16 +136,50 @@ router.post(
   })
 );
 
+// Per-account brute-force lockout — these stop a single account being
+// pummelled even if the attacker rotates IPs to dodge the IP-based rate limit.
+const LOCKOUT_THRESHOLD = 5;             // wrong-password attempts before lock
+const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 min
+
 router.post(
   '/login',
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email?.toLowerCase().trim() });
-    if (user && (await user.matchPassword(password))) {
-      res.json(userPayload(user));
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+
+    // ---- Account locked ----
+    // Check before verifying the password so we don't leak that the account
+    // exists or that the password was correct during the lockout window.
+    if (user?.lockedUntil && user.lockedUntil > new Date()) {
+      const minsLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      return res.status(429).json({
+        message: `Too many failed attempts. This account is temporarily locked. Try again in ${minsLeft} minute${minsLeft === 1 ? '' : 's'}, or reset your password.`,
+      });
     }
+
+    // ---- Wrong credentials ----
+    if (!user || !(await user.matchPassword(password))) {
+      // Bump the counter on the matched account (keeps generic 401 to avoid
+      // leaking whether the email exists). If the email doesn't exist, no
+      // counter is bumped — but the attacker won't get in either.
+      if (user) {
+        user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+        if (user.failedLoginAttempts >= LOCKOUT_THRESHOLD) {
+          user.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
+          console.warn(`🔒 Account locked: ${user.email} (${user.failedLoginAttempts} failed attempts)`);
+        }
+        await user.save();
+      }
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // ---- Success: reset counters ----
+    if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+      user.failedLoginAttempts = 0;
+      user.lockedUntil = undefined;
+      await user.save();
+    }
+    res.json(userPayload(user));
   })
 );
 
