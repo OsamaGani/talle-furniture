@@ -2,10 +2,10 @@ import { FiMail, FiFacebook, FiInstagram, FiYoutube } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const socials = [
-  { Icon: FiMail,       href: 'mailto:Huraira735@gmail.com', label: 'Email' },
+  { Icon: FiMail,       href: 'mailto:support@toymall.in',  label: 'Email' },
   { Icon: FiFacebook,   href: 'https://facebook.com',       label: 'Facebook' },
   { Icon: FiInstagram,  href: 'https://instagram.com',      label: 'Instagram' },
-  { Icon: FaWhatsapp,   href: 'https://wa.me/918655787075', label: 'WhatsApp' },
+  { Icon: FaWhatsapp,   href: 'https://wa.me/917738028750', label: 'WhatsApp' },
   { Icon: FiYoutube,    href: 'https://youtube.com',        label: 'YouTube' },
 ];
 

@@ -38,7 +38,7 @@ export default function Franchise() {
     setSending(true);
     setTimeout(() => {
       const body = encodeURIComponent(`Name: ${form.name}\nPhone: ${form.phone}\nCity: ${form.city}\n\n${form.message}`);
-      window.location.href = `mailto:Huraira735@gmail.com?subject=Franchise%20enquiry%20from%20${encodeURIComponent(form.city)}&body=${body}`;
+      window.location.href = `mailto:support@toymall.in?subject=Franchise%20enquiry%20from%20${encodeURIComponent(form.city)}&body=${body}`;
       toast.success('Opening your email client...');
       setSending(false);
     }, 400);

@@ -2,6 +2,12 @@ import { Link } from 'react-router-dom';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import FollowUs from './FollowUs';
 import NewsletterForm from './NewsletterForm';
+import {
+  PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL,
+  PHONE_SECONDARY_DISPLAY, PHONE_SECONDARY_TEL,
+  EMAIL_PRIMARY, EMAIL_GMAIL,
+  STORE_ADDRESS_FULL, STORE_NAME,
+} from '../config/contact';
 
 export default function Footer() {
   return (
@@ -45,9 +51,26 @@ export default function Footer() {
           <p className="text-sm mb-3">Get latest deals and offers in your inbox.</p>
           <NewsletterForm variant="dark" source="footer" />
           <ul className="mt-4 space-y-2 text-sm">
-            <li className="flex items-center gap-2"><FiPhone /> +91 86557 87075</li>
-            <li className="flex items-center gap-2"><FiMail /> Huraira735@gmail.com</li>
-            <li className="flex items-start gap-2"><FiMapPin className="mt-1 flex-shrink-0" /> <span>Toy Mall, Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</span></li>
+            <li className="flex items-center gap-2">
+              <FiPhone className="flex-shrink-0" />
+              <a href={`tel:${PHONE_PRIMARY_TEL}`} className="hover:text-white">{PHONE_PRIMARY_DISPLAY}</a>
+            </li>
+            <li className="flex items-center gap-2 text-gray-400">
+              <FiPhone className="flex-shrink-0 opacity-60" />
+              <a href={`tel:${PHONE_SECONDARY_TEL}`} className="hover:text-white text-xs">{PHONE_SECONDARY_DISPLAY}</a>
+            </li>
+            <li className="flex items-center gap-2">
+              <FiMail className="flex-shrink-0" />
+              <a href={`mailto:${EMAIL_PRIMARY}`} className="hover:text-white">{EMAIL_PRIMARY}</a>
+            </li>
+            <li className="flex items-center gap-2 text-gray-400">
+              <FiMail className="flex-shrink-0 opacity-60" />
+              <a href={`mailto:${EMAIL_GMAIL}`} className="hover:text-white text-xs">{EMAIL_GMAIL}</a>
+            </li>
+            <li className="flex items-start gap-2">
+              <FiMapPin className="mt-1 flex-shrink-0" />
+              <span>{STORE_NAME}, {STORE_ADDRESS_FULL}</span>
+            </li>
           </ul>
         </div>
       </div>

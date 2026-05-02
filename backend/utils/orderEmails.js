@@ -156,7 +156,7 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
       </div>
 
       <p style="color:#6b7280;font-size:13px;line-height:1.6;text-align:center;margin:16px 0 0 0;">
-        Questions? Reply to this email or call <a href="tel:+918655787075" style="color:#e53935;">+91 86557 87075</a>
+        Questions? Reply to this email or call <a href="tel:+917738028750" style="color:#e53935;">+91 77380 28750</a>
       </p>
     </div>
 
@@ -164,7 +164,7 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
     <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb;">
       <p style="margin:0;font-size:12px;color:#6b7280;">Toy Mall</p>
       <p style="margin:4px 0 0 0;font-size:11px;color:#9ca3af;">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</p>
-      <p style="margin:2px 0 0 0;font-size:11px;color:#9ca3af;">📞 +91 86557 87075 · ✉ Huraira735@gmail.com</p>
+      <p style="margin:2px 0 0 0;font-size:11px;color:#9ca3af;">📞 +91 77380 28750 · ✉ support@toymall.in</p>
       <p style="margin:8px 0 0 0;font-size:11px;color:#9ca3af;">© ${new Date().getFullYear()} Toy Mall. All rights reserved.</p>
     </div>
   </div>
@@ -182,7 +182,7 @@ function buildText(order, template, customerName, adminNote) {
     text += `Tracking Number: ${order.trackingNumber}\n`;
   }
   if (adminNote) text += `\nNote: ${adminNote}\n`;
-  text += `\nTotal: ₹${order.totalPrice.toFixed(2)}\n\nView your order: ${process.env.CLIENT_URL || 'http://localhost:5173'}/order/${order._id}\n\n— Team Toy Mall\nMobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612\nHuraira735@gmail.com`;
+  text += `\nTotal: ₹${order.totalPrice.toFixed(2)}\n\nView your order: ${process.env.CLIENT_URL || 'http://localhost:5173'}/order/${order._id}\n\n— Team Toy Mall\nMobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612\nsupport@toymall.in`;
   return text;
 }
 

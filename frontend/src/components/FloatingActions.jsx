@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { FaWhatsapp } from 'react-icons/fa';
+import { waLink } from '../config/contact';
 
 export default function FloatingActions() {
   const { pathname } = useLocation();
@@ -10,7 +11,7 @@ export default function FloatingActions() {
   return (
     <div className="fixed bottom-20 sm:bottom-4 right-4 z-40">
       <a
-        href="https://wa.me/918655787075?text=Hi%20Toy%20Mall!%20I%20have%20a%20question."
+        href={waLink('Hi Toy Mall! I have a question.')}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

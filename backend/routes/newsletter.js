@@ -35,7 +35,7 @@ function buildWelcomeEmail(email, promoCode, clientUrl) {
         <a href="${clientUrl}/shop" style="display:inline-block;background:#111827;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Browse the catalogue</a>
       </p>
       <p style="color:#6b7280;font-size:13px;margin:24px 0 0 0;">
-        Questions? Reply to this email or contact us at <a href="mailto:Huraira735@gmail.com" style="color:#374151;">Huraira735@gmail.com</a>.
+        Questions? Reply to this email or contact us at <a href="mailto:support@toymall.in" style="color:#374151;">support@toymall.in</a>.
       </p>
     </div>
     <div style="background:#f9fafb;padding:14px 20px;text-align:center;border-top:1px solid #e5e7eb;">
@@ -61,7 +61,7 @@ To say thanks, here's a one-time discount code for your first order:
 
 Browse the catalogue: ${clientUrl}/shop
 
-Questions? Reply to this email or contact us at Huraira735@gmail.com.
+Questions? Reply to this email or contact us at support@toymall.in.
 
 — Toy Mall
 Mobin Apartment A Wing, Shop No. 4, Mumbra, Thane — 400612
@@ -72,7 +72,7 @@ You're receiving this because you subscribed. Unsubscribe: ${unsubscribeUrl}`;
   // declares one-click unsubscribe — without these headers they down-rank
   // the message into Promotions / Spam.
   const headers = {
-    'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:Huraira735@gmail.com?subject=Unsubscribe>`,
+    'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:support@toymall.in?subject=Unsubscribe>`,
     'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     'X-Mailer': 'Toy Mall',
   };

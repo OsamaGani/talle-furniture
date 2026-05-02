@@ -11,6 +11,7 @@ import {
   FiRefreshCw, FiTag, FiClock, FiPhone, FiMail, FiEdit2, FiPlus,
   FiTrash2, FiHome, FiBriefcase,
 } from 'react-icons/fi';
+import { PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL, EMAIL_PRIMARY } from '../config/contact';
 
 // Indian mobile: 10 digits starting 6/7/8/9
 const PHONE_RE = /^[6-9]\d{9}$/;
@@ -547,8 +548,8 @@ export default function Checkout() {
 
             <div className="bg-white border rounded-lg p-3 text-xs text-gray-600 space-y-1.5">
               <p className="font-semibold text-gray-900">Need help?</p>
-              <a href="tel:+918655787075" className="flex items-center gap-2 hover:text-primary-500"><FiPhone size={12} /> +91 86557 87075</a>
-              <a href="mailto:Huraira735@gmail.com" className="flex items-center gap-2 hover:text-primary-500"><FiMail size={12} /> Huraira735@gmail.com</a>
+              <a href={`tel:${PHONE_PRIMARY_TEL}`} className="flex items-center gap-2 hover:text-primary-500"><FiPhone size={12} /> {PHONE_PRIMARY_DISPLAY}</a>
+              <a href={`mailto:${EMAIL_PRIMARY}`} className="flex items-center gap-2 hover:text-primary-500"><FiMail size={12} /> {EMAIL_PRIMARY}</a>
             </div>
           </aside>
         </form>

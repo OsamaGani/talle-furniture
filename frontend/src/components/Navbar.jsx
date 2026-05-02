@@ -15,7 +15,7 @@ const announcements = [
   { text: '⭐ New Arrivals every week — fresh toys, top brands',                      href: '/shop?newArrival=true' },
   { text: '💯 100% Authentic — LEGO, Hot Wheels, Barbie, Nerf, Marvel & more',        href: '/shop' },
   { text: '🎁 Easy 7-Day Returns on every purchase',                                  href: '/refund-policy' },
-  { text: '📞 Need help? Call +91 86557 87075 — we reply fast',                       href: '/contact' },
+  { text: '📞 Need help? Call +91 77380 28750 — we reply fast',                       href: '/contact' },
 ];
 
 const ageGroups = [
@@ -162,7 +162,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Shipping over ₹999</span>
-            <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 86557 87075</span>
+            <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 77380 28750</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/wholesale" className="hover:text-yellow-300 font-semibold">🛍 Wholesale</Link>

@@ -113,7 +113,7 @@ export default function About() {
           <Link to="/contact" className="bg-gray-900 text-white rounded-xl p-8 hover:shadow-xl transition flex items-center justify-between">
             <div>
               <h3 className="text-2xl font-extrabold">Get in touch</h3>
-              <p className="opacity-90 mt-1">Visit our store in Mumbra or call +91 86557 87075</p>
+              <p className="opacity-90 mt-1">Visit our store in Mumbra or call +91 77380 28750</p>
             </div>
             <FiArrowRight size={28} />
           </Link>

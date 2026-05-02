@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { FiTrash2, FiShoppingBag, FiTruck } from 'react-icons/fi';
 import { resolveImage } from '../utils/imageUrl';
+import { PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL, EMAIL_PRIMARY } from '../config/contact';
 
 export default function Cart() {
   const { items, removeFromCart, updateQty, subtotal, shipping, tax, total, amountToFreeShipping, FREE_SHIPPING_THRESHOLD, isWholesale } = useCart();
@@ -138,8 +139,8 @@ export default function Cart() {
           {/* Help line */}
           <div className="bg-white border rounded-lg p-3 text-xs text-gray-600">
             <p className="font-semibold text-gray-900 mb-1">Need help?</p>
-            <a href="tel:+918655787075" className="block hover:text-primary-500">📞 +91 86557 87075</a>
-            <a href="mailto:Huraira735@gmail.com" className="block hover:text-primary-500">✉ Huraira735@gmail.com</a>
+            <a href={`tel:${PHONE_PRIMARY_TEL}`} className="block hover:text-primary-500">📞 {PHONE_PRIMARY_DISPLAY}</a>
+            <a href={`mailto:${EMAIL_PRIMARY}`} className="block hover:text-primary-500">✉ {EMAIL_PRIMARY}</a>
           </div>
         </aside>
       </div>

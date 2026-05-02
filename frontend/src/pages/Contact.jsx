@@ -5,6 +5,11 @@ import API from '../api/axios';
 import { FiMapPin, FiPhone, FiMail, FiClock, FiSend, FiMessageCircle, FiCheckCircle } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import SEO from '../components/SEO';
+import {
+  PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL,
+  PHONE_SECONDARY_DISPLAY, PHONE_SECONDARY_TEL,
+  EMAIL_PRIMARY, EMAIL_GMAIL, waLink,
+} from '../config/contact';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
@@ -29,8 +34,8 @@ export default function Contact() {
   return (
     <div>
       <SEO
-        title="Contact Toy Mall — Mumbra, Thane | +91 86557 87075"
-        description="Get in touch with Toy Mall for orders, bulk wholesale enquiries, or product questions. Visit our store in Mumbra, Thane or call +91 86557 87075."
+        title={`Contact Toy Mall — Mumbra, Thane | ${PHONE_PRIMARY_DISPLAY}`}
+        description={`Get in touch with Toy Mall for orders, bulk wholesale enquiries, or product questions. Visit our store in Mumbra, Thane or call ${PHONE_PRIMARY_DISPLAY}.`}
         path="/contact"
       />
       <PageHeader
@@ -62,15 +67,18 @@ export default function Contact() {
           <InfoCard
             icon={<FiPhone />}
             title="Call Us"
-            lines={[<a href="tel:+918655787075" className="hover:text-primary-500">+91 86557 87075</a>]}
+            lines={[
+              <a href={`tel:${PHONE_PRIMARY_TEL}`} className="hover:text-primary-500">{PHONE_PRIMARY_DISPLAY}</a>,
+              <a href={`tel:${PHONE_SECONDARY_TEL}`} className="hover:text-primary-500 text-sm text-gray-600">{PHONE_SECONDARY_DISPLAY}</a>,
+            ]}
             color="text-blue-500 bg-blue-50"
           />
           <InfoCard
             icon={<FiMail />}
             title="Email Us"
             lines={[
-              <a href="mailto:Huraira735@gmail.com" className="hover:text-primary-500">Huraira735@gmail.com</a>,
-              <a href="mailto:Huraira735@gmail.com?subject=Bulk%20order%20enquiry" className="hover:text-primary-500 text-sm text-gray-600">Same address for bulk / wholesale</a>,
+              <a href={`mailto:${EMAIL_PRIMARY}`} className="hover:text-primary-500">{EMAIL_PRIMARY}</a>,
+              <a href={`mailto:${EMAIL_GMAIL}`} className="hover:text-primary-500 text-sm text-gray-600">{EMAIL_GMAIL}</a>,
             ]}
             color="text-purple-500 bg-purple-50"
           />
@@ -86,7 +94,7 @@ export default function Contact() {
               <p className="font-bold flex items-center gap-2"><FaWhatsapp /> WhatsApp us</p>
               <p className="text-sm opacity-90 mt-1">Quickest way to reach us</p>
             </div>
-            <a href="https://wa.me/918655787075" target="_blank" rel="noopener noreferrer" className="bg-white text-green-600 font-bold px-4 py-2 rounded-md hover:bg-gray-100">Chat now</a>
+            <a href={waLink()} target="_blank" rel="noopener noreferrer" className="bg-white text-green-600 font-bold px-4 py-2 rounded-md hover:bg-gray-100">Chat now</a>
           </div>
         </div>
 

@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import { FiSearch, FiShoppingBag, FiTruck, FiCreditCard, FiUser, FiPackage, FiMail, FiPhone, FiMessageCircle, FiChevronDown } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import {
+  PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL,
+  EMAIL_PRIMARY, waLink, mailtoLink,
+} from '../config/contact';
 
 const categories = [
   {
@@ -52,7 +56,7 @@ const categories = [
       { q: 'How long do refunds take?',
         a: 'Once we receive the returned item: 1–2 business days to process, then 5–7 business days for the refund to reach your account/card.' },
       { q: 'My order arrived damaged — what do I do?',
-        a: 'Email Huraira735@gmail.com the same day with photos of the damage. We\'ll dispatch a replacement at no extra cost.' },
+        a: `Email ${EMAIL_PRIMARY} the same day with photos of the damage. We'll dispatch a replacement at no extra cost.` },
     ],
   },
   {
@@ -111,9 +115,9 @@ export default function Help() {
 
       {/* Quick contact cards */}
       <section className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <ContactCard icon={<FaWhatsapp />} title="WhatsApp" desc="Chat with us instantly" cta="Open chat" link="https://wa.me/918655787075" color="bg-gradient-to-br from-green-500 to-emerald-600" />
-        <ContactCard icon={<FiPhone />} title="Call Us" desc="+91 86557 87075" cta="Call now" link="tel:+918655787075" color="bg-gradient-to-br from-blue-500 to-indigo-600" />
-        <ContactCard icon={<FiMail />} title="Email Us" desc="Huraira735@gmail.com" cta="Send email" link="mailto:Huraira735@gmail.com" color="bg-gradient-to-br from-primary-500 to-pink-600" />
+        <ContactCard icon={<FaWhatsapp />} title="WhatsApp" desc="Chat with us instantly" cta="Open chat" link={waLink()} color="bg-gradient-to-br from-green-500 to-emerald-600" />
+        <ContactCard icon={<FiPhone />} title="Call Us" desc={PHONE_PRIMARY_DISPLAY} cta="Call now" link={`tel:${PHONE_PRIMARY_TEL}`} color="bg-gradient-to-br from-blue-500 to-indigo-600" />
+        <ContactCard icon={<FiMail />} title="Email Us" desc={EMAIL_PRIMARY} cta="Send email" link={mailtoLink()} color="bg-gradient-to-br from-primary-500 to-pink-600" />
       </section>
 
       {/* FAQ categories */}

@@ -25,7 +25,7 @@ router.post(
       return res.status(400).json({ message: 'Message is too long (max 5000 characters).' });
     }
 
-    const TO = process.env.CONTACT_INBOX || 'Huraira735@gmail.com';
+    const TO = process.env.CONTACT_INBOX || 'support@toymall.in';
     const subjectLine = subject?.trim()
       ? `[Toy Mall Contact] ${subject.trim()}`
       : `[Toy Mall Contact] New enquiry from ${name.trim()}`;

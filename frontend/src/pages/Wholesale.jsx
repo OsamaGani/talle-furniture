@@ -181,8 +181,8 @@ export default function Wholesale() {
             </Link>
           )}
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-gray-300">
-            <span className="flex items-center gap-2"><FiPhone /> +91 86557 87075</span>
-            <span className="flex items-center gap-2"><FiMail /> Huraira735@gmail.com</span>
+            <span className="flex items-center gap-2"><FiPhone /> +91 77380 28750</span>
+            <span className="flex items-center gap-2"><FiMail /> support@toymall.in</span>
           </div>
         </div>
       </section>

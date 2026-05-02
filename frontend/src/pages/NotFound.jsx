@@ -171,13 +171,13 @@ export default function NotFound() {
           </p>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-4">
             <a
-              href="tel:+918655787075"
+              href="tel:+917738028750"
               className="inline-flex items-center gap-1.5 sm:gap-2 bg-white text-primary-600 hover:bg-yellow-300 hover:text-gray-900 font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow transition text-sm"
             >
               <FiPhone size={14} /> Call us
             </a>
             <a
-              href="mailto:Huraira735@gmail.com"
+              href="mailto:support@toymall.in"
               className="inline-flex items-center gap-1.5 sm:gap-2 bg-white/15 hover:bg-white/25 backdrop-blur border border-white/30 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg transition text-sm"
             >
               <FiMail size={14} /> Email

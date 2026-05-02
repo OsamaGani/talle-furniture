@@ -29,7 +29,7 @@ export default function Refund() {
 
       <h2 className="text-xl font-bold mt-6 mb-2">How to start a return</h2>
       <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
-        <li>Email us at <a href="mailto:Huraira735@gmail.com" className="text-primary-500 hover:underline">Huraira735@gmail.com</a> within 7 days of delivery.</li>
+        <li>Email us at <a href="mailto:support@toymall.in" className="text-primary-500 hover:underline">support@toymall.in</a> within 7 days of delivery.</li>
         <li>Mention your order number and what's wrong (a photo helps us approve fast).</li>
         <li>We'll arrange a courier pickup or share a return address.</li>
         <li>Pack the item securely with all original accessories.</li>
@@ -54,7 +54,7 @@ export default function Refund() {
 
       <h2 className="text-xl font-bold mt-6 mb-2">Need help?</h2>
       <p className="text-gray-700">
-        We're here to help — email <a href="mailto:Huraira735@gmail.com" className="text-primary-500 hover:underline">Huraira735@gmail.com</a> or WhatsApp us at <a href="https://wa.me/918655787075" className="text-primary-500 hover:underline">+91 86557 87075</a>.
+        We're here to help — email <a href="mailto:support@toymall.in" className="text-primary-500 hover:underline">support@toymall.in</a> or WhatsApp us at <a href="https://wa.me/917738028750" className="text-primary-500 hover:underline">+91 77380 28750</a>.
       </p>
     </PolicyLayout>
   );

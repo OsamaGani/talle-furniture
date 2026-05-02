@@ -31,7 +31,7 @@ export default function Shipping() {
       <p className="text-gray-700 mb-4">COD is available on most PIN codes for orders below ₹10,000. The exact COD amount is printed on the package label so the courier can collect it accurately.</p>
 
       <h2 className="text-xl font-bold mt-6 mb-2">If your package doesn't arrive</h2>
-      <p className="text-gray-700 mb-4">If your order hasn't arrived within the expected window, please contact us at <a href="mailto:Huraira735@gmail.com" className="text-primary-500 hover:underline">Huraira735@gmail.com</a> or call <a href="tel:+918655787075" className="text-primary-500 hover:underline">+91 86557 87075</a>. We'll trace it with our courier partner and resolve quickly.</p>
+      <p className="text-gray-700 mb-4">If your order hasn't arrived within the expected window, please contact us at <a href="mailto:support@toymall.in" className="text-primary-500 hover:underline">support@toymall.in</a> or call <a href="tel:+917738028750" className="text-primary-500 hover:underline">+91 77380 28750</a>. We'll trace it with our courier partner and resolve quickly.</p>
 
       <h2 className="text-xl font-bold mt-6 mb-2">Address changes</h2>
       <p className="text-gray-700">If you need to change your shipping address after placing an order, contact us within 2 hours. Once the package leaves our warehouse, we may not be able to redirect it.</p>

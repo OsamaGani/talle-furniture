@@ -242,7 +242,7 @@ export default function Home() {
           <UspBadge icon={<FiTruck />}      title="Free Shipping"  desc="On orders ₹999+"      color="bg-blue-50 text-blue-600" />
           <UspBadge icon={<FiShield />}     title="100% Authentic" desc="Top-brand products"  color="bg-emerald-50 text-emerald-600" />
           <UspBadge icon={<FiRefreshCw />}  title="Easy Returns"   desc="7-day hassle-free"   color="bg-orange-50 text-orange-600" />
-          <UspBadge icon={<FiHeadphones />} title="Help Anytime"   desc="+91 86557 87075"      color="bg-purple-50 text-purple-600" />
+          <UspBadge icon={<FiHeadphones />} title="Help Anytime"   desc="+91 77380 28750"      color="bg-purple-50 text-purple-600" />
           <UspBadge icon={<FiPackage />}    title="Bulk Inquiry"   desc="Wholesale prices"    color="bg-pink-50 text-pink-600" link="/wholesale" />
         </div>
       </section>
