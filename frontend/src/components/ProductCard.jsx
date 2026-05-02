@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { FiShoppingCart, FiStar, FiHeart, FiTruck, FiEye } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { resolveImage } from '../utils/imageUrl';
+import { resolveImage, PLACEHOLDER } from '../utils/imageUrl';
 
 const FREE_SHIPPING_THRESHOLD = 999;
 
@@ -64,7 +64,7 @@ export default function ProductCard({ product }) {
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          onError={(e) => { e.target.src = 'https://via.placeholder.com/400?text=Toy'; }}
+          onError={(e) => { e.target.src = PLACEHOLDER; }}
         />
         {/* Out of stock overlay */}
         {product.stock === 0 && (

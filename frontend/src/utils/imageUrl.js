@@ -10,7 +10,9 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 // /api to get the bare server origin used for static /uploads files.
 const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 
-const PLACEHOLDER = 'https://via.placeholder.com/400?text=Toy';
+// Inline SVG data URI — never makes a network request, can't 404, fast to
+// render. Replaces the dead via.placeholder.com service.
+export const PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23f3f4f6'/><text x='50%25' y='50%25' font-family='system-ui,sans-serif' font-size='32' font-weight='700' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'>🧸 Toy</text></svg>";
 
 export function resolveImage(src) {
   if (!src) return PLACEHOLDER;

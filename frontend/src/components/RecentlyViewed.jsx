@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiClock, FiArrowRight } from 'react-icons/fi';
 import { getRecentlyViewed } from '../utils/recentlyViewed';
-import { resolveImage } from '../utils/imageUrl';
+import { resolveImage, PLACEHOLDER } from '../utils/imageUrl';
 
 // Lightweight Recently Viewed strip for the homepage.
 // Reads from localStorage on mount — if the user hasn't browsed any
@@ -50,7 +50,7 @@ export default function RecentlyViewed() {
                     alt={p.name}
                     loading="lazy"
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com/200?text=Toy'; }}
+                    onError={(e) => { e.target.src = PLACEHOLDER; }}
                   />
                   {p.discount > 0 && (
                     <span className="absolute top-1 left-1 bg-primary-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded">

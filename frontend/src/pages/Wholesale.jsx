@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { FiCheck, FiPackage, FiTrendingDown, FiTruck, FiAward, FiShield, FiPhone, FiMail, FiArrowRight, FiBriefcase } from 'react-icons/fi';
+import { PLACEHOLDER } from '../utils/imageUrl';
 
 const benefits = [
   { icon: <FiTrendingDown />, title: 'Save up to 40%', desc: 'Special wholesale pricing on bulk orders' },
@@ -138,10 +139,10 @@ export default function Wholesale() {
                 className="group relative aspect-square rounded-xl overflow-hidden shadow hover:shadow-xl transition bg-gray-100"
               >
                 <img
-                  src={c.image || c.img || 'https://via.placeholder.com/400?text=Toy'}
+                  src={c.image || c.img || PLACEHOLDER}
                   alt={c.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400?text=Toy'; }}
+                  onError={(e) => { e.target.src = PLACEHOLDER; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
                   <h3 className="text-white font-bold text-lg drop-shadow">{c.name}</h3>

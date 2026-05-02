@@ -4,6 +4,7 @@ import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
 import { FiTrash2, FiPlus, FiEdit2 } from 'react-icons/fi';
+import { PLACEHOLDER } from '../../utils/imageUrl';
 
 export default function AdminBrands() {
   const [list, setList] = useState([]);
@@ -51,7 +52,7 @@ export default function AdminBrands() {
               <tbody>
                 {list.map((b) => (
                   <tr key={b._id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="p-3"><img src={b.logo || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded object-contain bg-gray-50" alt="" /></td>
+                    <td className="p-3"><img src={b.logo || PLACEHOLDER} className="w-10 h-10 rounded object-contain bg-gray-50" alt="" /></td>
                     <td className="font-medium">{b.name}</td>
                     <td className="text-gray-500">{b.slug}</td>
                     <td className="p-3 flex gap-1">

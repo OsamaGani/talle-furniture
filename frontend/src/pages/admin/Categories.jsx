@@ -4,6 +4,7 @@ import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
 import { FiTrash2, FiPlus, FiEdit2 } from 'react-icons/fi';
+import { PLACEHOLDER } from '../../utils/imageUrl';
 
 export default function AdminCategories() {
   const [list, setList] = useState([]);
@@ -55,7 +56,7 @@ export default function AdminCategories() {
                 {list.map((c) => (
                   <tr key={c._id} className="border-b last:border-0 hover:bg-gray-50">
                     <td className="p-3">
-                      <img src={c.image || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded object-cover" alt="" />
+                      <img src={c.image || PLACEHOLDER} className="w-10 h-10 rounded object-cover" alt="" />
                     </td>
                     <td className="font-medium">{c.name}</td>
                     <td className="text-gray-500">{c.slug}</td>

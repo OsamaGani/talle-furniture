@@ -4,6 +4,7 @@ import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
 import { FiTrash2, FiPlus, FiEdit2, FiArrowUp, FiArrowDown, FiEye, FiEyeOff, FiExternalLink } from 'react-icons/fi';
+import { PLACEHOLDER } from '../../utils/imageUrl';
 
 const emptyForm = { name: '', image: '', link: '', order: 0, active: true };
 
@@ -161,7 +162,7 @@ export default function AdminWholesaleCategories() {
                     </td>
                     <td className="p-3">
                       <img
-                        src={c.image || 'https://via.placeholder.com/80?text=?'}
+                        src={c.image || PLACEHOLDER}
                         className="w-14 h-14 rounded object-cover border"
                         alt={c.name}
                       />

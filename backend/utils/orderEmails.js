@@ -53,8 +53,9 @@ const STATUS_TEMPLATES = {
 };
 
 // Email clients can't follow relative paths, so /uploads/foo.jpg must be made absolute.
-// Falls back to a tiny inline placeholder if there's no image at all.
-const PLACEHOLDER_IMG = 'https://via.placeholder.com/64x64.png?text=Toy';
+// Falls back to a reliable hosted placeholder if there's no image — note this
+// MUST be a remote URL (Gmail and others strip data: URIs from <img>).
+const PLACEHOLDER_IMG = 'https://placehold.co/64x64/f3f4f6/9ca3af?text=Toy';
 function absoluteImage(image, apiBase) {
   if (!image) return PLACEHOLDER_IMG;
   if (/^https?:\/\//i.test(image)) return image;
