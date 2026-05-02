@@ -75,6 +75,26 @@ const orderSchema = new mongoose.Schema(
     estimatedDelivery: Date,
     trackingNumber: String,
     carrier: { type: String, default: '' }, // e.g. 'Bluedart', 'FedEx', 'Self Delivery'
+
+    // Cancellation + refund tracking. Customers can cancel their own orders
+    // before they're packed/shipped; if they paid online we attempt a
+    // Razorpay-side refund automatically.
+    cancelledBy: { type: String, enum: ['', 'customer', 'admin'], default: '' },
+    cancelledReason: { type: String, default: '' },
+    cancelledAt: Date,
+    refund: {
+      // 'initiated' = Razorpay accepted the refund request
+      // 'completed' = funds returned to customer (set by webhook later)
+      // 'failed'    = refund call errored — manual intervention needed
+      // 'pending_manual' = paid order cancelled but auto-refund failed; admin to resolve
+      // 'not_applicable' = COD or unpaid; nothing to refund
+      status: { type: String, default: '' },
+      id: { type: String, default: '' },     // Razorpay refund id (rfnd_...)
+      amount: { type: Number, default: 0 },  // in paise, mirrors Razorpay
+      initiatedAt: Date,
+      completedAt: Date,
+      failureReason: { type: String, default: '' },
+    },
   },
   { timestamps: true }
 );

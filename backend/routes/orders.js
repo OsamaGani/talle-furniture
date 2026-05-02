@@ -136,6 +136,137 @@ router.get('/', protect, admin, asyncHandler(async (req, res) => {
   res.json(orders);
 }));
 
+// Customer-initiated cancellation. Allowed only while the order is still in
+// 'pending' or 'confirmed' status — once it's been packed/shipped the
+// customer needs to go through the returns flow with the admin instead.
+//
+// Side effects on cancel:
+//   * stock for every line item is restored (atomic $inc per product)
+//   * status flips to 'cancelled' with a customer-attributed history entry
+//   * if paid via Razorpay, an automatic refund is requested through the
+//     Razorpay API. The refund record is saved on the order so the customer
+//     can see "Refund initiated, expect 5–7 business days" on the order page.
+//   * if paid via COD that hasn't been delivered yet — nothing to refund.
+//   * customer + admin both get a status email so everyone's in sync.
+router.put('/:id/cancel', protect, asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: 'Order not found' });
+
+  // Only the order owner can cancel from the customer side. Admins use the
+  // dedicated /:id/status route.
+  if (order.user.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ message: 'You can only cancel your own orders' });
+  }
+
+  if (order.status === 'cancelled') {
+    return res.status(400).json({ message: 'This order is already cancelled' });
+  }
+
+  const cancellable = ['pending', 'confirmed'];
+  if (!cancellable.includes(order.status)) {
+    return res.status(400).json({
+      message: 'This order has already been packed or shipped — please contact us to arrange a return instead of cancelling.',
+    });
+  }
+
+  const reason = String(req.body?.reason || '').trim().slice(0, 200);
+
+  // Restore stock — fire-and-forget per item; failures don't block the cancel
+  // because over-restoring is recoverable from inventory; under-restoring isn't.
+  await Promise.allSettled(
+    order.items.map((it) =>
+      Product.findByIdAndUpdate(it.product, { $inc: { stock: it.qty } })
+    )
+  );
+
+  // Update order itself
+  order.status = 'cancelled';
+  order.cancelledBy = 'customer';
+  order.cancelledAt = new Date();
+  order.cancelledReason = reason;
+  order.statusHistory.push({
+    status: 'cancelled',
+    note: reason ? `Cancelled by customer · ${reason}` : 'Cancelled by customer',
+    at: new Date(),
+  });
+
+  // ---- Refund flow ----
+  if (order.isPaid && order.paymentMethod === 'Razorpay' && order.paymentResult?.id) {
+    const id = process.env.RAZORPAY_KEY_ID;
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!id || !secret) {
+      // Razorpay not configured on this environment — flag for manual refund.
+      order.refund = {
+        status: 'pending_manual',
+        amount: Math.round(order.totalPrice * 100),
+        initiatedAt: new Date(),
+        failureReason: 'Razorpay credentials not configured',
+      };
+    } else {
+      try {
+        const Razorpay = require('razorpay');
+        const razorpay = new Razorpay({ key_id: id, key_secret: secret });
+        const refund = await razorpay.payments.refund(order.paymentResult.id, {
+          amount: Math.round(order.totalPrice * 100),
+          speed: 'normal', // 'optimum' = instant refund (Razorpay charges extra)
+          notes: {
+            orderId: String(order._id),
+            orderNumber: order.orderNumber || '',
+            reason: reason || 'Customer cancelled',
+          },
+        });
+        order.refund = {
+          status: 'initiated',
+          id: refund.id,
+          amount: refund.amount,
+          initiatedAt: new Date(),
+        };
+        // Reverse the paid flag so revenue dashboards stay accurate. paidAt
+        // is left intact as the historical timestamp of original capture.
+        order.isPaid = false;
+        console.log(`💸 Razorpay refund initiated for order ${order._id} -> ${refund.id}`);
+      } catch (err) {
+        console.error('Razorpay refund failed:', err.message);
+        order.refund = {
+          status: 'pending_manual',
+          amount: Math.round(order.totalPrice * 100),
+          initiatedAt: new Date(),
+          failureReason: err.message || 'Razorpay refund call failed',
+        };
+      }
+    }
+  } else if (order.paymentMethod === 'COD' && !order.isPaid) {
+    // COD that wasn't delivered yet — nothing was charged, nothing to refund.
+    order.refund = { status: 'not_applicable', amount: 0 };
+  } else if (order.isPaid && order.paymentMethod === 'COD') {
+    // Pre-paid COD (rare edge case — admin marked paid before delivery).
+    // Roll back the paid flag and require manual refund.
+    order.isPaid = false;
+    order.refund = {
+      status: 'pending_manual',
+      amount: Math.round(order.totalPrice * 100),
+      initiatedAt: new Date(),
+      failureReason: 'Pre-paid COD requires manual cash refund',
+    };
+  } else {
+    order.refund = { status: 'not_applicable', amount: 0 };
+  }
+
+  const updated = await order.save();
+
+  // Notify the customer + admin via status email (best-effort)
+  try {
+    const customer = await User.findById(order.user);
+    if (customer?.email) {
+      await sendStatusEmail(updated, customer.email, customer.name, reason);
+    }
+  } catch (err) {
+    console.error('Cancel email failed:', err.message);
+  }
+
+  res.json(updated);
+}));
+
 router.get('/:id', protect, asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id).populate('user', 'name email');
   if (!order) return res.status(404).json({ message: 'Order not found' });
