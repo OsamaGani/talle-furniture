@@ -48,17 +48,17 @@ const heroSlides = [
 
 const sideCards = [
   {
-    eyebrow: 'BIG SAVINGS',
-    title: 'Up to 50% Off',
-    subtitle: 'on Hot Wheels &amp; Vehicles',
+    eyebrow: 'WEEKEND DEAL',
+    title: 'Vehicles up to 50% Off',
+    subtitle: 'Hot Wheels die-cast cars, remote-control beasts and racing tracks.',
     link: '/shop?category=Vehicles',
     image: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=600',
     bg: 'bg-gradient-to-br from-blue-500 to-indigo-700',
   },
   {
-    eyebrow: 'NEW IN',
-    title: 'Magical Dolls',
-    subtitle: 'Barbie, Disney &amp; more',
+    eyebrow: 'JUST LANDED',
+    title: 'Dolls & Pretend Play',
+    subtitle: 'Barbie, Disney princesses, kitchen sets and more — for the storytellers.',
     link: '/shop?category=Dolls',
     image: 'https://images.unsplash.com/photo-1606503153255-59d8b8b6a9ec?w=600',
     bg: 'bg-gradient-to-br from-pink-500 to-rose-600',
@@ -239,11 +239,11 @@ export default function Home() {
       {/* USP strip — Amazon/Flipkart style trust signals right under hero */}
       <section className="border-b bg-gradient-to-r from-gray-50 via-white to-gray-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5 grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
-          <UspBadge icon={<FiTruck />}      title="Free Shipping"  desc="On orders ₹999+"      color="bg-blue-50 text-blue-600" />
-          <UspBadge icon={<FiShield />}     title="100% Authentic" desc="Top-brand products"  color="bg-emerald-50 text-emerald-600" />
-          <UspBadge icon={<FiRefreshCw />}  title="Easy Returns"   desc="7-day hassle-free"   color="bg-orange-50 text-orange-600" />
-          <UspBadge icon={<FiHeadphones />} title="Help Anytime"   desc="+91 77380 28750"      color="bg-purple-50 text-purple-600" />
-          <UspBadge icon={<FiPackage />}    title="Bulk Inquiry"   desc="Wholesale prices"    color="bg-pink-50 text-pink-600" link="/wholesale" />
+          <UspBadge icon={<FiTruck />}      title="Free Pan-India Delivery" desc="On every order over ₹999"  color="bg-blue-50 text-blue-600" />
+          <UspBadge icon={<FiShield />}     title="100% Genuine Brands"     desc="Direct from authorised dealers" color="bg-emerald-50 text-emerald-600" />
+          <UspBadge icon={<FiRefreshCw />}  title="7-Day Easy Returns"      desc="No questions asked"        color="bg-orange-50 text-orange-600" />
+          <UspBadge icon={<FiHeadphones />} title="Talk to a Human"         desc="Call +91 77380 28750"      color="bg-purple-50 text-purple-600" link="/contact" />
+          <UspBadge icon={<FiPackage />}    title="Wholesale Pricing"       desc="40% off for shop owners"   color="bg-pink-50 text-pink-600" link="/wholesale" />
         </div>
       </section>
 
