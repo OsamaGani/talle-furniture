@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MobileBackBar from './components/MobileBackBar';
+import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import VerifyEmailBanner from './components/VerifyEmailBanner';
 import ScrollToTop from './components/ScrollToTop';
@@ -63,7 +64,7 @@ export default function App() {
   const { pathname } = useLocation();
   const isInvoice = pathname.includes('/invoice') || pathname.includes('/label');
   return (
-    <div className="flex min-h-screen flex-col bg-white overflow-x-clip">
+    <div className="flex min-h-screen flex-col bg-white overflow-x-clip pb-14 sm:pb-0">
       <ScrollToTop />
       {!isInvoice && <RouteLoader duration={700} />}
       {!isInvoice && <Navbar />}
@@ -130,6 +131,7 @@ export default function App() {
       </main>
       {!isInvoice && <Footer />}
       {!isInvoice && <FloatingActions />}
+      {!isInvoice && <BottomNav />}
     </div>
   );
 }

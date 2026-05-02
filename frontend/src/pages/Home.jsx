@@ -9,8 +9,10 @@ import StatsCounter from '../components/StatsCounter';
 import BrandMarquee from '../components/BrandMarquee';
 import VideoShowcase from '../components/VideoShowcase';
 import Reveal from '../components/Reveal';
-import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight, FiPhone, FiPackage, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight, FiPhone, FiPackage, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi';
 import SEO from '../components/SEO';
+import ShopByAge from '../components/ShopByAge';
+import RecentlyViewed from '../components/RecentlyViewed';
 // FiShield, FiRefreshCw, FiHeadphones used in the USP trust strip below
 
 const heroSlides = [
@@ -92,6 +94,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
+  const [todaysDeals, setTodaysDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [slide, setSlide] = useState(0);
 
@@ -103,14 +106,16 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const [a, b, c] = await Promise.all([
+        const [a, b, c, d] = await Promise.all([
           API.get('/products?featured=true&limit=8'),
           API.get('/products?bestSeller=true&limit=8'),
           API.get('/products?newArrival=true&limit=8'),
+          API.get('/products?onDeal=true&sort=price-asc&limit=8'),
         ]);
         setFeatured(a.data.products);
         setBestSellers(b.data.products);
         setNewArrivals(c.data.products);
+        setTodaysDeals(d.data.products);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
@@ -234,11 +239,28 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Shop by Age */}
+      <ShopByAge />
+
       {/* Featured */}
       <Section title="Featured Toys" subtitle="Hand-picked favorites" link="/shop?featured=true" products={featured} />
 
+      {/* Today's Deals — eye-catching strip with discount accents */}
+      {todaysDeals.length > 0 && (
+        <Section
+          title={<span className="inline-flex items-center gap-2"><FiZap className="text-orange-500" /> Today's Deals</span>}
+          subtitle="25% off and more — limited quantities"
+          link="/shop?discount=true"
+          products={todaysDeals}
+          bg="bg-gradient-to-br from-orange-50 to-amber-50"
+        />
+      )}
+
       {/* Best Sellers */}
       <Section title="Best Sellers" subtitle="Most loved by customers" link="/shop?bestSeller=true" products={bestSellers} bg="bg-gray-50" />
+
+      {/* Recently Viewed — empty section returns null if no history yet */}
+      <RecentlyViewed />
 
       {/* Animated stats counter */}
       <StatsCounter />
