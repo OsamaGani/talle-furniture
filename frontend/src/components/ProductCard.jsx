@@ -53,10 +53,11 @@ export default function ProductCard({ product }) {
         <FiHeart size={15} className={wished ? 'fill-current' : ''} />
       </button>
 
-      {/* Image */}
+      {/* Image — square aspect so the photo dominates the card without
+          changing the overall card width set by the parent grid. */}
       <Link
         to={`/product/${product._id}`}
-        className="block h-28 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-gray-50 to-white p-1.5 sm:p-3 relative"
+        className="block aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-white p-2 sm:p-3 relative"
       >
         <img
           src={resolveImage(product.image || product.images?.[0])}
@@ -73,86 +74,80 @@ export default function ProductCard({ product }) {
         )}
       </Link>
 
-      {/* Body */}
-      <div className="p-2 sm:p-2.5 flex flex-col flex-1">
-        <p className="text-[9px] sm:text-[10px] uppercase tracking-wide text-gray-500 truncate font-semibold">
+      {/* Body — compact info column, image stays the hero */}
+      <div className="px-2 py-1.5 sm:px-2.5 sm:py-2 flex flex-col flex-1">
+        <p className="text-[8px] sm:text-[9px] uppercase tracking-wide text-gray-400 truncate font-semibold">
           {product.brand}
         </p>
 
         <Link to={`/product/${product._id}`}>
-          <h3 className="font-medium text-[12px] sm:text-[13px] text-gray-900 line-clamp-2 mt-0.5 hover:text-primary-500 leading-snug">
+          <h3 className="font-medium text-[11px] sm:text-xs text-gray-800 line-clamp-2 hover:text-primary-500 leading-snug">
             {product.name}
           </h3>
         </Link>
 
-        {/* Rating row — Flipkart-style green pill */}
+        {/* Rating + reviews — single tiny line */}
         {stars > 0 && (
-          <div className="flex items-center gap-1.5 mt-1">
-            <span className="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded inline-flex items-center gap-0.5">
-              {stars.toFixed(1)} <FiStar className="fill-current" size={9} />
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="bg-emerald-600 text-white text-[8px] sm:text-[9px] font-bold px-1 py-0 rounded inline-flex items-center gap-0.5">
+              {stars.toFixed(1)} <FiStar className="fill-current" size={7} />
             </span>
-            <span className="text-[10px] text-gray-500">
-              ({product.numReviews || 0})
-            </span>
+            <span className="text-[9px] text-gray-500">({product.numReviews || 0})</span>
           </div>
         )}
 
-        {/* Price block — final price + strike-through original + savings */}
+        {/* Price block */}
         <div className="mt-1">
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-base font-extrabold text-gray-900">₹{final.toFixed(0)}</span>
+          <div className="flex items-baseline gap-1 flex-wrap">
+            <span className="text-[13px] sm:text-sm font-bold text-gray-900">₹{final.toFixed(0)}</span>
             {product.discount > 0 && (
               <>
-                <span className="text-[11px] text-gray-400 line-through">₹{product.price.toFixed(0)}</span>
-                <span className="text-[10px] text-emerald-600 font-bold">{product.discount}% off</span>
+                <span className="text-[10px] text-gray-400 line-through">₹{product.price.toFixed(0)}</span>
+                <span className="text-[9px] text-emerald-600 font-bold">{product.discount}% off</span>
               </>
             )}
           </div>
           {saved > 0 && (
-            <p className="text-[10px] text-emerald-700">You save ₹{saved.toFixed(0)}</p>
+            <p className="text-[9px] text-gray-500 leading-tight">Save ₹{saved.toFixed(0)}</p>
           )}
         </div>
 
-        {/* Free shipping / stock signals — combined into one inline row to save space */}
+        {/* Stock / shipping signal — single conditional line */}
         {(eligibleFreeShip || lowStock) && product.stock > 0 && (
-          <p className="text-[10px] mt-0.5 flex items-center gap-1">
-            {eligibleFreeShip && (
-              <span className="text-emerald-600 font-semibold inline-flex items-center gap-1">
-                <FiTruck size={10} /> Free delivery
-              </span>
-            )}
-            {lowStock && (
-              <span className="text-orange-600 font-semibold">
-                Only {product.stock} left
-              </span>
-            )}
+          <p className="text-[9px] leading-tight mt-0.5">
+            {lowStock
+              ? <span className="text-orange-600 font-semibold">Only {product.stock} left</span>
+              : <span className="text-emerald-600 font-semibold inline-flex items-center gap-0.5"><FiTruck size={9} /> Free delivery</span>}
           </p>
         )}
+
+        {/* Spacer pushes buttons to bottom for grid alignment */}
+        <div className="flex-1" />
 
         {/* Mobile: single full-width Add button */}
         <button
           disabled={product.stock === 0}
           onClick={() => addToCart(product)}
-          className="sm:hidden mt-1.5 w-full bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-bold py-1.5 rounded flex items-center justify-center gap-1.5 transition active:scale-95"
+          className="sm:hidden mt-1.5 w-full bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-[10px] font-bold py-1 rounded flex items-center justify-center gap-1 transition active:scale-95"
         >
-          <FiShoppingCart size={12} />
+          <FiShoppingCart size={10} />
           {product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
         </button>
 
         {/* Desktop: View + Add side by side */}
-        <div className="hidden sm:flex gap-1.5 mt-2">
+        <div className="hidden sm:flex gap-1.5 mt-1.5">
           <Link
             to={`/product/${product._id}`}
-            className="flex-1 border border-gray-300 hover:border-primary-500 hover:text-primary-500 text-[11px] font-semibold py-1.5 rounded text-center inline-flex items-center justify-center gap-1 transition"
+            className="flex-1 border border-gray-200 hover:border-primary-500 hover:text-primary-500 text-[10px] font-semibold py-1 rounded text-center inline-flex items-center justify-center gap-1 transition"
           >
-            <FiEye size={11} /> View
+            <FiEye size={10} /> View
           </Link>
           <button
             disabled={product.stock === 0}
             onClick={() => addToCart(product)}
-            className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-[11px] font-bold py-1.5 rounded flex items-center justify-center gap-1 transition active:scale-95"
+            className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-[10px] font-bold py-1 rounded flex items-center justify-center gap-1 transition active:scale-95"
           >
-            <FiShoppingCart size={11} />
+            <FiShoppingCart size={10} />
             {product.stock === 0 ? 'Sold Out' : 'Add'}
           </button>
         </div>
