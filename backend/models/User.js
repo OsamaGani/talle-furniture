@@ -19,7 +19,10 @@ const userSchema = new mongoose.Schema(
     accountType: { type: String, enum: ['retail', 'wholesale'], default: 'retail' },
     businessName: { type: String, default: '' },
     gstNumber: { type: String, default: '' },
-    wholesaleApproved: { type: Boolean, default: true },
+    // Wholesale customers must be approved by an admin before they get
+    // wholesale prices — otherwise anyone could pick "wholesale" at signup
+    // and unlock bulk pricing instantly.
+    wholesaleApproved: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: false },
     verificationOTP: { type: String, default: '' },
     otpExpiresAt: { type: Date },

@@ -10,7 +10,12 @@ router.get(
   asyncHandler(async (req, res) => {
     const { keyword, category, brand, ageGroup, minPrice, maxPrice, sort, featured, bestSeller, newArrival, page = 1, limit = 24 } = req.query;
     const filter = {};
-    if (keyword) filter.name = { $regex: keyword, $options: 'i' };
+    if (keyword) {
+      // Escape regex metacharacters so a search for "a.*" doesn't become a
+      // CPU-burning regex. Cap length to keep the query bounded.
+      const safe = String(keyword).slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.name = { $regex: safe, $options: 'i' };
+    }
     if (category) filter.category = category;
     if (brand) filter.brand = brand;
     if (ageGroup) filter.ageGroup = ageGroup;

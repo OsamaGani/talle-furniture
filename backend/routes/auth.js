@@ -176,7 +176,30 @@ router.put(
     user.address = req.body.address || user.address;
     user.businessName = req.body.businessName ?? user.businessName;
     user.gstNumber = req.body.gstNumber ?? user.gstNumber;
-    if (req.body.password) user.password = req.body.password;
+
+    // Password change requires the CURRENT password — defends against a
+    // stolen JWT being used to lock the real owner out of their account.
+    if (req.body.password) {
+      const { currentPassword, password } = req.body;
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to set a new one' });
+      }
+      const ok = await user.matchPassword(currentPassword);
+      if (!ok) {
+        return res.status(401).json({ message: 'Current password is incorrect' });
+      }
+      // Match the registration strength rules.
+      if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters' });
+      }
+      if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
+        return res.status(400).json({ message: 'Password must contain both upper and lower case letters' });
+      }
+      if (!/\d/.test(password)) {
+        return res.status(400).json({ message: 'Password must contain at least one number' });
+      }
+      user.password = password; // bcrypt hashed by User.pre('save')
+    }
     const updated = await user.save();
     res.json(userPayload(updated));
   })
