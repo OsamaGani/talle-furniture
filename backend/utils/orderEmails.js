@@ -57,9 +57,11 @@ const STATUS_TEMPLATES = {
   },
 };
 
-// Builds the body copy for a cancellation email based on who cancelled,
-// the payment method, and the live refund state on the order. Returns
-// plain text — buildHtml wraps it with the standard layout.
+// Builds the cancellation email body — splits into:
+//   1. intro paragraph (changes based on who cancelled)
+//   2. a visually prominent refund callout box (when applicable)
+//   3. "what happens next" timeline (when applicable)
+//   4. recorded reason line
 function cancelledMessage(order) {
   const who = order.cancelledBy;
   const reason = (order.cancelledReason || '').trim();
@@ -75,24 +77,138 @@ function cancelledMessage(order) {
     intro = 'Your order has been cancelled.';
   }
 
-  let refund;
-  if (r.status === 'initiated') {
-    const amount = r.amount > 0 ? `₹${(r.amount / 100).toFixed(2)}` : `₹${total}`;
-    refund = `<strong>Refund of ${amount}</strong> has been started and will return to your original payment method in <strong>5–7 business days</strong>.`;
-    if (r.id) refund += ` Refund reference: <code>${r.id}</code>.`;
-  } else if (r.status === 'completed') {
-    refund = `Your refund of ₹${(r.amount / 100).toFixed(2)} has been completed and credited to your account.`;
+  // ----- Refund callout box -----
+  // Visually-prominent green/amber/blue panel that spells out exactly what
+  // the customer should expect to see in their account, when, and where to
+  // look for it. This is what the merchant asked us to make crystal clear.
+  let refundCallout = '';
+  let timeline = '';
+
+  if (r.status === 'initiated' || r.status === 'completed') {
+    const isDone = r.status === 'completed';
+    const amount = r.amount > 0 ? (r.amount / 100).toFixed(2) : total;
+    const accentColor = isDone ? '#059669' : '#10b981';      // emerald
+    const bgColor = isDone ? '#ecfdf5' : '#f0fdf4';
+    const borderColor = isDone ? '#a7f3d0' : '#86efac';
+
+    refundCallout = `
+      <div style="background:${bgColor};border:2px solid ${borderColor};border-radius:12px;padding:18px 20px;margin:20px 0;">
+        <p style="margin:0;font-size:11px;color:${accentColor};font-weight:700;letter-spacing:1px;">
+          ${isDone ? '✓ REFUND COMPLETED' : '💰 REFUND INITIATED'}
+        </p>
+        <p style="margin:8px 0 0 0;font-size:30px;font-weight:800;color:#065f46;line-height:1;">
+          ₹${amount}
+        </p>
+        <p style="margin:6px 0 0 0;font-size:13px;color:#047857;font-weight:600;">
+          ${isDone
+            ? 'Successfully credited to your account'
+            : 'Returning to your original payment method'}
+        </p>
+        ${!isDone ? `
+          <hr style="border:none;border-top:1px dashed ${borderColor};margin:14px 0;">
+          <p style="margin:0;font-size:12px;color:${accentColor};font-weight:600;letter-spacing:0.5px;">⏱ EXPECTED IN YOUR ACCOUNT</p>
+          <p style="margin:4px 0 0 0;font-size:18px;font-weight:700;color:#065f46;">5 to 7 business days</p>
+          <p style="margin:4px 0 0 0;font-size:12px;color:#047857;">Most banks credit within 5 working days, occasionally up to 7.</p>
+        ` : ''}
+        ${r.id ? `
+          <hr style="border:none;border-top:1px dashed ${borderColor};margin:14px 0;">
+          <p style="margin:0;font-size:11px;color:${accentColor};font-weight:600;letter-spacing:0.5px;">REFUND REFERENCE</p>
+          <p style="margin:3px 0 0 0;font-family:'Courier New',monospace;font-size:13px;color:#065f46;font-weight:700;">${r.id}</p>
+          <p style="margin:3px 0 0 0;font-size:11px;color:#047857;">Quote this if you need to ask your bank or our support about the refund.</p>
+        ` : ''}
+      </div>
+    `;
+
+    if (!isDone) {
+      timeline = `
+        <div style="background:#f9fafb;border-radius:10px;padding:16px 18px;margin:16px 0;">
+          <p style="margin:0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:0.5px;">📋 WHAT HAPPENS NEXT</p>
+          <table role="presentation" style="width:100%;margin-top:10px;font-size:13px;">
+            <tr>
+              <td style="padding:6px 0;width:36px;vertical-align:top;font-size:18px;line-height:1;">✅</td>
+              <td style="padding:6px 0;color:#374151;line-height:1.5;"><strong>Today:</strong> Refund request sent to your bank/UPI.</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0;width:36px;vertical-align:top;font-size:18px;line-height:1;">⏳</td>
+              <td style="padding:6px 0;color:#374151;line-height:1.5;"><strong>1–2 days:</strong> Razorpay processes the refund.</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0;width:36px;vertical-align:top;font-size:18px;line-height:1;">🏦</td>
+              <td style="padding:6px 0;color:#374151;line-height:1.5;"><strong>5–7 days:</strong> Money credited to your account. You'll get an SMS from your bank.</td>
+            </tr>
+          </table>
+          <p style="margin:14px 0 0 0;font-size:12px;color:#6b7280;line-height:1.5;">
+            <strong>Don't see it after 7 days?</strong> Reply to this email or call us at +91 77380 28750 with the refund reference above — we'll trace it for you.
+          </p>
+        </div>
+      `;
+    }
   } else if (r.status === 'pending_manual') {
-    refund = `Our team is processing your <strong>₹${total}</strong> refund manually. Someone from Toy Mall will reach out within 1–2 business days. Apologies for the small delay.`;
+    refundCallout = `
+      <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:18px 20px;margin:20px 0;">
+        <p style="margin:0;font-size:11px;color:#b45309;font-weight:700;letter-spacing:1px;">⏱ REFUND BEING PROCESSED MANUALLY</p>
+        <p style="margin:8px 0 0 0;font-size:30px;font-weight:800;color:#78350f;line-height:1;">₹${total}</p>
+        <p style="margin:8px 0 0 0;font-size:13px;color:#92400e;line-height:1.5;">
+          Our team will reach out within <strong>1–2 business days</strong> to confirm your refund details. Once initiated, the amount will reach your account in 5–7 business days from then.
+        </p>
+        <p style="margin:8px 0 0 0;font-size:12px;color:#92400e;">Apologies for the small delay — we're on it.</p>
+      </div>
+    `;
   } else if (r.status === 'not_applicable' && order.paymentMethod === 'COD') {
-    refund = 'Since this was a Cash on Delivery order, no payment was made — there\'s nothing to refund.';
-  } else {
-    refund = '';
+    refundCallout = `
+      <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:12px;padding:18px 20px;margin:20px 0;">
+        <p style="margin:0;font-size:11px;color:#1d4ed8;font-weight:700;letter-spacing:1px;">💵 NO REFUND NEEDED</p>
+        <p style="margin:8px 0 0 0;font-size:14px;color:#1e3a8a;font-weight:600;line-height:1.5;">
+          This was a Cash on Delivery order — you weren't charged, so there's nothing to refund.
+        </p>
+      </div>
+    `;
   }
 
-  const reasonLine = reason ? `Reason recorded: <em>${reason}</em>.` : '';
+  const reasonLine = reason ? `<p style="margin:14px 0 0 0;font-size:13px;color:#6b7280;">Reason on record: <em>${reason}</em>.</p>` : '';
 
-  return [intro, refund, reasonLine].filter(Boolean).join('<br><br>');
+  return `<p style="margin:0 0 12px 0;">${intro}</p>${refundCallout}${timeline}${reasonLine}`;
+}
+
+// Plaintext mirror of cancelledMessage() — same content, formatted for
+// clients that don't (or won't) render HTML.
+function cancelledTextBody(order) {
+  const who = order.cancelledBy;
+  const reason = (order.cancelledReason || '').trim();
+  const r = order.refund || {};
+  const total = order.totalPrice.toFixed(2);
+
+  let intro;
+  if (who === 'customer') {
+    intro = "You've cancelled this order successfully. We're sorry to see it go — if there's anything we can do better next time, just reply to this email and let us know.";
+  } else if (who === 'admin') {
+    intro = "Your order has been cancelled. We're sorry for the inconvenience and appreciate your patience.";
+  } else {
+    intro = 'Your order has been cancelled.';
+  }
+
+  let block = '';
+  if (r.status === 'initiated' || r.status === 'completed') {
+    const isDone = r.status === 'completed';
+    const amount = r.amount > 0 ? (r.amount / 100).toFixed(2) : total;
+    block = isDone
+      ? `\n\n✓ REFUND COMPLETED\nAmount: ₹${amount}\nSuccessfully credited to your account.${r.id ? `\nReference: ${r.id}` : ''}`
+      : `\n\n💰 REFUND INITIATED\nAmount: ₹${amount}\nExpected in your account: 5 to 7 business days\n` +
+        `${r.id ? `Refund reference: ${r.id}\n` : ''}` +
+        `\nWhat happens next:\n` +
+        `  ✅ Today: Refund request sent to your bank/UPI.\n` +
+        `  ⏳ 1–2 days: Razorpay processes the refund.\n` +
+        `  🏦 5–7 days: Money credited to your account (your bank will SMS you).\n` +
+        `\nDon't see it after 7 days? Reply to this email or call +91 77380 28750 — we'll trace it for you.`;
+  } else if (r.status === 'pending_manual') {
+    block = `\n\n⏱ REFUND BEING PROCESSED MANUALLY\nAmount: ₹${total}\n` +
+            `Our team will reach out within 1–2 business days. Once initiated, the amount will reach your account in 5–7 business days from then. Apologies for the small delay.`;
+  } else if (r.status === 'not_applicable' && order.paymentMethod === 'COD') {
+    block = `\n\n💵 NO REFUND NEEDED\nThis was a Cash on Delivery order — you weren't charged, so there's nothing to refund.`;
+  }
+
+  const reasonLine = reason ? `\n\nReason on record: ${reason}` : '';
+  return `${intro}${block}${reasonLine}`;
 }
 
 // Email clients can't follow relative paths, so /uploads/foo.jpg must be made absolute.
@@ -157,11 +273,14 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
     : '';
 
   // Body that goes inside the shared layout's content slot.
+  // For cancellations, cancelledMessage() returns block-level HTML
+  // (callout boxes + timeline) so don't wrap it in a <p> — that produces
+  // invalid HTML and some email clients render it badly.
   const bodyHtml = `
     <p style="margin:0 0 14px 0;font-size:15px;">Hi <strong>${escape(customerName)}</strong>,</p>
-    <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${
-      order.status === 'cancelled' ? cancelledMessage(order) : template.message
-    }</p>
+    ${order.status === 'cancelled'
+      ? cancelledMessage(order)
+      : `<p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${template.message}</p>`}
 
     ${trackingBlock}
     ${noteBlock}
@@ -189,10 +308,11 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
 }
 
 function buildText(order, template, customerName, adminNote) {
-  // Cancellation emails get a tailored body based on who cancelled + refund
-  // state. Strip HTML tags from cancelledMessage() for the plaintext branch.
+  // Cancellation emails get a tailored plaintext block since the HTML
+  // version uses block-level callouts that don't translate well via
+  // tag-stripping. Build a clean parallel string here.
   const bodyMessage = order.status === 'cancelled'
-    ? cancelledMessage(order).replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')
+    ? cancelledTextBody(order)
     : template.message;
   let text = `Hi ${customerName},\n\n${template.headline}\n\n${bodyMessage}\n\nOrder Number: ${order.orderNumber}\n`;
   if (order.carrier) {
