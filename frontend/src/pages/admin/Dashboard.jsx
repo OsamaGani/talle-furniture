@@ -88,14 +88,39 @@ export default function AdminDashboard() {
     ? 'All time'
     : `${activeRange.from?.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} – ${activeRange.to?.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 
-  const revenue = useMemo(
-    () => filteredOrders.reduce((s, o) => s + (o.isPaid ? o.totalPrice : 0), 0),
-    [filteredOrders]
-  );
-  const pendingRevenue = useMemo(
-    () => filteredOrders.reduce((s, o) => s + (!o.isPaid ? o.totalPrice : 0), 0),
-    [filteredOrders]
-  );
+  // ---- Revenue / cancellation breakdown ----
+  // isPaid is rolled back to false when an order is cancelled and refunded,
+  // so "Net revenue" = currently-paid orders only. We surface pending and
+  // refunded amounts as sub-lines so the admin can see the full picture
+  // at a glance without having to filter the orders table.
+  const revenueBreakdown = useMemo(() => {
+    let netRevenue = 0;
+    let pendingRevenue = 0;
+    let refundedAmount = 0;
+    let cancelledCount = 0;
+    let cancelledValue = 0;
+    let deliveredCount = 0;
+
+    for (const o of filteredOrders) {
+      const isCancelled = o.status === 'cancelled';
+      if (isCancelled) {
+        cancelledCount += 1;
+        cancelledValue += o.totalPrice || 0;
+        // refund.amount is in paise; only counts if it was actually refunded
+        if (o.refund?.amount > 0) refundedAmount += o.refund.amount / 100;
+        continue; // never count cancelled orders in net or pending
+      }
+      if (o.status === 'delivered') deliveredCount += 1;
+      if (o.isPaid) {
+        netRevenue += o.totalPrice || 0;
+      } else {
+        pendingRevenue += o.totalPrice || 0;
+      }
+    }
+    return { netRevenue, pendingRevenue, refundedAmount, cancelledCount, cancelledValue, deliveredCount };
+  }, [filteredOrders]);
+
+  const { netRevenue, pendingRevenue, refundedAmount, cancelledCount, cancelledValue, deliveredCount } = revenueBreakdown;
 
   // For "All products" / "All users", show the all-time figure when the
   // user is on All time (or custom with no dates set), otherwise show
@@ -111,6 +136,19 @@ export default function AdminDashboard() {
 
   if (loading) return <Loader />;
 
+  // Compose order-card sub-line so the admin sees the cancelled count next
+  // to the total without needing to open the orders page.
+  const ordersSub = cancelledCount > 0
+    ? `${deliveredCount} delivered · ${cancelledCount} cancelled`
+    : deliveredCount > 0 ? `${deliveredCount} delivered` : null;
+
+  // Revenue card sub-lines — separate the "money still expected" (pending)
+  // from "money returned" (refunded). Each shown only if non-zero so the
+  // card stays clean.
+  const revenueSubLines = [];
+  if (pendingRevenue > 0) revenueSubLines.push({ text: `₹${pendingRevenue.toFixed(0)} pending`, color: 'text-orange-500' });
+  if (refundedAmount > 0) revenueSubLines.push({ text: `₹${refundedAmount.toFixed(0)} refunded`, color: 'text-red-500' });
+
   const cards = [
     {
       label: isAllTime ? 'Total Products' : 'New Products',
@@ -120,6 +158,8 @@ export default function AdminDashboard() {
     {
       label: isAllTime ? 'Total Orders' : 'Orders in period',
       value: filteredOrders.length,
+      sub: ordersSub,
+      subColor: 'text-gray-500',
       icon: <FiShoppingBag />, color: 'bg-green-500', link: '/admin/orders',
     },
     {
@@ -128,9 +168,11 @@ export default function AdminDashboard() {
       icon: <FiUsers />, color: 'bg-purple-500', link: '/admin/users',
     },
     {
-      label: 'Revenue (paid)',
-      value: `₹${revenue.toFixed(2)}`,
-      sub: pendingRevenue > 0 ? `₹${pendingRevenue.toFixed(2)} pending` : null,
+      // "Net Revenue" = paid + not cancelled. Refunded orders rolled back to
+      // isPaid=false in /api/orders/:id/cancel so they're correctly excluded.
+      label: 'Net Revenue',
+      value: `₹${netRevenue.toFixed(2)}`,
+      subLines: revenueSubLines,
       icon: <FiDollarSign />, color: 'bg-primary-500',
     },
   ];
@@ -216,8 +258,19 @@ export default function AdminDashboard() {
             </div>
             <p className="text-lg sm:text-2xl font-bold truncate">{c.value}</p>
             <p className="text-[11px] sm:text-sm text-gray-500">{c.label}</p>
+            {/* Single sub line (e.g. orders breakdown) */}
             {c.sub && (
-              <p className="text-[10px] sm:text-xs text-orange-500 mt-0.5">{c.sub}</p>
+              <p className={`text-[10px] sm:text-xs mt-0.5 ${c.subColor || 'text-orange-500'}`}>{c.sub}</p>
+            )}
+            {/* Multiple sub lines (revenue card → pending + refunded) */}
+            {Array.isArray(c.subLines) && c.subLines.length > 0 && (
+              <div className="mt-0.5 space-y-0">
+                {c.subLines.map((sl, i) => (
+                  <p key={i} className={`text-[10px] sm:text-xs ${sl.color || 'text-gray-500'}`}>
+                    {sl.text}
+                  </p>
+                ))}
+              </div>
             )}
             {c.link && <Link to={c.link} className="text-[10px] sm:text-xs text-primary-500 hover:underline mt-1 sm:mt-2 inline-block">Manage →</Link>}
           </div>
