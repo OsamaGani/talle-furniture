@@ -52,6 +52,12 @@ router.get(
       Product.find(filter).sort(sortBy).skip(skip).limit(Number(limit)),
       Product.countDocuments(filter),
     ]);
+    // Browser & CDN cache for a minute. New product additions take up to a
+    // minute to show up — acceptable trade for snappy repeat loads. Vary
+    // ensures the CDN keys cache by Authorization (admin/wholesale views
+    // can return different prices in future).
+    res.set('Cache-Control', 'public, max-age=60');
+    res.set('Vary', 'Authorization');
     res.json({ products, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   })
 );
@@ -62,6 +68,8 @@ router.get(
     const product = await findProductByIdOrSlug(req.params.idOrSlug);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     await product.populate('reviews.user', 'name');
+    // Cache individual product pages for a minute — same trade-off as the list.
+    res.set('Cache-Control', 'public, max-age=60');
     res.json(product);
   })
 );

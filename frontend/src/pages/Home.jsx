@@ -13,6 +13,7 @@ import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight, FiPhone, Fi
 import SEO from '../components/SEO';
 import ShopByAge from '../components/ShopByAge';
 import RecentlyViewed from '../components/RecentlyViewed';
+import { ProductRowSkeleton } from '../components/ProductCardSkeleton';
 // FiShield, FiRefreshCw, FiHeadphones used in the USP trust strip below
 
 const heroSlides = [
@@ -90,12 +91,38 @@ const homeBrands = [
   { name: 'Funskool',     color: 'from-rose-500 to-pink-600',           icon: '🎲', tag: 'Games' },
 ];
 
+// Read homepage product cache from localStorage. Used to render the page
+// instantly on repeat visits while a fresh fetch happens in the background.
+const HOME_CACHE_KEY = 'tm_home_v1';
+const HOME_CACHE_TTL = 5 * 60 * 1000; // 5 min — long enough to feel instant, short enough to stay fresh
+
+function readHomeCache() {
+  try {
+    const raw = localStorage.getItem(HOME_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || (Date.now() - obj.savedAt) > HOME_CACHE_TTL) return null;
+    return obj.data;
+  } catch { return null; }
+}
+function writeHomeCache(data) {
+  try {
+    localStorage.setItem(HOME_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), data }));
+  } catch { /* localStorage full or disabled — ignore */ }
+}
+
 export default function Home() {
-  const [featured, setFeatured] = useState([]);
-  const [bestSellers, setBestSellers] = useState([]);
-  const [newArrivals, setNewArrivals] = useState([]);
-  const [todaysDeals, setTodaysDeals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Hydrate from cache on first render so repeat visitors see content
+  // immediately instead of a spinner waiting for the slow Render API.
+  const cached = readHomeCache();
+  const [featured, setFeatured] = useState(cached?.featured || []);
+  const [bestSellers, setBestSellers] = useState(cached?.bestSellers || []);
+  const [newArrivals, setNewArrivals] = useState(cached?.newArrivals || []);
+  const [todaysDeals, setTodaysDeals] = useState(cached?.todaysDeals || []);
+  // "loading" only applies when there's no cache to fall back on. With
+  // cache, we never show a blocking loader — we just refresh in the
+  // background and the user sees the new data appear.
+  const [loading, setLoading] = useState(!cached);
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
@@ -112,16 +139,25 @@ export default function Home() {
           API.get('/products?newArrival=true&limit=8'),
           API.get('/products?onDeal=true&sort=price-asc&limit=8'),
         ]);
-        setFeatured(a.data.products);
-        setBestSellers(b.data.products);
-        setNewArrivals(c.data.products);
-        setTodaysDeals(d.data.products);
+        const fresh = {
+          featured: a.data.products,
+          bestSellers: b.data.products,
+          newArrivals: c.data.products,
+          todaysDeals: d.data.products,
+        };
+        setFeatured(fresh.featured);
+        setBestSellers(fresh.bestSellers);
+        setNewArrivals(fresh.newArrivals);
+        setTodaysDeals(fresh.todaysDeals);
+        writeHomeCache(fresh);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
   }, []);
 
-  if (loading) return <Loader size="lg" />;
+  // No early bail-out. Skeleton placeholders inside <Section /> handle the
+  // loading state per-rail so the hero, brand strip, and other static
+  // content render right away instead of being blocked by a full-page loader.
 
   const s = heroSlides[slide];
   const next = () => setSlide((s) => (s + 1) % heroSlides.length);
@@ -243,21 +279,21 @@ export default function Home() {
       <ShopByAge />
 
       {/* Featured */}
-      <Section title="Featured Toys" subtitle="Hand-picked favorites" link="/shop?featured=true" products={featured} />
+      <Section title="Featured Toys" subtitle="Hand-picked favorites" link="/shop?featured=true" products={featured} loading={loading} />
 
-      {/* Today's Deals — eye-catching strip with discount accents */}
+      {/* Today's Deals — only renders if admin has flagged products onDeal */}
       {todaysDeals.length > 0 && (
         <Section
           title={<span className="inline-flex items-center gap-2"><FiZap className="text-orange-500" /> Today's Deals</span>}
-          subtitle="25% off and more — limited quantities"
-          link="/shop?discount=true"
+          subtitle="Hand-picked deals"
+          link="/shop?onDeal=true"
           products={todaysDeals}
           bg="bg-gradient-to-br from-orange-50 to-amber-50"
         />
       )}
 
       {/* Best Sellers */}
-      <Section title="Best Sellers" subtitle="Most loved by customers" link="/shop?bestSeller=true" products={bestSellers} bg="bg-gray-50" />
+      <Section title="Best Sellers" subtitle="Most loved by customers" link="/shop?bestSeller=true" products={bestSellers} bg="bg-gray-50" loading={loading} />
 
       {/* Recently Viewed — empty section returns null if no history yet */}
       <RecentlyViewed />
@@ -342,7 +378,7 @@ export default function Home() {
       </section>
 
       {/* New Arrivals */}
-      <Section title="New Arrivals" subtitle="Fresh on the shelves" link="/shop?newArrival=true" products={newArrivals} />
+      <Section title="New Arrivals" subtitle="Fresh on the shelves" link="/shop?newArrival=true" products={newArrivals} loading={loading} />
 
       {/* Brands */}
       <section className="bg-gradient-to-b from-white to-gray-50 border-t">
@@ -450,8 +486,10 @@ function PromoStrip({ icon, title, desc, link, cta, color }) {
   );
 }
 
-function Section({ title, subtitle, link, products, bg = '' }) {
-  if (!products?.length) return null;
+function Section({ title, subtitle, link, products, bg = '', loading = false }) {
+  // Show skeletons while the first fetch is in flight; vanish entirely if
+  // there's nothing to show after loading completes.
+  if (!loading && !products?.length) return null;
   return (
     <section className={bg}>
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -464,13 +502,17 @@ function Section({ title, subtitle, link, products, bg = '' }) {
             <Link to={link} className="text-primary-500 hover:underline text-sm font-medium">View All →</Link>
           </div>
         </Reveal>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map((p, i) => (
-            <Reveal key={p._id} delay={i * 80}>
-              <ProductCard product={p} />
-            </Reveal>
-          ))}
-        </div>
+        {loading && (!products || products.length === 0) ? (
+          <ProductRowSkeleton count={4} />
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {products.map((p, i) => (
+              <Reveal key={p._id} delay={i * 80}>
+                <ProductCard product={p} />
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

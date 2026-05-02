@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { warmUpBackend } from './utils/warmup';
 import Navbar from './components/Navbar';
 import MobileBackBar from './components/MobileBackBar';
 import BottomNav from './components/BottomNav';
@@ -63,6 +64,9 @@ const AdminWholesaleCategories = lazy(() => import('./pages/admin/WholesaleCateg
 export default function App() {
   const { pathname } = useLocation();
   const isInvoice = pathname.includes('/invoice') || pathname.includes('/label');
+  // Wake the Render-hosted API in the background as soon as the SPA mounts,
+  // so subsequent product / auth calls don't pay the 30 s cold-start penalty.
+  useEffect(() => { warmUpBackend(); }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white overflow-x-clip pb-14 sm:pb-0">
       <ScrollToTop />
