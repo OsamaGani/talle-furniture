@@ -123,7 +123,11 @@ export default function AdminOrderDetail() {
         </div>
       )}
 
-      <OrderTimeline status={order.status} history={order.statusHistory} estimatedDelivery={order.estimatedDelivery} trackingNumber={order.trackingNumber} carrier={order.carrier} />
+      {/* Admin already shows a comprehensive cancellation banner above —
+          skip the timeline's own slim cancelled card to avoid duplication. */}
+      {order.status !== 'cancelled' && (
+        <OrderTimeline status={order.status} history={order.statusHistory} estimatedDelivery={order.estimatedDelivery} trackingNumber={order.trackingNumber} carrier={order.carrier} />
+      )}
 
       {/* Status update controls */}
       <div className="bg-white border rounded-lg p-5 mt-4">

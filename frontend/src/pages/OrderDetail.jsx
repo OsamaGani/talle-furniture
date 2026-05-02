@@ -99,12 +99,18 @@ export default function OrderDetail() {
         estimatedDelivery={order.estimatedDelivery}
         trackingNumber={order.trackingNumber}
         carrier={order.carrier}
+        cancelledBy={order.cancelledBy}
+        cancelledAt={order.cancelledAt}
       />
 
-      {/* Refund status banner — replaces the Pay Now banner once the order
-          has been cancelled. Different copy depending on whether a Razorpay
-          refund was auto-initiated, needs manual handling, or was COD. */}
-      {order.status === 'cancelled' && <RefundBanner order={order} />}
+      {/* Refund status banner — only when there's actual refund info to share.
+          For COD/not_applicable, the cancellation header on the timeline is
+          enough on its own; rendering a second "no refund needed" card just
+          duplicates the message. */}
+      {order.status === 'cancelled' && order.refund?.status &&
+       order.refund.status !== 'not_applicable' && (
+        <RefundBanner order={order} />
+      )}
 
       {/* Retry-payment banner for unpaid Razorpay orders. */}
       {!order.isPaid && order.paymentMethod === 'Razorpay' && order.status !== 'cancelled' && (

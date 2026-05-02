@@ -1,4 +1,4 @@
-import { FiCheckCircle, FiClock, FiPackage, FiTruck, FiHome, FiX } from 'react-icons/fi';
+import { FiCheckCircle, FiClock, FiPackage, FiTruck, FiHome, FiSlash, FiUser, FiBriefcase } from 'react-icons/fi';
 
 const STEPS = [
   { key: 'pending',          label: 'Order Placed',     icon: <FiClock />,       desc: 'We received your order' },
@@ -9,12 +9,33 @@ const STEPS = [
   { key: 'delivered',        label: 'Delivered',        icon: <FiHome />,        desc: 'Successfully delivered' },
 ];
 
-export default function OrderTimeline({ status, history = [], estimatedDelivery, trackingNumber, carrier }) {
+export default function OrderTimeline({ status, history = [], estimatedDelivery, trackingNumber, carrier, cancelledBy, cancelledAt }) {
   if (status === 'cancelled') {
+    // Find the cancellation event in history for the timestamp; fall back
+    // to cancelledAt prop, then to "today" if neither is set on legacy orders.
+    const cancelEvent = history.find((h) => h.status === 'cancelled');
+    const when = cancelledAt || cancelEvent?.at;
+    const whenLabel = when ? new Date(when).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : null;
+    const whoIcon = cancelledBy === 'admin' ? <FiBriefcase size={12} /> : <FiUser size={12} />;
+    const whoLabel = cancelledBy === 'admin' ? 'by Toy Mall' : cancelledBy === 'customer' ? 'by you' : '';
+
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-        <FiX className="mx-auto text-red-500" size={32} />
-        <p className="mt-2 font-bold text-red-700">Order Cancelled</p>
+      <div className="bg-white border border-red-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-red-50 to-rose-50 border-b border-red-100">
+          <div className="w-9 h-9 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+            <FiSlash size={16} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-red-900 text-sm sm:text-base">Order Cancelled</p>
+            <div className="flex items-center gap-1.5 flex-wrap text-xs text-red-700/80 mt-0.5">
+              {whenLabel && <span>{whenLabel}</span>}
+              {whoLabel && <>
+                <span className="text-red-300">·</span>
+                <span className="inline-flex items-center gap-1">{whoIcon} {whoLabel}</span>
+              </>}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
