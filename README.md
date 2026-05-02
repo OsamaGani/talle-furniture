@@ -9,7 +9,7 @@ A complete e-commerce website for a toy store, inspired by toycra.com. Built wit
 - Shop page with filters (category, brand, age group, sort)
 - Product detail page with image gallery, reviews, ratings
 - Shopping cart (persists in localStorage)
-- Checkout with shipping address + multiple payment methods (COD, Stripe, PayPal)
+- Checkout with saved address book + payment methods (COD or Razorpay — UPI, cards, netbanking, wallets)
 - User registration & login (JWT)
 - Profile management & address book
 - My Orders + Order tracking
@@ -28,7 +28,7 @@ A complete e-commerce website for a toy store, inspired by toycra.com. Built wit
 ## Tech Stack
 
 **Frontend:** React 18 · Vite · React Router · Tailwind CSS · Axios · React Hot Toast · React Icons
-**Backend:** Node.js · Express · MongoDB · Mongoose · JWT · Bcrypt · Multer · Stripe
+**Backend:** Node.js · Express · MongoDB · Mongoose · JWT · Bcrypt · Multer · Razorpay
 
 ## Project Structure
 
@@ -72,10 +72,15 @@ Edit `backend/.env`:
 ```
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/toymall
-JWT_SECRET=any_long_random_string
+JWT_SECRET=any_long_random_string         # min 32 chars; generate with `openssl rand -hex 32`
 JWT_EXPIRE=30d
-STRIPE_SECRET_KEY=sk_test_...     # optional - leave blank to disable Stripe
 CLIENT_URL=http://localhost:5173
+
+# Razorpay (Indian payment gateway) — leave blank to disable online payment.
+# COD still works without these.
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
 ```
 
 ### 3. Frontend
@@ -121,18 +126,23 @@ After login as admin, click **Admin Dashboard** in the user dropdown to manage p
 | PUT    | /api/orders/:id/status                | Admin     | Update status                     |
 | GET/PUT/DELETE /api/users             | Admin     | Manage users                      |
 | POST   | /api/upload                           | Admin     | Upload image                      |
-| POST   | /api/payment/create-checkout-session  | User      | Stripe checkout                   |
+| POST   | /api/payment/razorpay/create-order    | User      | Create Razorpay order             |
+| POST   | /api/payment/razorpay/verify          | User      | Verify HMAC signature after pay   |
+| POST   | /api/payment/razorpay/webhook         | -         | Razorpay server-to-server webhook |
+| GET/POST/PUT/DELETE /api/addresses    | User      | Saved address book CRUD           |
 
-## Stripe (optional)
+## Razorpay (optional)
 
-To enable real card payments:
-1. Sign up at https://stripe.com
-2. Copy your **Test Secret Key**
-3. Paste into `STRIPE_SECRET_KEY` in `backend/.env`
-4. Restart the backend
-5. Use card `4242 4242 4242 4242`, any future date, any CVC
+To enable online payments (UPI, cards, netbanking, wallets):
+1. Sign up at https://razorpay.com
+2. From the dashboard, copy your **Key ID** and **Key Secret**
+3. Paste into `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `backend/.env`
+4. (Recommended) Add a webhook in Razorpay dashboard pointing to
+   `https://YOUR-API/api/payment/razorpay/webhook`, set its secret in
+   `RAZORPAY_WEBHOOK_SECRET`, and tick the `payment.captured` event
+5. Restart the backend
 
-If Stripe isn't configured, customers can still order via Cash on Delivery or PayPal (placeholder).
+If Razorpay isn't configured, customers can still order via Cash on Delivery.
 
 ## Production Build
 

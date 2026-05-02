@@ -27,7 +27,7 @@ export default function Privacy() {
       <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
         <li>We <strong>do not sell</strong> your personal data to third parties.</li>
         <li>We don't share your information with advertisers.</li>
-        <li>We don't store your full payment card details — these are handled by our payment processor (Stripe / Razorpay / your bank).</li>
+        <li>We don't store your full payment card details — these are handled securely by Razorpay (PCI-DSS compliant) and your issuing bank.</li>
       </ul>
 
       <h2 className="text-xl font-bold mt-6 mb-2">Cookies</h2>

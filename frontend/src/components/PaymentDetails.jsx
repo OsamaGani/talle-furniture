@@ -42,7 +42,7 @@ export default function PaymentDetails({ order, compact = false }) {
     );
   }
 
-  // === Online (Razorpay / Stripe) ===
+  // === Online (Razorpay) ===
   const m = methodMeta(pr.method, pr.wallet);
   const last4 = pr.cardLast4;
   const cardLine = last4 ? `•••• ${last4}${pr.cardBrand ? ` (${pr.cardBrand})` : ''}${pr.cardType ? ` · ${pr.cardType}` : ''}` : '';

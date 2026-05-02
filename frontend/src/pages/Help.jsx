@@ -36,9 +36,9 @@ const categories = [
     title: 'Payments &amp; Pricing',
     questions: [
       { q: 'What payment methods do you accept?',
-        a: 'Cash on Delivery, Credit/Debit cards (via Stripe), UPI, Netbanking and Wallets via Razorpay.' },
+        a: 'Cash on Delivery and online payments via Razorpay — UPI (GPay, PhonePe, Paytm), Credit/Debit cards, Netbanking, and Wallets.' },
       { q: 'Is my card information safe?',
-        a: 'Absolutely. We never store your full card details — payments are securely processed by Stripe. Our site uses HTTPS and JWT authentication.' },
+        a: 'Absolutely. We never store your full card details — payments are securely processed by Razorpay (PCI-DSS compliant). Our site uses HTTPS and JWT authentication.' },
       { q: 'When am I charged?',
         a: 'For prepaid orders (card/UPI), at the time you place the order. For COD, you pay the delivery person in cash when your order arrives.' },
     ],
