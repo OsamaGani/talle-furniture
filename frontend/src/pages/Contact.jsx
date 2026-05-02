@@ -2,14 +2,24 @@ import { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import toast from 'react-hot-toast';
 import API from '../api/axios';
-import { FiMapPin, FiPhone, FiMail, FiClock, FiSend, FiMessageCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiMapPin, FiPhone, FiMail, FiClock, FiSend, FiMessageCircle, FiCheckCircle, FiNavigation, FiExternalLink } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import SEO from '../components/SEO';
 import {
   PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL,
   PHONE_SECONDARY_DISPLAY, PHONE_SECONDARY_TEL,
   EMAIL_PRIMARY, EMAIL_GMAIL, waLink,
+  STORE_NAME, STORE_ADDRESS_FULL,
 } from '../config/contact';
+
+// Google Maps embed pointing at the Toy Mall pin on Google Business Profile.
+// The query string targets the business name + city so Google centers on the
+// claimed listing (with the storefront photo + reviews) instead of a generic
+// address search. No API key required for this iframe form.
+const MAP_QUERY = encodeURIComponent('Toy Mall, Mobin Apartment, Amrut Nagar, Mumbra, Thane 400612');
+const MAP_EMBED_URL = `https://www.google.com/maps?q=${MAP_QUERY}&output=embed&z=17`;
+const MAP_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${MAP_QUERY}`;
+const MAP_VIEW_URL = `https://www.google.com/maps/search/?api=1&query=${MAP_QUERY}`;
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
@@ -146,18 +156,45 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Map (Google Maps embed) */}
+      {/* Map — embedded Google Maps centered on the Toy Mall pin, with
+          quick-action buttons for directions and full Maps view. */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
-        <h2 className="text-xl font-bold mb-3 flex items-center gap-2"><FiMapPin /> Find us on the map</h2>
-        <div className="rounded-xl overflow-hidden border shadow-md">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <FiMapPin className="text-primary-500" /> Find us on the map
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">{STORE_NAME} · {STORE_ADDRESS_FULL}</p>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href={MAP_DIRECTIONS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-3 sm:px-4 py-2 rounded-md transition shadow-sm"
+            >
+              <FiNavigation size={14} /> Get Directions
+            </a>
+            <a
+              href={MAP_VIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 border border-gray-300 hover:border-primary-400 hover:text-primary-500 text-sm font-semibold px-3 sm:px-4 py-2 rounded-md transition"
+            >
+              <FiExternalLink size={14} /> View larger
+            </a>
+          </div>
+        </div>
+        <div className="rounded-xl overflow-hidden border shadow-md bg-gray-100">
           <iframe
-            title="Toy Mall location"
-            src="https://maps.google.com/maps?q=Mumbra%20Dargah%2C%20Mumbra%2C%20Thane%2C%20Maharashtra&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            title="Toy Mall — Mumbra, Thane location"
+            src={MAP_EMBED_URL}
             width="100%"
-            height="380"
+            height="420"
             style={{ border: 0 }}
             loading="lazy"
             allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
           ></iframe>
         </div>
       </section>
