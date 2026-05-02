@@ -8,51 +8,106 @@ import { resolveImage } from '../utils/imageUrl';
 import { openRazorpayCheckout } from '../utils/razorpay';
 import {
   FiUser, FiMapPin, FiCreditCard, FiCheck, FiShield, FiTruck,
-  FiRefreshCw, FiTag, FiClock, FiPhone, FiMail, FiEdit2,
+  FiRefreshCw, FiTag, FiClock, FiPhone, FiMail, FiEdit2, FiPlus,
+  FiTrash2, FiHome, FiBriefcase,
 } from 'react-icons/fi';
 
 // Indian mobile: 10 digits starting 6/7/8/9
 const PHONE_RE = /^[6-9]\d{9}$/;
-
 // 6-digit Indian PIN code
 const PIN_RE = /^\d{6}$/;
-
 const cleanPhone = (v) => v.replace(/\D/g, '').slice(0, 10);
 
+const EMPTY_ADDR = {
+  label: '',
+  fullName: '',
+  phone: '',
+  street: '',
+  city: '',
+  state: '',
+  zip: '',
+  country: 'India',
+  isDefault: false,
+};
+
 export default function Checkout() {
-  const { items, subtotal, shipping, tax, total, clearCart, FREE_SHIPPING_THRESHOLD, amountToFreeShipping } = useCart();
+  const { items, subtotal, shipping, tax, total, clearCart, amountToFreeShipping } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('Razorpay');
   const [coupon, setCoupon] = useState('');
-  const [editingAddress, setEditingAddress] = useState(true); // collapses once filled & valid
+
+  // Saved addresses + which one is selected for this order.
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Inline form mode: 'closed' | 'new' | 'edit'. When 'edit', editingId is set.
+  const [formMode, setFormMode] = useState('closed');
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(EMPTY_ADDR);
+  const [saveAddress, setSaveAddress] = useState(true);  // checkbox state when adding new
+  const [savingAddr, setSavingAddr] = useState(false);
   const [pinLookup, setPinLookup] = useState({ loading: false, error: '' });
 
-  const [addr, setAddr] = useState({
-    fullName: user?.name || '',
-    phone: cleanPhone(user?.phone || ''),
-    street: user?.address?.street || '',
-    city: user?.address?.city || '',
-    state: user?.address?.state || '',
-    zip: user?.address?.zip || '',
-    country: user?.address?.country || 'India',
-  });
+  // ---- Load saved addresses on mount ----
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await API.get('/addresses');
+        if (cancelled) return;
+        setSavedAddresses(data);
+        const def = data.find((a) => a.isDefault) || data[0];
+        if (def) setSelectedId(def._id);
+        // No saved addresses yet → open the new-address form by default,
+        // pre-filled with what we know about the user.
+        if (data.length === 0) {
+          setFormMode('new');
+          setForm({
+            ...EMPTY_ADDR,
+            fullName: user?.name || '',
+            phone: cleanPhone(user?.phone || ''),
+          });
+        }
+      } catch (err) {
+        // Silent fail — guests don't have addresses; logged-in users see the form.
+        if (!cancelled) {
+          setFormMode('new');
+          setForm({
+            ...EMPTY_ADDR,
+            fullName: user?.name || '',
+            phone: cleanPhone(user?.phone || ''),
+          });
+        }
+      } finally {
+        if (!cancelled) setLoadingAddresses(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?._id]);
 
-  // Validate the address before allowing payment.
+  // ---- Derived: which address actually ships this order ----
+  const selectedAddress = useMemo(() => {
+    if (formMode === 'new') return form;
+    return savedAddresses.find((a) => a._id === selectedId) || null;
+  }, [formMode, form, savedAddresses, selectedId]);
+
+  // ---- Validation against the form (for the inline form only) ----
   const validation = useMemo(() => {
     const errs = {};
-    if (!addr.fullName.trim()) errs.fullName = 'Full name is required';
-    if (!PHONE_RE.test(addr.phone)) errs.phone = 'Enter a valid 10-digit Indian mobile';
-    if (!addr.street.trim()) errs.street = 'Street is required';
-    if (!addr.city.trim()) errs.city = 'City is required';
-    if (!addr.state.trim()) errs.state = 'State is required';
-    if (!PIN_RE.test(addr.zip)) errs.zip = 'Enter a valid 6-digit PIN code';
+    if (!form.fullName.trim()) errs.fullName = 'Full name is required';
+    if (!PHONE_RE.test(form.phone)) errs.phone = 'Enter a valid 10-digit Indian mobile';
+    if (!form.street.trim()) errs.street = 'Street is required';
+    if (!form.city.trim()) errs.city = 'City is required';
+    if (!form.state.trim()) errs.state = 'State is required';
+    if (!PIN_RE.test(form.zip)) errs.zip = 'Enter a valid 6-digit PIN code';
     return errs;
-  }, [addr]);
-  const addressValid = Object.keys(validation).length === 0;
+  }, [form]);
+  const formValid = Object.keys(validation).length === 0;
 
-  // Look up city/state from a 6-digit Indian PIN code (free public API).
   const lookupPin = async (zip) => {
     if (!PIN_RE.test(zip)) return;
     setPinLookup({ loading: true, error: '' });
@@ -61,26 +116,106 @@ export default function Checkout() {
       const data = await r.json();
       if (data?.[0]?.Status === 'Success' && data[0].PostOffice?.length) {
         const po = data[0].PostOffice[0];
-        setAddr((a) => ({ ...a, city: po.District || a.city, state: po.State || a.state, country: 'India' }));
+        setForm((a) => ({ ...a, city: po.District || a.city, state: po.State || a.state, country: 'India' }));
         setPinLookup({ loading: false, error: '' });
       } else {
-        setPinLookup({ loading: false, error: 'PIN not found — please type city/state manually' });
+        setPinLookup({ loading: false, error: 'PIN not found — type city/state manually' });
       }
     } catch {
-      setPinLookup({ loading: false, error: '' }); // fail silent — let user fill manually
+      setPinLookup({ loading: false, error: '' });
     }
   };
 
-  // Estimated delivery — 4-7 working days from today.
+  // ---- Address handlers ----
+  const openNew = () => {
+    setEditingId(null);
+    setFormMode('new');
+    setForm({
+      ...EMPTY_ADDR,
+      fullName: user?.name || '',
+      phone: cleanPhone(user?.phone || ''),
+    });
+    setSaveAddress(true);
+  };
+
+  const openEdit = (addr) => {
+    setEditingId(addr._id);
+    setFormMode('edit');
+    setForm({ ...addr });
+  };
+
+  const closeForm = () => {
+    setFormMode('closed');
+    setEditingId(null);
+    setForm(EMPTY_ADDR);
+  };
+
+  const submitAddressForm = async () => {
+    if (!formValid) {
+      toast.error(Object.values(validation)[0]);
+      return;
+    }
+    setSavingAddr(true);
+    try {
+      if (formMode === 'edit' && editingId) {
+        const { data } = await API.put(`/addresses/${editingId}`, form);
+        setSavedAddresses(data);
+        setSelectedId(editingId);
+        toast.success('Address updated');
+        closeForm();
+      } else if (formMode === 'new' && saveAddress && user) {
+        // Save to address book + use for this order
+        const { data } = await API.post('/addresses', form);
+        setSavedAddresses(data);
+        const newest = data[data.length - 1];
+        setSelectedId(newest._id);
+        toast.success('Address saved');
+        closeForm();
+      }
+      // If guest or saveAddress unchecked, we leave the form open — the
+      // place-order flow uses the unsaved form values directly.
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not save address');
+    } finally {
+      setSavingAddr(false);
+    }
+  };
+
+  const deleteAddress = async (id) => {
+    if (!confirm('Remove this address?')) return;
+    try {
+      const { data } = await API.delete(`/addresses/${id}`);
+      setSavedAddresses(data);
+      // If we just deleted the selected one, fall back to the new default.
+      if (selectedId === id) {
+        const def = data.find((a) => a.isDefault) || data[0];
+        setSelectedId(def?._id || null);
+        if (data.length === 0) openNew();
+      }
+      toast.success('Address removed');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not delete');
+    }
+  };
+
+  const setAsDefault = async (id) => {
+    try {
+      const { data } = await API.put(`/addresses/${id}/default`);
+      setSavedAddresses(data);
+      toast.success('Default address updated');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not update');
+    }
+  };
+
   const eta = useMemo(() => {
-    const start = new Date();
-    start.setDate(start.getDate() + 4);
-    const end = new Date();
-    end.setDate(end.getDate() + 7);
+    const start = new Date(); start.setDate(start.getDate() + 4);
+    const end = new Date();   end.setDate(end.getDate() + 7);
     const fmt = (d) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
     return `${fmt(start)} – ${fmt(end)}`;
   }, []);
 
+  // ---- Empty cart / unverified guards ----
   if (items.length === 0) {
     return (
       <div className="max-w-md mx-auto py-20 px-4 text-center">
@@ -91,7 +226,6 @@ export default function Checkout() {
       </div>
     );
   }
-
   if (user && !user.emailVerified) {
     return (
       <div className="max-w-md mx-auto py-16 px-4 text-center">
@@ -105,23 +239,65 @@ export default function Checkout() {
     );
   }
 
+  // ---- Place order ----
+  // The shipping address sent to the API is whichever one is currently
+  // active: the selected saved card, or the values being typed into the
+  // unsaved-new form (if the user opted out of saving).
   const placeOrder = async (e) => {
     e.preventDefault();
-    if (!addressValid) {
-      setEditingAddress(true);
-      toast.error(Object.values(validation)[0]);
+
+    // Resolve the shipping address — selected saved card OR unsaved new form
+    let shippingAddress = null;
+    if (formMode === 'new' || formMode === 'edit') {
+      // The form is open. Validate first.
+      if (!formValid) {
+        toast.error(Object.values(validation)[0]);
+        return;
+      }
+      // If user asked to save, persist before placing the order so future
+      // orders pick it up. If not (or guest), use form values directly.
+      if (formMode === 'new' && saveAddress && user) {
+        try {
+          const { data } = await API.post('/addresses', form);
+          setSavedAddresses(data);
+          const newest = data[data.length - 1];
+          setSelectedId(newest._id);
+          shippingAddress = newest;
+          closeForm();
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Could not save address');
+          return;
+        }
+      } else if (formMode === 'edit' && editingId) {
+        try {
+          const { data } = await API.put(`/addresses/${editingId}`, form);
+          setSavedAddresses(data);
+          shippingAddress = data.find((a) => a._id === editingId);
+          setSelectedId(editingId);
+          closeForm();
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Could not save address');
+          return;
+        }
+      } else {
+        // Guest checkout or "don't save" — pass form values straight through
+        shippingAddress = form;
+      }
+    } else {
+      shippingAddress = savedAddresses.find((a) => a._id === selectedId);
+    }
+
+    if (!shippingAddress) {
+      toast.error('Please select a shipping address');
       return;
     }
+
     setSubmitting(true);
     try {
       const { data: order } = await API.post('/orders', {
         items: items.map((i) => ({ product: i.product, name: i.name, image: i.image, price: i.price, qty: i.qty, isWholesalePrice: i.isWholesalePrice })),
-        shippingAddress: addr,
+        shippingAddress,
         paymentMethod,
-        itemsPrice: subtotal,
-        shippingPrice: shipping,
-        taxPrice: tax,
-        totalPrice: total,
       });
 
       if (paymentMethod === 'Razorpay') {
@@ -153,32 +329,25 @@ export default function Checkout() {
     }
   };
 
-  // Step state — sequence is informational only (single-page flow).
+  const addressDone = !!selectedAddress && (formMode === 'closed' || (formMode !== 'closed' && formValid));
   const steps = [
-    { id: 1, label: 'Login', icon: <FiUser />, done: true,  active: false, value: user?.email },
-    { id: 2, label: 'Address', icon: <FiMapPin />, done: addressValid && !editingAddress, active: editingAddress, value: addressValid && !editingAddress ? `${addr.fullName} · ${addr.city}` : null },
-    { id: 3, label: 'Payment', icon: <FiCreditCard />, done: false, active: !editingAddress && addressValid, value: paymentMethod },
+    { id: 1, label: 'Login',   icon: <FiUser />,       done: !!user, active: false, value: user?.email },
+    { id: 2, label: 'Address', icon: <FiMapPin />,     done: addressDone && formMode === 'closed', active: !addressDone || formMode !== 'closed' },
+    { id: 3, label: 'Payment', icon: <FiCreditCard />, done: false, active: addressDone && formMode === 'closed' },
   ];
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {/* Page header with stepper */}
         <div className="mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">Secure Checkout</h1>
           <Stepper steps={steps} />
         </div>
 
         <form onSubmit={placeOrder} className="grid lg:grid-cols-[1fr_400px] gap-4 sm:gap-6">
-          {/* === LEFT — Address + Payment === */}
           <div className="space-y-4">
-            {/* Logged-in identity card */}
-            <SectionCard
-              n="1"
-              title="Logged in as"
-              icon={<FiUser />}
-              done={!!user}
-            >
+            {/* 1. Logged-in identity */}
+            <SectionCard n="1" title="Logged in as" icon={<FiUser />} done={!!user}>
               <div className="flex items-center justify-between">
                 <div className="min-w-0">
                   <p className="font-semibold truncate">{user?.name || 'Guest'}</p>
@@ -188,101 +357,69 @@ export default function Checkout() {
               </div>
             </SectionCard>
 
-            {/* Shipping address */}
+            {/* 2. Shipping address — saved cards + add-new form */}
             <SectionCard
               n="2"
               title="Shipping Address"
               icon={<FiMapPin />}
-              active={editingAddress}
-              done={addressValid && !editingAddress}
-              actionLabel={addressValid && !editingAddress ? 'Change' : null}
-              onAction={() => setEditingAddress(true)}
+              active={!addressDone || formMode !== 'closed'}
+              done={addressDone && formMode === 'closed'}
             >
-              {addressValid && !editingAddress ? (
-                /* Collapsed summary */
-                <div className="text-sm">
-                  <p className="font-semibold">{addr.fullName} <span className="text-gray-500 font-normal">· +91 {addr.phone}</span></p>
-                  <p className="text-gray-700 mt-0.5">{addr.street}, {addr.city}, {addr.state} {addr.zip}, {addr.country}</p>
-                </div>
+              {loadingAddresses ? (
+                <p className="text-sm text-gray-500">Loading saved addresses…</p>
               ) : (
-                /* Editable form */
                 <div className="space-y-3">
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <Field
-                      label="Full Name"
-                      value={addr.fullName}
-                      onChange={(v) => setAddr({ ...addr, fullName: v })}
-                      error={validation.fullName}
-                      required
+                  {/* Saved address cards */}
+                  {savedAddresses.length > 0 && (
+                    <div className="space-y-2">
+                      {savedAddresses.map((a) => (
+                        <SavedAddressCard
+                          key={a._id}
+                          address={a}
+                          selected={selectedId === a._id && formMode === 'closed'}
+                          onSelect={() => { setSelectedId(a._id); setFormMode('closed'); }}
+                          onEdit={() => openEdit(a)}
+                          onDelete={() => deleteAddress(a._id)}
+                          onSetDefault={() => setAsDefault(a._id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Inline form (new / edit) */}
+                  {formMode !== 'closed' ? (
+                    <AddressForm
+                      form={form}
+                      setForm={setForm}
+                      validation={validation}
+                      pinLookup={pinLookup}
+                      lookupPin={lookupPin}
+                      isEdit={formMode === 'edit'}
+                      isGuest={!user}
+                      saveAddress={saveAddress}
+                      setSaveAddress={setSaveAddress}
+                      onCancel={savedAddresses.length > 0 ? closeForm : null}
+                      onSubmit={submitAddressForm}
+                      saving={savingAddr}
                     />
-                    <Field
-                      label="Mobile Number"
-                      value={addr.phone}
-                      onChange={(v) => setAddr({ ...addr, phone: cleanPhone(v) })}
-                      placeholder="10-digit (starts with 6/7/8/9)"
-                      prefix="+91"
-                      maxLength={10}
-                      error={validation.phone}
-                      required
-                    />
-                  </div>
-                  <Field
-                    label="Flat / House / Building, Street"
-                    value={addr.street}
-                    onChange={(v) => setAddr({ ...addr, street: v })}
-                    placeholder="e.g. Flat 4, Mobin Apt, Amrut Nagar"
-                    error={validation.street}
-                    required
-                  />
-                  <div className="grid sm:grid-cols-3 gap-3">
-                    <Field
-                      label="PIN Code"
-                      value={addr.zip}
-                      onChange={(v) => {
-                        const z = v.replace(/\D/g, '').slice(0, 6);
-                        setAddr({ ...addr, zip: z });
-                        if (PIN_RE.test(z)) lookupPin(z);
-                      }}
-                      placeholder="400612"
-                      maxLength={6}
-                      error={validation.zip}
-                      hint={pinLookup.loading ? 'Looking up…' : pinLookup.error}
-                      required
-                    />
-                    <Field
-                      label="City"
-                      value={addr.city}
-                      onChange={(v) => setAddr({ ...addr, city: v })}
-                      error={validation.city}
-                      required
-                    />
-                    <Field
-                      label="State"
-                      value={addr.state}
-                      onChange={(v) => setAddr({ ...addr, state: v })}
-                      error={validation.state}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    disabled={!addressValid}
-                    onClick={() => setEditingAddress(false)}
-                    className="bg-primary-500 hover:bg-primary-600 text-white font-semibold px-5 py-2.5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Save & Continue
-                  </button>
+                  ) : (
+                    /* "+ Add new address" button — only shown when there's at least one saved */
+                    savedAddresses.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={openNew}
+                        className="w-full border-2 border-dashed border-gray-300 hover:border-primary-400 hover:bg-primary-50/30 text-gray-700 hover:text-primary-600 font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 text-sm"
+                      >
+                        <FiPlus /> Add a new address
+                      </button>
+                    )
+                  )}
                 </div>
               )}
             </SectionCard>
 
-            {/* Payment method */}
-            <SectionCard
-              n="3"
-              title="Payment Method"
-              icon={<FiCreditCard />}
-              active={!editingAddress && addressValid}
-            >
+            {/* 3. Payment */}
+            <SectionCard n="3" title="Payment Method" icon={<FiCreditCard />} active={addressDone && formMode === 'closed'}>
               <div className="space-y-2">
                 <PaymentOption
                   selected={paymentMethod === 'Razorpay'}
@@ -302,7 +439,6 @@ export default function Checkout() {
               </div>
             </SectionCard>
 
-            {/* Trust badges row */}
             <div className="bg-white border rounded-lg p-3 sm:p-4 grid grid-cols-3 gap-2 sm:gap-3 text-center">
               <Trust icon={<FiShield />} title="Secure" desc="SSL encrypted" />
               <Trust icon={<FiTruck />}  title="Fast" desc="Pan-India delivery" />
@@ -310,7 +446,7 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* === RIGHT — Order summary sidebar === */}
+          {/* === Order summary === */}
           <aside className="lg:sticky lg:top-32 h-fit space-y-4">
             <div className="bg-white border rounded-lg overflow-hidden">
               <div className="px-4 py-3 border-b bg-gray-50">
@@ -320,11 +456,10 @@ export default function Checkout() {
                 </h2>
               </div>
 
-              {/* Item list */}
               <div className="px-4 py-3 max-h-60 overflow-y-auto space-y-3 border-b">
                 {items.map((i) => (
                   <div key={i.product} className="flex gap-3 text-sm">
-                    <img src={resolveImage(i.image)} className="w-12 h-12 rounded border object-contain p-1 bg-gray-50 flex-shrink-0" alt="" />
+                    <img src={resolveImage(i.image)} className="w-12 h-12 rounded border object-contain p-1 bg-gray-50 flex-shrink-0" alt={i.name} />
                     <div className="flex-1 min-w-0">
                       <p className="line-clamp-2 leading-snug">{i.name}</p>
                       <p className="text-gray-500 text-xs mt-0.5">Qty {i.qty} × ₹{i.price}</p>
@@ -334,7 +469,6 @@ export default function Checkout() {
                 ))}
               </div>
 
-              {/* Coupon */}
               <div className="px-4 py-3 border-b bg-gradient-to-r from-yellow-50/50 to-orange-50/30">
                 <label className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
                   <FiTag size={12} /> Have a coupon?
@@ -357,7 +491,6 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {/* Bill */}
               <div className="px-4 py-3 space-y-2 text-sm">
                 <Row label="Item Total" value={`₹${subtotal.toFixed(2)}`} />
                 <Row label="Delivery" value={shipping === 0 ? <span className="text-emerald-600 font-semibold">FREE</span> : `₹${shipping.toFixed(2)}`} />
@@ -371,43 +504,31 @@ export default function Checkout() {
                 <Row label="Total Payable" value={`₹${total.toFixed(2)}`} bold />
               </div>
 
-              {/* ETA */}
               <div className="px-4 py-3 bg-emerald-50/40 border-t flex items-center gap-2 text-xs">
                 <FiClock className="text-emerald-600" />
-                <span className="text-gray-700">
-                  Delivery between <strong className="text-gray-900">{eta}</strong>
-                </span>
+                <span className="text-gray-700">Delivery between <strong className="text-gray-900">{eta}</strong></span>
               </div>
 
-              {/* Place order */}
               <div className="px-4 py-3 border-t">
                 <button
                   type="submit"
-                  disabled={submitting || !addressValid}
+                  disabled={submitting || !selectedAddress || (formMode !== 'closed' && !formValid)}
                   className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2"
                 >
-                  {submitting
-                    ? 'Placing Order…'
-                    : paymentMethod === 'COD'
-                      ? <>Place Order · ₹{total.toFixed(2)}</>
-                      : <>Pay ₹{total.toFixed(2)}</>
-                  }
+                  {submitting ? 'Placing Order…'
+                    : paymentMethod === 'COD' ? <>Place Order · ₹{total.toFixed(2)}</>
+                    : <>Pay ₹{total.toFixed(2)}</>}
                 </button>
-                {!addressValid && (
-                  <p className="text-[11px] text-orange-600 text-center mt-2">Complete your address to continue</p>
+                {!selectedAddress && (
+                  <p className="text-[11px] text-orange-600 text-center mt-2">Add a shipping address to continue</p>
                 )}
               </div>
             </div>
 
-            {/* Need help footer */}
             <div className="bg-white border rounded-lg p-3 text-xs text-gray-600 space-y-1.5">
               <p className="font-semibold text-gray-900">Need help?</p>
-              <a href="tel:+918655787075" className="flex items-center gap-2 hover:text-primary-500">
-                <FiPhone size={12} /> +91 86557 87075
-              </a>
-              <a href="mailto:Huraira735@gmail.com" className="flex items-center gap-2 hover:text-primary-500">
-                <FiMail size={12} /> Huraira735@gmail.com
-              </a>
+              <a href="tel:+918655787075" className="flex items-center gap-2 hover:text-primary-500"><FiPhone size={12} /> +91 86557 87075</a>
+              <a href="mailto:Huraira735@gmail.com" className="flex items-center gap-2 hover:text-primary-500"><FiMail size={12} /> Huraira735@gmail.com</a>
             </div>
           </aside>
         </form>
@@ -416,7 +537,145 @@ export default function Checkout() {
   );
 }
 
-// === Components ===
+// ====================================================================
+// Subcomponents
+// ====================================================================
+
+function SavedAddressCard({ address: a, selected, onSelect, onEdit, onDelete, onSetDefault }) {
+  // Pick a small visual cue for the label — Home / Office / generic.
+  const labelLower = (a.label || '').toLowerCase();
+  const Icon = labelLower.includes('office') || labelLower.includes('work') ? FiBriefcase : FiHome;
+
+  return (
+    <label
+      className={`block border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition ${
+        selected
+          ? 'border-primary-500 bg-primary-50/40 ring-2 ring-primary-100'
+          : 'border-gray-200 hover:border-primary-400'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <input
+          type="radio"
+          name="savedAddress"
+          checked={selected}
+          onChange={onSelect}
+          className="mt-1 accent-primary-500 flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+            <Icon className="text-gray-500 flex-shrink-0" size={14} />
+            <span className="font-semibold text-sm">{a.fullName}</span>
+            {a.label && (
+              <span className="text-[10px] uppercase tracking-wide font-bold bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded">
+                {a.label}
+              </span>
+            )}
+            {a.isDefault && (
+              <span className="text-[10px] uppercase tracking-wide font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">
+                Default
+              </span>
+            )}
+          </div>
+          <p className="text-xs sm:text-sm text-gray-700 leading-snug">
+            {a.street}, {a.city}, {a.state} {a.zip}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5">+91 {a.phone}</p>
+
+          {/* Actions row — only revealed when this card is selected to keep
+              other cards visually clean. */}
+          {selected && (
+            <div className="flex gap-3 mt-2 pt-2 border-t border-primary-100 text-xs">
+              <button type="button" onClick={(e) => { e.preventDefault(); onEdit(); }} className="text-primary-500 hover:underline font-semibold inline-flex items-center gap-1">
+                <FiEdit2 size={11} /> Edit
+              </button>
+              {!a.isDefault && (
+                <button type="button" onClick={(e) => { e.preventDefault(); onSetDefault(); }} className="text-gray-600 hover:text-gray-900 font-semibold">
+                  Set as default
+                </button>
+              )}
+              <button type="button" onClick={(e) => { e.preventDefault(); onDelete(); }} className="text-red-500 hover:text-red-700 font-semibold inline-flex items-center gap-1 ml-auto">
+                <FiTrash2 size={11} /> Remove
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </label>
+  );
+}
+
+function AddressForm({ form, setForm, validation, pinLookup, lookupPin, isEdit, isGuest, saveAddress, setSaveAddress, onCancel, onSubmit, saving }) {
+  return (
+    <div className="space-y-3 bg-gray-50/60 border-2 border-dashed border-gray-200 rounded-lg p-3 sm:p-4">
+      <h3 className="font-bold text-sm flex items-center gap-2">
+        <FiMapPin /> {isEdit ? 'Edit address' : 'Add a new address'}
+      </h3>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <Field label="Full Name" value={form.fullName} onChange={(v) => setForm({ ...form, fullName: v })} error={validation.fullName} required />
+        <Field label="Mobile Number" value={form.phone} onChange={(v) => setForm({ ...form, phone: cleanPhone(v) })} placeholder="10-digit (starts with 6/7/8/9)" prefix="+91" maxLength={10} error={validation.phone} required />
+      </div>
+      <Field label="Flat / House / Building, Street" value={form.street} onChange={(v) => setForm({ ...form, street: v })} placeholder="e.g. Flat 4, Mobin Apt, Amrut Nagar" error={validation.street} required />
+      <div className="grid sm:grid-cols-3 gap-3">
+        <Field
+          label="PIN Code"
+          value={form.zip}
+          onChange={(v) => {
+            const z = v.replace(/\D/g, '').slice(0, 6);
+            setForm({ ...form, zip: z });
+            if (PIN_RE.test(z)) lookupPin(z);
+          }}
+          placeholder="400612" maxLength={6} error={validation.zip}
+          hint={pinLookup.loading ? 'Looking up…' : pinLookup.error}
+          required
+        />
+        <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} error={validation.city} required />
+        <Field label="State" value={form.state} onChange={(v) => setForm({ ...form, state: v })} error={validation.state} required />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <Field label="Label (optional)" value={form.label} onChange={(v) => setForm({ ...form, label: v.slice(0, 20) })} placeholder="Home, Office, Mom…" />
+        {!isGuest && !isEdit && (
+          <label className="flex items-center gap-2 text-sm text-gray-700 sm:mt-7">
+            <input
+              type="checkbox"
+              checked={saveAddress}
+              onChange={(e) => setSaveAddress(e.target.checked)}
+              className="accent-primary-500"
+            />
+            Save this address for next time
+          </label>
+        )}
+        {isEdit && (
+          <label className="flex items-center gap-2 text-sm text-gray-700 sm:mt-7">
+            <input
+              type="checkbox"
+              checked={form.isDefault}
+              onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
+              className="accent-primary-500"
+            />
+            Use as default address
+          </label>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 pt-1">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={saving}
+          className="bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 text-white font-semibold px-5 py-2.5 rounded-md transition"
+        >
+          {saving ? 'Saving…' : isEdit ? 'Save changes' : (saveAddress ? 'Save & Use' : 'Use this address')}
+        </button>
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2.5 font-semibold">
+            Cancel
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Stepper({ steps }) {
   return (
@@ -444,7 +703,7 @@ function Stepper({ steps }) {
   );
 }
 
-function SectionCard({ n, title, icon, active, done, children, actionLabel, onAction }) {
+function SectionCard({ n, title, icon, active, done, children }) {
   return (
     <section className={`bg-white border rounded-lg overflow-hidden transition ${
       active ? 'ring-2 ring-primary-100 border-primary-300' : ''
@@ -461,15 +720,6 @@ function SectionCard({ n, title, icon, active, done, children, actionLabel, onAc
             {title}
           </h2>
         </div>
-        {actionLabel && (
-          <button
-            type="button"
-            onClick={onAction}
-            className="text-xs sm:text-sm text-primary-500 hover:underline font-semibold whitespace-nowrap inline-flex items-center gap-1"
-          >
-            <FiEdit2 size={12} /> {actionLabel}
-          </button>
-        )}
       </header>
       <div className="px-4 sm:px-5 py-4">{children}</div>
     </section>
@@ -507,13 +757,9 @@ function Field({ label, value, onChange, required, placeholder, prefix, maxLengt
 
 function PaymentOption({ selected, onSelect, icon, title, subtitle, badge }) {
   return (
-    <label
-      className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${
-        selected
-          ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100'
-          : 'border-gray-200 hover:border-primary-400'
-      }`}
-    >
+    <label className={`flex items-center gap-3 border-2 rounded-lg p-3 cursor-pointer transition ${
+      selected ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-400'
+    }`}>
       <input type="radio" name="pm" checked={selected} onChange={onSelect} className="accent-primary-500 flex-shrink-0" />
       <span className="text-2xl flex-shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">

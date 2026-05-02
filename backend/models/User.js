@@ -1,12 +1,29 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+// Saved shipping address — a user can have many. Each one is a complete,
+// shippable record (recipient name + phone + full address) because the
+// person receiving an order doesn't have to be the account holder.
+const addressItemSchema = new mongoose.Schema({
+  label:    { type: String, default: '', trim: true },     // e.g. "Home", "Office", "Mom"
+  fullName: { type: String, required: true, trim: true },
+  phone:    { type: String, required: true, trim: true },
+  street:   { type: String, required: true, trim: true },
+  city:     { type: String, required: true, trim: true },
+  state:    { type: String, required: true, trim: true },
+  zip:      { type: String, required: true, trim: true },
+  country:  { type: String, default: 'India', trim: true },
+  isDefault:{ type: Boolean, default: false },
+}, { timestamps: true });
+
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, minlength: 8 },
     phone: { type: String, default: '' },
+    // Legacy single-address field — kept so existing users keep their data.
+    // New code reads/writes the addresses[] array; this is no longer surfaced.
     address: {
       street: { type: String, default: '' },
       city: { type: String, default: '' },
@@ -14,6 +31,7 @@ const userSchema = new mongoose.Schema(
       zip: { type: String, default: '' },
       country: { type: String, default: '' },
     },
+    addresses: [addressItemSchema],
     isAdmin: { type: Boolean, default: false },
     avatar: { type: String, default: '' },
     accountType: { type: String, enum: ['retail', 'wholesale'], default: 'retail' },

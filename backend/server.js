@@ -131,6 +131,7 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/wishlist', require('./routes/wishlist'));
+app.use('/api/addresses', require('./routes/addresses'));
 app.use('/api/wholesale-categories', require('./routes/wholesaleCategories'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/newsletter', require('./routes/newsletter'));
