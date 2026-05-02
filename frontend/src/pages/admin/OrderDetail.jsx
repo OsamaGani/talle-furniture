@@ -78,6 +78,51 @@ export default function AdminOrderDetail() {
         </div>
       </div>
 
+      {/* Cancellation banner — makes the source of cancellation obvious so the
+          admin can tell at a glance whether they need to follow up with the
+          customer (admin-cancelled) or process a refund (customer-cancelled). */}
+      {order.status === 'cancelled' && (
+        <div className={`rounded-lg p-4 mb-3 border-l-4 ${
+          order.cancelledBy === 'customer'
+            ? 'bg-orange-50 border-orange-500'
+            : 'bg-gray-100 border-gray-500'
+        }`}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="font-bold text-sm flex items-center gap-2">
+                {order.cancelledBy === 'customer' ? '👤 Cancelled by Customer' :
+                 order.cancelledBy === 'admin' ? '👔 Cancelled by Admin' :
+                 '❌ Order Cancelled'}
+              </p>
+              {order.cancelledReason && (
+                <p className="text-xs text-gray-700 mt-1"><strong>Reason:</strong> {order.cancelledReason}</p>
+              )}
+              {order.cancelledAt && (
+                <p className="text-xs text-gray-500 mt-0.5">on {new Date(order.cancelledAt).toLocaleString()}</p>
+              )}
+            </div>
+            {/* Refund summary — shows what state the customer's money is in */}
+            {order.refund?.status && order.refund.status !== 'not_applicable' && (
+              <div className={`text-xs font-semibold px-3 py-1.5 rounded ${
+                order.refund.status === 'initiated'      ? 'bg-emerald-100 text-emerald-700' :
+                order.refund.status === 'completed'      ? 'bg-emerald-200 text-emerald-800' :
+                order.refund.status === 'pending_manual' ? 'bg-amber-100 text-amber-700' :
+                                                           'bg-red-100 text-red-700'
+              }`}>
+                Refund: {order.refund.status.replace('_', ' ')}
+                {order.refund.amount > 0 && ` · ₹${(order.refund.amount / 100).toFixed(2)}`}
+              </div>
+            )}
+          </div>
+          {order.refund?.status === 'pending_manual' && (
+            <p className="text-xs text-amber-800 mt-2 bg-amber-100 px-2 py-1 rounded">
+              ⚠️ Auto-refund failed — process manually via Razorpay dashboard.
+              {order.refund.failureReason && ` Reason: ${order.refund.failureReason}`}
+            </p>
+          )}
+        </div>
+      )}
+
       <OrderTimeline status={order.status} history={order.statusHistory} estimatedDelivery={order.estimatedDelivery} trackingNumber={order.trackingNumber} carrier={order.carrier} />
 
       {/* Status update controls */}

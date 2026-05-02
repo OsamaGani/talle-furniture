@@ -123,6 +123,20 @@ export default function AdminOrders() {
                     className={`select-sm text-xs rounded px-2 py-1 font-semibold border ${statusColor[o.status]}`}>
                     {STATUSES.map((s) => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
                   </select>
+                  {/* Show who cancelled — helps admin tell customer-driven
+                      vs admin-driven cancellations apart at a glance. */}
+                  {o.status === 'cancelled' && o.cancelledBy && (
+                    <span
+                      className={`block mt-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${
+                        o.cancelledBy === 'customer'
+                          ? 'bg-orange-100 text-orange-700'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}
+                      title={o.cancelledReason || ''}
+                    >
+                      by {o.cancelledBy}
+                    </span>
+                  )}
                 </td>
                 <td className="p-3">
                   <div className="flex gap-1">

@@ -296,7 +296,20 @@ router.put('/:id/status', protect, admin, asyncHandler(async (req, res) => {
   }
   const oldStatus = order.status;
   order.status = newStatus;
-  order.statusHistory.push({ status: newStatus, note, at: new Date() });
+  // Tag admin-driven cancellations so the dashboard can distinguish them
+  // from customer self-cancellations. Only stamp on the transition into
+  // cancelled (don't overwrite an existing customer cancellation if an
+  // admin happens to re-save the same status).
+  if (newStatus === 'cancelled' && oldStatus !== 'cancelled') {
+    order.cancelledBy = 'admin';
+    order.cancelledAt = new Date();
+    if (note) order.cancelledReason = note;
+  }
+  order.statusHistory.push({
+    status: newStatus,
+    note: newStatus === 'cancelled' && note ? `Cancelled by admin · ${note}` : note,
+    at: new Date(),
+  });
   if (req.body.trackingNumber !== undefined) {
     order.trackingNumber = String(req.body.trackingNumber).slice(0, 80);
   }
