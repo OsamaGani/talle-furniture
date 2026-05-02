@@ -46,11 +46,53 @@ const STATUS_TEMPLATES = {
   cancelled: {
     emoji: '❌',
     color: '#dc2626',
-    subject: (o) => `Order ${o.orderNumber} cancelled — Toy Mall`,
+    // Subject and body are computed dynamically below so the email reflects
+    // who actually cancelled and what happens to the customer's money.
+    subject: (o) => o.cancelledBy === 'customer'
+      ? `Order ${o.orderNumber} cancelled — refund details inside`
+      : `Order ${o.orderNumber} cancelled — Toy Mall`,
     headline: 'Order Cancelled',
-    message: 'Your order has been cancelled. If you paid online, the refund will be processed within 5-7 business days.',
+    message: '', // populated per-order in cancelledMessage()
   },
 };
+
+// Builds the body copy for a cancellation email based on who cancelled,
+// the payment method, and the live refund state on the order. Returns
+// plain text — buildHtml wraps it with the standard layout.
+function cancelledMessage(order) {
+  const who = order.cancelledBy;
+  const reason = (order.cancelledReason || '').trim();
+  const r = order.refund || {};
+  const total = order.totalPrice.toFixed(2);
+
+  let intro;
+  if (who === 'customer') {
+    intro = 'You\'ve cancelled this order successfully. We\'re sorry to see it go — if there\'s anything we can do better next time, just reply to this email and let us know.';
+  } else if (who === 'admin') {
+    intro = 'Your order has been cancelled. We\'re sorry for the inconvenience and appreciate your patience.';
+  } else {
+    intro = 'Your order has been cancelled.';
+  }
+
+  let refund;
+  if (r.status === 'initiated') {
+    const amount = r.amount > 0 ? `₹${(r.amount / 100).toFixed(2)}` : `₹${total}`;
+    refund = `<strong>Refund of ${amount}</strong> has been started and will return to your original payment method in <strong>5–7 business days</strong>.`;
+    if (r.id) refund += ` Refund reference: <code>${r.id}</code>.`;
+  } else if (r.status === 'completed') {
+    refund = `Your refund of ₹${(r.amount / 100).toFixed(2)} has been completed and credited to your account.`;
+  } else if (r.status === 'pending_manual') {
+    refund = `Our team is processing your <strong>₹${total}</strong> refund manually. Someone from Toy Mall will reach out within 1–2 business days. Apologies for the small delay.`;
+  } else if (r.status === 'not_applicable' && order.paymentMethod === 'COD') {
+    refund = 'Since this was a Cash on Delivery order, no payment was made — there\'s nothing to refund.';
+  } else {
+    refund = '';
+  }
+
+  const reasonLine = reason ? `Reason recorded: <em>${reason}</em>.` : '';
+
+  return [intro, refund, reasonLine].filter(Boolean).join('<br><br>');
+}
 
 // Email clients can't follow relative paths, so /uploads/foo.jpg must be made absolute.
 // Falls back to a reliable hosted placeholder if there's no image — note this
@@ -134,7 +176,9 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
     <!-- Body -->
     <div style="padding:24px 20px;">
       <p style="margin:0 0 16px 0;font-size:15px;color:#111827;">Hi <strong>${customerName}</strong>,</p>
-      <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${template.message}</p>
+      <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${
+        order.status === 'cancelled' ? cancelledMessage(order) : template.message
+      }</p>
 
       ${trackingBlock}
       ${noteBlock}
@@ -174,7 +218,12 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
 }
 
 function buildText(order, template, customerName, adminNote) {
-  let text = `Hi ${customerName},\n\n${template.headline}\n\n${template.message}\n\nOrder Number: ${order.orderNumber}\n`;
+  // Cancellation emails get a tailored body based on who cancelled + refund
+  // state. Strip HTML tags from cancelledMessage() for the plaintext branch.
+  const bodyMessage = order.status === 'cancelled'
+    ? cancelledMessage(order).replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')
+    : template.message;
+  let text = `Hi ${customerName},\n\n${template.headline}\n\n${bodyMessage}\n\nOrder Number: ${order.orderNumber}\n`;
   if (order.carrier) {
     text += `Delivery via: ${order.carrier}\n`;
   }
