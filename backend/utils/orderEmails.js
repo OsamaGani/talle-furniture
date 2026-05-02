@@ -1,4 +1,5 @@
 const { sendEmail } = require('./email');
+const { renderEmail, escape } = require('./emailLayout');
 
 const STATUS_TEMPLATES = {
   pending: {
@@ -108,30 +109,30 @@ function absoluteImage(image, apiBase) {
 function buildHtml(order, template, customerName, adminNote, clientUrl) {
   const orderUrl = `${clientUrl}/order/${order._id}`;
   const apiBase = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-  // Tracking + carrier — shown on every status email once they're set.
   const hasTracking = !!order.trackingNumber;
   const hasCarrier  = !!order.carrier;
+
   const trackingBlock = (hasTracking || hasCarrier)
     ? `
-      <div style="background:#f3f4f6;border-radius:8px;padding:14px;margin:16px 0;">
+      <div style="background:#f3f4f6;border-radius:8px;padding:14px 16px;margin:18px 0;">
         <p style="margin:0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:0.5px;">📦 SHIPMENT DETAILS</p>
         ${hasCarrier ? `
           <p style="margin:8px 0 0 0;font-size:13px;color:#374151;">
             <span style="color:#6b7280;">Delivery via</span>
-            <strong style="color:#111827;">${order.carrier}</strong>
+            <strong style="color:#111827;">${escape(order.carrier)}</strong>
           </p>
         ` : ''}
         ${hasTracking ? `
-          <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;">Tracking #</p>
-          <p style="margin:2px 0 0 0;font-family:monospace;font-size:18px;font-weight:bold;color:#111827;letter-spacing:1px;">${order.trackingNumber}</p>
+          <p style="margin:6px 0 0 0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:0.5px;">TRACKING NUMBER</p>
+          <p style="margin:2px 0 0 0;font-family:'Courier New',monospace;font-size:18px;font-weight:bold;color:#111827;letter-spacing:1px;">${escape(order.trackingNumber)}</p>
         ` : ''}
       </div>
     ` : '';
 
   const noteBlock = adminNote ? `
-    <div style="background:#fffbeb;border:1px solid #fde68a;padding:12px;border-radius:8px;margin:16px 0;">
-      <p style="margin:0;font-size:12px;color:#92400e;font-weight:600;">📝 NOTE FROM TOY MALL</p>
-      <p style="margin:4px 0 0 0;color:#78350f;font-size:14px;">${adminNote}</p>
+    <div style="background:#fffbeb;border:1px solid #fde68a;padding:12px 14px;border-radius:8px;margin:16px 0;">
+      <p style="margin:0;font-size:11px;color:#92400e;font-weight:600;letter-spacing:0.5px;">📝 NOTE FROM TOY MALL</p>
+      <p style="margin:4px 0 0 0;color:#78350f;font-size:14px;line-height:1.5;">${escape(adminNote)}</p>
     </div>
   ` : '';
 
@@ -140,81 +141,51 @@ function buildHtml(order, template, customerName, adminNote, clientUrl) {
     const lineTotal = (Number(it.price) || 0) * (Number(it.qty) || 0);
     return `
     <tr>
-      <td style="padding:8px 0;width:64px;vertical-align:middle;">
-        <img src="${img}" width="56" height="56" alt="${it.name || 'Product'}" style="display:block;width:56px;height:56px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;object-fit:contain;" />
+      <td style="padding:10px 0;width:64px;vertical-align:middle;">
+        <img src="${img}" width="56" height="56" alt="${escape(it.name || 'Product')}" style="display:block;width:56px;height:56px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;object-fit:contain;" />
       </td>
-      <td style="padding:8px 12px;vertical-align:middle;">
-        <p style="margin:0;font-size:13px;font-weight:600;color:#111827;line-height:1.4;">${it.name || 'Product'}</p>
+      <td style="padding:10px 12px;vertical-align:middle;">
+        <p style="margin:0;font-size:13px;font-weight:600;color:#111827;line-height:1.4;">${escape(it.name || 'Product')}</p>
         <p style="margin:2px 0 0 0;font-size:12px;color:#6b7280;">Qty ${it.qty} × ₹${(Number(it.price) || 0).toFixed(2)}</p>
       </td>
-      <td style="padding:8px 0;font-size:13px;font-weight:600;color:#111827;text-align:right;vertical-align:middle;white-space:nowrap;">₹${lineTotal.toFixed(2)}</td>
+      <td style="padding:10px 0;font-size:13px;font-weight:600;color:#111827;text-align:right;vertical-align:middle;white-space:nowrap;">₹${lineTotal.toFixed(2)}</td>
     </tr>
   `;
   }).join('');
-  const moreItems = order.items.length > 4 ? `<p style="text-align:center;color:#6b7280;font-size:12px;margin:8px 0 0 0;">+${order.items.length - 4} more item(s) — see full order online</p>` : '';
+  const moreItems = order.items.length > 4
+    ? `<p style="text-align:center;color:#6b7280;font-size:12px;margin:8px 0 0 0;">+${order.items.length - 4} more item(s) — see full order online</p>`
+    : '';
 
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#ffffff;">
-    <!-- Header -->
-    <div style="background:#111827;padding:20px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:800;">
-        <span style="color:#e53935;">Toy</span>Mall
-      </h1>
+  // Body that goes inside the shared layout's content slot.
+  const bodyHtml = `
+    <p style="margin:0 0 14px 0;font-size:15px;">Hi <strong>${escape(customerName)}</strong>,</p>
+    <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${
+      order.status === 'cancelled' ? cancelledMessage(order) : template.message
+    }</p>
+
+    ${trackingBlock}
+    ${noteBlock}
+
+    <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:18px 0;">
+      <p style="margin:0 0 10px 0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:0.5px;">YOUR ITEMS</p>
+      <table style="width:100%;border-collapse:collapse;">
+        ${itemsList}
+      </table>
+      ${moreItems}
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0;">
+      <p style="margin:0;text-align:right;font-weight:bold;font-size:16px;color:#e53935;">Total: ₹${order.totalPrice.toFixed(2)}</p>
     </div>
-
-    <!-- Status banner -->
-    <div style="background:${template.color};padding:32px 20px;text-align:center;color:#ffffff;">
-      <div style="font-size:48px;margin-bottom:8px;">${template.emoji}</div>
-      <h2 style="margin:0;font-size:24px;font-weight:bold;">${template.headline}</h2>
-      <p style="margin:8px 0 0 0;opacity:0.95;font-size:14px;">Order ${order.orderNumber}</p>
-    </div>
-
-    <!-- Body -->
-    <div style="padding:24px 20px;">
-      <p style="margin:0 0 16px 0;font-size:15px;color:#111827;">Hi <strong>${customerName}</strong>,</p>
-      <p style="margin:0 0 16px 0;color:#374151;line-height:1.6;">${
-        order.status === 'cancelled' ? cancelledMessage(order) : template.message
-      }</p>
-
-      ${trackingBlock}
-      ${noteBlock}
-
-      <!-- Items summary -->
-      <div style="border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:16px 0;">
-        <p style="margin:0 0 8px 0;font-size:12px;color:#6b7280;font-weight:600;">YOUR ITEMS</p>
-        <table style="width:100%;border-collapse:collapse;">
-          ${itemsList}
-        </table>
-        ${moreItems}
-        <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0;">
-        <p style="margin:0;text-align:right;font-weight:bold;font-size:16px;color:#e53935;">Total: ₹${order.totalPrice.toFixed(2)}</p>
-      </div>
-
-      <!-- CTA -->
-      <div style="text-align:center;margin:24px 0;">
-        <a href="${orderUrl}" style="display:inline-block;background:#e53935;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">View Order Details →</a>
-      </div>
-
-      <p style="color:#6b7280;font-size:13px;line-height:1.6;text-align:center;margin:16px 0 0 0;">
-        Questions? Reply to this email or call <a href="tel:+917738028750" style="color:#e53935;">+91 77380 28750</a>
-      </p>
-    </div>
-
-    <!-- Footer -->
-    <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;color:#6b7280;">Toy Mall</p>
-      <p style="margin:4px 0 0 0;font-size:11px;color:#9ca3af;">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</p>
-      <p style="margin:2px 0 0 0;font-size:11px;color:#9ca3af;">📞 +91 77380 28750 · ✉ support@toymall.in</p>
-      <p style="margin:8px 0 0 0;font-size:11px;color:#9ca3af;">© ${new Date().getFullYear()} Toy Mall. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
   `;
+
+  return renderEmail({
+    preheader: `${template.headline} · Order ${order.orderNumber}`,
+    heroEmoji: template.emoji,
+    heroColor: template.color,
+    heroTitle: template.headline,
+    heroSubtitle: `Order ${order.orderNumber}`,
+    bodyHtml,
+    cta: { text: 'View order details', url: orderUrl, color: '#e53935' },
+  });
 }
 
 function buildText(order, template, customerName, adminNote) {

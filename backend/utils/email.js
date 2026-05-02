@@ -64,19 +64,51 @@ async function sendEmail({ to, subject, html, text, replyTo, headers }) {
 }
 
 async function sendVerificationOTP(email, otp, name = '') {
-  const subject = `Your Toy Mall verification code: ${otp}`;
-  const text = `Hi ${name || 'there'},\n\nYour Toy Mall email verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't sign up, ignore this email.\n\n— Team Toy Mall, Mumbra, Thane`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-      <h2 style="color:#e53935">Toy Mall — Verify your email</h2>
-      <p>Hi ${name || 'there'},</p>
-      <p>Use this code to verify your email address:</p>
-      <div style="background:#fff5f5;border:2px dashed #e53935;padding:16px;text-align:center;font-size:32px;letter-spacing:8px;font-weight:bold;color:#b71c1c;border-radius:8px;margin:16px 0;">${otp}</div>
-      <p style="color:#666;font-size:13px">This code expires in 10 minutes. If you didn't create an account, just ignore this email.</p>
-      <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
-      <p style="color:#999;font-size:12px;text-align:center">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Amrut Nagar, Near Dargah Road, Mumbra, Thane — 400612</p>
+  const { renderEmail, escape } = require('./emailLayout');
+  const firstName = (name || 'there').split(' ')[0];
+  const subject = `${otp} is your Toy Mall verification code`;
+
+  const bodyHtml = `
+    <p style="margin:0 0 14px 0;font-size:15px;">Hi <strong>${escape(firstName)}</strong>,</p>
+    <p style="margin:0 0 18px 0;">
+      Welcome to Toy Mall! Use the code below to verify your email and finish creating your account.
+    </p>
+    <div style="background:#fff5f5;border:2px dashed #e53935;padding:18px 16px;text-align:center;border-radius:10px;margin:18px 0;">
+      <p style="margin:0;font-size:11px;font-weight:600;color:#9b2c2c;letter-spacing:1px;">VERIFICATION CODE</p>
+      <p style="margin:8px 0 0 0;font-family:'Courier New',monospace;font-size:36px;font-weight:bold;color:#b71c1c;letter-spacing:10px;">${escape(otp)}</p>
     </div>
+    <p style="margin:0;color:#6b7280;font-size:13px;">
+      This code expires in <strong>10 minutes</strong>. For security, never share it with anyone — Toy Mall staff will never ask for it.
+    </p>
+    <p style="margin:14px 0 0 0;color:#6b7280;font-size:13px;">
+      Didn't sign up? You can safely ignore this email — no account will be created.
+    </p>
   `;
+
+  const text = [
+    `Hi ${firstName},`,
+    '',
+    'Welcome to Toy Mall! Use this code to verify your email:',
+    '',
+    `   ${otp}`,
+    '',
+    'This code expires in 10 minutes.',
+    'For security, never share it with anyone.',
+    '',
+    'Didn\'t sign up? You can safely ignore this email.',
+    '',
+    '— Team Toy Mall',
+  ].join('\n');
+
+  const html = renderEmail({
+    preheader: `Your verification code is ${otp}. Expires in 10 minutes.`,
+    heroEmoji: '🔐',
+    heroColor: '#b91c1c',
+    heroTitle: 'Verify your email',
+    heroSubtitle: 'One more step to finish setting up your account',
+    bodyHtml,
+  });
+
   return sendEmail({ to: email, subject, html, text });
 }
 

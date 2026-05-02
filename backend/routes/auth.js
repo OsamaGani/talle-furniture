@@ -247,50 +247,47 @@ router.post(
     const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '');
     const resetUrl = `${clientUrl}/reset-password/${rawToken}`;
 
+    const { renderEmail, escape } = require('../utils/emailLayout');
+    const firstName = user.name?.split(' ')[0] || 'there';
+
     const subject = 'Reset your Toy Mall password';
-    const html = `
-<!DOCTYPE html>
-<html><body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#ffffff;">
-    <div style="background:#111827;padding:20px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;">
-        <span style="color:#e53935;">Toy</span>Mall
-      </h1>
-    </div>
-    <div style="padding:28px 24px;color:#374151;line-height:1.6;">
-      <h2 style="margin:0 0 12px 0;font-size:20px;font-weight:700;color:#111827;">Reset your password</h2>
-      <p style="margin:0 0 16px 0;">Hi ${user.name?.split(' ')[0] || 'there'},</p>
+    const bodyHtml = `
+      <p style="margin:0 0 14px 0;font-size:15px;">Hi <strong>${escape(firstName)}</strong>,</p>
       <p style="margin:0 0 16px 0;">
         We received a request to reset the password on your Toy Mall account.
-        Click the button below to set a new password — this link is valid for the next ${PASSWORD_RESET_TTL_MIN} minutes.
+        Tap the button below to choose a new one — this link works for the next
+        <strong>${PASSWORD_RESET_TTL_MIN} minutes</strong>.
       </p>
-      <div style="text-align:center;margin:24px 0;">
-        <a href="${resetUrl}" style="display:inline-block;background:#e53935;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">Reset password</a>
-      </div>
-      <p style="margin:0 0 8px 0;color:#6b7280;font-size:13px;">Or paste this link into your browser:</p>
-      <p style="margin:0 0 16px 0;word-break:break-all;color:#374151;font-size:13px;">${resetUrl}</p>
-      <p style="margin:24px 0 0 0;color:#6b7280;font-size:13px;">
-        Didn't ask for a password reset? You can safely ignore this email — your password won't change unless you click the link.
+      <p style="margin:18px 0 8px 0;color:#6b7280;font-size:13px;">If the button doesn't open, copy and paste this URL into your browser:</p>
+      <p style="margin:0 0 0 0;word-break:break-all;color:#374151;font-size:12px;background:#f9fafb;padding:10px;border-radius:6px;border:1px solid #e5e7eb;font-family:'Courier New',monospace;">${escape(resetUrl)}</p>
+      <p style="margin:22px 0 0 0;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb;padding-top:18px;">
+        <strong style="color:#111827;">Didn't ask for a reset?</strong><br>
+        Safe to ignore this email. Your password won't change unless you click the link, and the link expires automatically.
       </p>
-    </div>
-    <div style="background:#f9fafb;padding:14px 20px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;color:#6b7280;">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Mumbra, Thane — 400612</p>
-    </div>
-  </div>
-</body></html>`;
+    `;
 
-    const text = `Reset your Toy Mall password
+    const text = [
+      `Hi ${firstName},`,
+      '',
+      'We received a request to reset the password on your Toy Mall account.',
+      `Open this link to set a new one (valid for ${PASSWORD_RESET_TTL_MIN} minutes):`,
+      '',
+      resetUrl,
+      '',
+      'Didn\'t ask for a password reset? You can safely ignore this email — your password won\'t change unless you click the link.',
+      '',
+      '— Team Toy Mall',
+    ].join('\n');
 
-Hi ${user.name?.split(' ')[0] || 'there'},
-
-We received a request to reset the password on your Toy Mall account.
-Open this link to set a new password (valid for ${PASSWORD_RESET_TTL_MIN} minutes):
-
-${resetUrl}
-
-Didn't ask for a password reset? You can safely ignore this email.
-
-— Toy Mall`;
+    const html = renderEmail({
+      preheader: 'Tap the link to set a new password (valid 30 min).',
+      heroEmoji: '🔑',
+      heroColor: '#1f2937',
+      heroTitle: 'Reset your password',
+      heroSubtitle: `This link is valid for ${PASSWORD_RESET_TTL_MIN} minutes`,
+      bodyHtml,
+      cta: { text: 'Reset password', url: resetUrl, color: '#e53935' },
+    });
 
     try {
       await sendEmail({ to: user.email, subject, html, text });

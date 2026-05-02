@@ -10,63 +10,54 @@ const router = express.Router();
 // classic spam triggers, so we keep it understated and lead with the
 // account confirmation.
 function buildWelcomeEmail(email, promoCode, clientUrl) {
+  const { renderEmail, escape } = require('../utils/emailLayout');
   const unsubscribeUrl = `${clientUrl}/unsubscribe?email=${encodeURIComponent(email)}`;
 
-  const html = `
-<!DOCTYPE html>
-<html><body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#ffffff;">
-    <div style="background:#111827;padding:20px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;">
-        <span style="color:#e53935;">Toy</span>Mall
-      </h1>
+  const bodyHtml = `
+    <p style="margin:0 0 14px 0;font-size:15px;">Hi there,</p>
+    <p style="margin:0 0 16px 0;">
+      Thanks for subscribing to Toy Mall updates! You'll be the first to hear about
+      new arrivals, festive sales, and the occasional surprise we save for our list.
+    </p>
+    <p style="margin:0 0 12px 0;">As a small welcome gift, here's a code for your first order:</p>
+    <div style="background:#fff5f5;border:2px dashed #e53935;padding:18px 16px;text-align:center;border-radius:10px;margin:16px 0;">
+      <p style="margin:0;font-size:11px;color:#9b2c2c;font-weight:600;letter-spacing:1px;">YOUR WELCOME CODE</p>
+      <p style="margin:8px 0 0 0;font-family:'Courier New',monospace;font-size:28px;font-weight:bold;color:#b71c1c;letter-spacing:6px;">${escape(promoCode)}</p>
+      <p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Apply at checkout · valid 30 days · one-time use</p>
     </div>
-    <div style="padding:28px 24px;color:#374151;line-height:1.6;">
-      <h2 style="margin:0 0 12px 0;font-size:20px;font-weight:700;color:#111827;">Subscription confirmed</h2>
-      <p style="margin:0 0 16px 0;">Hi,</p>
-      <p style="margin:0 0 16px 0;">Thanks for subscribing to Toy Mall updates. Your email has been added to our list, and you'll be the first to hear about new arrivals and seasonal offers.</p>
-      <p style="margin:0 0 16px 0;">To say thanks, here's a one-time discount code for your first order:</p>
-      <div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;text-align:center;border-radius:8px;margin:16px 0;">
-        <p style="margin:0;font-size:11px;color:#6b7280;font-weight:600;letter-spacing:1px;">DISCOUNT CODE</p>
-        <p style="margin:6px 0 0 0;font-family:monospace;font-size:24px;letter-spacing:4px;font-weight:700;color:#111827;">${promoCode}</p>
-        <p style="margin:6px 0 0 0;font-size:12px;color:#6b7280;">Apply at checkout · valid 30 days</p>
-      </div>
-      <p style="margin:20px 0 0 0;">
-        <a href="${clientUrl}/shop" style="display:inline-block;background:#111827;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Browse the catalogue</a>
-      </p>
-      <p style="color:#6b7280;font-size:13px;margin:24px 0 0 0;">
-        Questions? Reply to this email or contact us at <a href="mailto:support@toymall.in" style="color:#374151;">support@toymall.in</a>.
-      </p>
-    </div>
-    <div style="background:#f9fafb;padding:14px 20px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;color:#6b7280;">Toy Mall · Mobin Apartment A Wing, Shop No. 4, Mumbra, Thane — 400612</p>
-      <p style="margin:6px 0 0 0;font-size:11px;color:#9ca3af;">
-        You're receiving this because you subscribed at toymall.
-        <a href="${unsubscribeUrl}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
-      </p>
-    </div>
-  </div>
-</body></html>`;
+    <p style="margin:18px 0 0 0;color:#6b7280;font-size:13px;">
+      You can unsubscribe at any time using the link at the bottom of this email.
+      We won't send you more than 2–3 emails a month — promise.
+    </p>
+  `;
 
-  const text = `Subscription confirmed — Toy Mall
+  const text = [
+    'Hi there,',
+    '',
+    'Thanks for subscribing to Toy Mall updates! You\'ll be the first to hear about new arrivals, festive sales, and the occasional surprise we save for our list.',
+    '',
+    'Your welcome code:',
+    `   ${promoCode}`,
+    'Apply at checkout. Valid 30 days, one-time use.',
+    '',
+    `Browse the catalogue: ${clientUrl}/shop`,
+    '',
+    'You can unsubscribe at any time:',
+    unsubscribeUrl,
+    '',
+    '— Team Toy Mall',
+  ].join('\n');
 
-Hi,
-
-Thanks for subscribing to Toy Mall updates. Your email has been added to our list, and you'll be the first to hear about new arrivals and seasonal offers.
-
-To say thanks, here's a one-time discount code for your first order:
-
-  Discount code: ${promoCode}
-  Apply at checkout. Valid for 30 days.
-
-Browse the catalogue: ${clientUrl}/shop
-
-Questions? Reply to this email or contact us at support@toymall.in.
-
-— Toy Mall
-Mobin Apartment A Wing, Shop No. 4, Mumbra, Thane — 400612
-
-You're receiving this because you subscribed. Unsubscribe: ${unsubscribeUrl}`;
+  const html = renderEmail({
+    preheader: `Welcome! Use code ${promoCode} for 10% off your first order.`,
+    heroEmoji: '🎁',
+    heroColor: '#0891b2',
+    heroTitle: 'Subscription confirmed',
+    heroSubtitle: 'Welcome to the Toy Mall list',
+    bodyHtml,
+    cta: { text: 'Browse the catalogue', url: `${clientUrl}/shop`, color: '#e53935' },
+    footerNote: `You're receiving this because you subscribed at Toy Mall. <a href="${unsubscribeUrl}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>.`,
+  });
 
   // Gmail / Yahoo / Microsoft strongly prefer marketing email that
   // declares one-click unsubscribe — without these headers they down-rank
