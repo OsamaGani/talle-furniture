@@ -6,6 +6,7 @@ import MobileBackBar from './components/MobileBackBar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import VerifyEmailBanner from './components/VerifyEmailBanner';
+import AntiCopyGuard from './components/AntiCopyGuard';
 import ScrollToTop from './components/ScrollToTop';
 import RouteLoader from './components/RouteLoader';
 import FloatingActions from './components/FloatingActions';
@@ -69,6 +70,7 @@ export default function App() {
   useEffect(() => { warmUpBackend(); }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white overflow-x-clip pb-14 sm:pb-0">
+      <AntiCopyGuard />
       <ScrollToTop />
       {!isInvoice && <RouteLoader duration={700} />}
       {!isInvoice && <Navbar />}
