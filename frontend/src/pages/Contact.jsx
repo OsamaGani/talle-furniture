@@ -12,14 +12,17 @@ import {
   STORE_NAME, STORE_ADDRESS_FULL,
 } from '../config/contact';
 
-// Google Maps embed pointing at the Toy Mall pin on Google Business Profile.
-// The query string targets the business name + city so Google centers on the
-// claimed listing (with the storefront photo + reviews) instead of a generic
-// address search. No API key required for this iframe form.
-const MAP_QUERY = encodeURIComponent('Toy Mall, Mobin Apartment, Amrut Nagar, Mumbra, Thane 400612');
-const MAP_EMBED_URL = `https://www.google.com/maps?q=${MAP_QUERY}&output=embed&z=17`;
-const MAP_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${MAP_QUERY}`;
-const MAP_VIEW_URL = `https://www.google.com/maps/search/?api=1&query=${MAP_QUERY}`;
+// Exact Google Maps embed for the Toy Mall storefront, pulled from
+// Google's "Share → Embed a map" tool — uses the verified Business
+// Profile place ID so the pin lands precisely on the shop with the
+// storefront photo + reviews, not on a generic address match.
+const MAP_LAT = '19.175107';
+const MAP_LNG = '73.020168';
+const MAP_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3768.4598442616034!2d73.02016807425437!3d19.175107548855628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7bf103c1fd643%3A0xb2773c43eccde054!2sToy%20Mall!5e0!3m2!1sen!2sin!4v1777716002974!5m2!1sen!2sin';
+// Directions deep-link uses lat/lng so it works whether the user has
+// the Maps app installed (mobile) or opens it in a browser (desktop).
+const MAP_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${MAP_LAT},${MAP_LNG}`;
+const MAP_VIEW_URL = `https://www.google.com/maps/search/?api=1&query=Toy+Mall+Mumbra+Thane`;
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
