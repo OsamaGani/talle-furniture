@@ -666,13 +666,13 @@ function ColorSwatchPanel({ colors, selectedColor, onSelect }) {
   const current = selectedColor || colors[0];
   return (
     <>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-bold">
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-xs font-bold">
           Color: <span className="font-medium text-primary-600">{current}</span>
         </p>
-        <p className="text-xs text-gray-500">{colors.length} option{colors.length === 1 ? '' : 's'}</p>
+        <p className="text-[10px] text-gray-500">{colors.length} option{colors.length === 1 ? '' : 's'}</p>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {colors.map((c) => {
           const bg = colorToBackground(c);
           const isPicked = current.toLowerCase() === c.toLowerCase();
@@ -683,18 +683,18 @@ function ColorSwatchPanel({ colors, selectedColor, onSelect }) {
               onClick={() => onSelect(c)}
               title={c}
               aria-label={`Select ${c}`}
-              className={`relative inline-flex items-center gap-2 border-2 rounded-full pl-1 pr-3 py-1 text-sm transition ${
+              className={`relative inline-flex items-center gap-1.5 border-2 rounded-full pl-0.5 pr-2.5 py-0.5 text-xs transition ${
                 isPicked
-                  ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-100'
+                  ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-100'
                   : 'border-gray-200 bg-white hover:border-primary-400'
               }`}
             >
               <span
-                className={`w-7 h-7 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
-                style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+                className={`w-5 h-5 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 3px,#fff 3px 6px)' }}
               />
               <span className="font-medium">{c}</span>
-              {isPicked && <FiCheck size={14} className="text-primary-600" />}
+              {isPicked && <FiCheck size={11} className="text-primary-600" />}
             </button>
           );
         })}
