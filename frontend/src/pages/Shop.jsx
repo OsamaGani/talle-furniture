@@ -61,9 +61,14 @@ export default function Shop() {
     const np = new URLSearchParams(params);
     if (value) np.set(key, value); else np.delete(key);
     setParams(np);
+    // Auto-close the mobile filter drawer after any selection so the
+    // customer sees the filtered results immediately. No-op on desktop
+    // because the sidebar isn't a drawer there — showFilter stays false
+    // and the always-visible aside renders independently.
+    setShowFilter(false);
   };
 
-  const clearAll = () => setParams({});
+  const clearAll = () => { setParams({}); setShowFilter(false); };
 
   const headerLabel = keyword ? `Results for "${keyword}"` :
     category || brand || ageGroup || (featured && 'Featured Toys') ||
@@ -184,42 +189,43 @@ function FilterGroup({ title, items, active, onChange }) {
   );
 }
 
-// Visual colour filter — clicking a swatch toggles it as the active filter.
-// Single-select to keep the URL clean (one ?color= param). Common colours
-// only; if a customer wants something exotic they can always type the
-// keyword in the search bar.
+// Colour filter — each row is a swatch + name pill. Single-select to keep
+// the URL clean (one ?color= param). Reading the colour name avoids the
+// "is that black or dark blue?" guess from a tiny circle.
 function ColorFilter({ active, onChange }) {
   return (
     <div>
       <h3 className="font-bold mb-2">Color</h3>
-      <div className="flex flex-wrap gap-1.5">
+      <ul className="space-y-1">
         {COMMON_COLORS.map((c) => {
           const bg = colorToBackground(c);
           const isActive = active.toLowerCase() === c.toLowerCase();
           return (
-            <button
-              key={c}
-              type="button"
-              onClick={() => onChange(isActive ? '' : c)}
-              title={c}
-              aria-label={c}
-              className={`relative w-8 h-8 rounded-full border-2 transition hover:scale-110 ${
-                isActive ? 'border-primary-500 ring-2 ring-primary-200' : (isLightColor(c) ? 'border-gray-300' : 'border-white shadow-sm')
-              }`}
-              style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
-            >
-              {isActive && (
-                <span className="absolute inset-0 flex items-center justify-center text-white drop-shadow text-xs">✓</span>
-              )}
-            </button>
+            <li key={c}>
+              <label className="flex items-center gap-2 cursor-pointer hover:text-primary-500">
+                <input
+                  type="radio"
+                  checked={isActive}
+                  onChange={() => onChange(c)}
+                  className="accent-primary-500"
+                />
+                <span
+                  className={`w-4 h-4 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                  style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 3px,#fff 3px 6px)' }}
+                />
+                {c}
+              </label>
+            </li>
           );
         })}
-      </div>
-      {active && (
-        <button onClick={() => onChange('')} className="text-xs text-primary-500 hover:underline mt-2">
-          Clear color
-        </button>
-      )}
+        {active && (
+          <li>
+            <button onClick={() => onChange('')} className="text-xs text-primary-500 hover:underline mt-1">
+              Clear
+            </button>
+          </li>
+        )}
+      </ul>
     </div>
   );
 }
