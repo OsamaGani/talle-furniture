@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-export function useReveal({ threshold = 0.15, once = true } = {}) {
+// Threshold + rootMargin tuned together: the element only needs ~5% of
+// its height in view, AND we extend the trigger zone 80px above the
+// viewport bottom. Together this means the reveal starts firing while
+// the card is still mostly off-screen, so by the time the user is
+// looking AT the card it's already finishing its slide-in — the result
+// reads as smooth presence rather than abrupt pop-in.
+export function useReveal({ threshold = 0.05, once = true, rootMargin = '0px 0px -80px 0px' } = {}) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -16,11 +22,11 @@ export function useReveal({ threshold = 0.15, once = true } = {}) {
           setVisible(false);
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [threshold, once]);
+  }, [threshold, once, rootMargin]);
 
   return [ref, visible];
 }

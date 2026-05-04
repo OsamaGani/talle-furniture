@@ -239,7 +239,16 @@ export default function ProductDetail() {
               right column doesn't disappear below the fold on a 14-inch
               laptop screen. */}
           <div className="aspect-square max-h-[280px] sm:max-h-[360px] md:max-h-[380px] mx-auto md:max-w-[420px] border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4">
-            <img src={resolveImage(activeImg || displayImages[0])} alt={product.name} className="max-w-full max-h-full object-contain" />
+            {/* key on the active image URL forces React to remount the <img>,
+                which re-runs the .animate-imgFade keyframe — gives a smooth
+                opacity + tiny zoom-out cross-fade every time the customer
+                taps a new colour swatch. */}
+            <img
+              key={activeImg || displayImages[0] || product._id}
+              src={resolveImage(activeImg || displayImages[0])}
+              alt={product.name}
+              className="max-w-full max-h-full object-contain animate-imgFade"
+            />
           </div>
           {displayImages.length > 1 && (
             <div className="mt-3">
@@ -252,7 +261,8 @@ export default function ProductDetail() {
                   <button
                     key={`${activeVariant?.color || 'main'}-${i}`}
                     onClick={() => setActiveImg(img)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] ${(activeImg || displayImages[0]) === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}
+                    style={{ animationDelay: `${i * 70}ms` }}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] animate-imgFade ${(activeImg || displayImages[0]) === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}
                     aria-label={`View image ${i + 1} of ${displayImages.length}`}
                   >
                     <img src={resolveImage(img)} className="w-full h-full object-contain p-1" alt="" />
