@@ -341,7 +341,6 @@ export default function Navbar() {
             <NavItem to="/shop?category=Books" label="Books" />
             <NavItem to="/shop?bestSeller=true" label="⭐ Best Sellers" />
             <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
-            <NavItem to="/gifts" label="🎁 Gift Finder" highlight />
             <li className="ml-auto">
               <NavLink to="/wholesale" className={({ isActive }) =>
                 `inline-block px-4 py-3 text-purple-700 font-bold hover:bg-purple-50 transition ${isActive ? 'bg-purple-50' : ''}`
@@ -487,7 +486,6 @@ export default function Navbar() {
               <li><Link to="/shop?discount=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded text-primary-500 font-semibold hover:bg-primary-50 transition">🔥 Up to 70% Off</Link></li>
               <li><Link to="/shop?bestSeller=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded hover:bg-gray-50 transition">⭐ Best Sellers</Link></li>
               <li><Link to="/shop?newArrival=true" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded hover:bg-gray-50 transition">✨ New Arrivals</Link></li>
-              <li><Link to="/gifts" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded text-primary-500 font-semibold hover:bg-primary-50 transition">🎁 Gift Finder</Link></li>
               <li><Link to="/shop?category=Books" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded hover:bg-gray-50 transition">📚 Books</Link></li>
 
               {/* Collapsible: Categories */}

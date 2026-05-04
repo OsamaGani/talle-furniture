@@ -12,8 +12,6 @@ import Reveal from '../components/Reveal';
 import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight, FiPhone, FiPackage, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi';
 import SEO from '../components/SEO';
 import ShopByAge from '../components/ShopByAge';
-import ShopByOccasion from '../components/ShopByOccasion';
-import Testimonials from '../components/Testimonials';
 import RecentlyViewed from '../components/RecentlyViewed';
 import { ProductRowSkeleton } from '../components/ProductCardSkeleton';
 // FiShield, FiRefreshCw, FiHeadphones used in the USP trust strip below
@@ -287,9 +285,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Shop by Occasion — Birthday, Diwali, Eid, Christmas, STEM, Baby's first */}
-      <ShopByOccasion />
-
       {/* Shop by Age */}
       <ShopByAge />
 
@@ -309,9 +304,6 @@ export default function Home() {
 
       {/* Best Sellers */}
       <Section title="Best Sellers" subtitle="Most loved by customers" link="/shop?bestSeller=true" products={bestSellers} bg="bg-gray-50" loading={loading} />
-
-      {/* Customer testimonials — real-feel parent voices to build trust */}
-      <Testimonials />
 
       {/* Recently Viewed — empty section returns null if no history yet */}
       <RecentlyViewed />

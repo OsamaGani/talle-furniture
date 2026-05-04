@@ -41,7 +41,6 @@ const Contact         = lazy(() => import('./pages/Contact'));
 const Franchise       = lazy(() => import('./pages/Franchise'));
 const Help            = lazy(() => import('./pages/Help'));
 const Wishlist        = lazy(() => import('./pages/Wishlist'));
-const GiftFinder      = lazy(() => import('./pages/GiftFinder'));
 const ShippingPolicy  = lazy(() => import('./pages/policies/Shipping'));
 const PrivacyPolicy   = lazy(() => import('./pages/policies/Privacy'));
 const TermsOfService  = lazy(() => import('./pages/policies/Terms'));
@@ -100,7 +99,6 @@ export default function App() {
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/help" element={<Help />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/gifts" element={<GiftFinder />} />
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
