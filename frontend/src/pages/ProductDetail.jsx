@@ -535,10 +535,11 @@ export default function ProductDetail() {
               customer enters a PIN. Three working days out gives a safe
               estimate; the PIN check below refines it for their pincode. */}
           {product.stock > 0 && !pinCheck?.etaText && (
-            <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 font-semibold">
-              <FiClock size={12} />
-              <span>
-                Order today · Delivery by{' '}
+            <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 font-semibold max-w-full">
+              <FiClock size={12} className="flex-shrink-0" />
+              <span className="truncate">
+                <span className="xs:hidden">Delivery by </span>
+                <span className="hidden xs:inline">Order today · Delivery by </span>
                 {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
               </span>
             </div>
@@ -573,16 +574,20 @@ export default function ProductDetail() {
           {/* Ask on WhatsApp — Indian customers are 10× more likely to
               ping a store on WhatsApp than fill a contact form. The link
               pre-fills a message with the product name and URL so the
-              shop team knows exactly what the customer is asking about. */}
+              shop team knows exactly what the customer is asking about.
+              Two text variants — tight on small phones, fuller on tablet+. */}
           <a
             href={waLink(`Hi Toy Mall! I'm interested in *${product.name}* (${typeof window !== 'undefined' ? window.location.href : ''}). Can you help me?`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-2 rounded-lg transition"
+            className="mt-3 inline-flex max-w-full items-center gap-2 text-xs sm:text-sm font-semibold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-2 rounded-lg transition"
           >
-            <FaWhatsapp size={16} className="text-green-600" />
-            <span>Ask about this toy on WhatsApp</span>
-            <span className="text-[10px] text-green-600 hidden sm:inline">· typically replies within an hour</span>
+            <FaWhatsapp size={16} className="text-green-600 flex-shrink-0" />
+            <span className="truncate">
+              <span className="xs:hidden">Ask on WhatsApp</span>
+              <span className="hidden xs:inline">Ask about this toy on WhatsApp</span>
+            </span>
+            <span className="text-[10px] text-green-600 hidden md:inline whitespace-nowrap">· replies within an hour</span>
           </a>
 
           <div className="mt-6 grid grid-cols-3 gap-3 text-xs text-center pt-6 border-t">

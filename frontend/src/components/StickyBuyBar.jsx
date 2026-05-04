@@ -59,18 +59,24 @@ export default function StickyBuyBar({
 
   return (
     <div
-      // Mobile: sits above the BottomNav (which is ~56 px). Desktop:
-      // sits at bottom of viewport. Translate-y animation gives a smooth
-      // slide-up the moment the buy buttons go out of view.
-      className={`fixed inset-x-0 z-30 bg-white border-t shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ${
+      // Mobile: sits above the BottomNav. BottomNav itself is 56 px of
+      // content + env(safe-area-inset-bottom) on iPhones with a home
+      // indicator. We mirror that calc so the bar lands cleanly above
+      // BottomNav on every device — including iPhone 14/15 with the
+      // 34 px home indicator inset. Desktop has no BottomNav, so we
+      // hug bottom-0 (also respecting safe-area for iPad full-screen).
+      className={`fixed inset-x-0 z-30 bg-white border-t shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] sm:bottom-[env(safe-area-inset-bottom)] ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
-      } bottom-14 sm:bottom-0`}
+      }`}
       role="region"
       aria-label="Quick buy bar"
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3">
-        {/* Thumbnail */}
-        <div className="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg bg-gray-50 border overflow-hidden p-1">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3">
+        {/* Thumbnail — hidden on very narrow phones (<360px) so name+price
+            and buttons get the breathing room they need. The thumbnail
+            adds nothing on a 320 px screen anyway since the customer is
+            already on the product page looking at the gallery. */}
+        <div className="hidden xs:block w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg bg-gray-50 border overflow-hidden p-1">
           <img
             src={resolveImage(image)}
             alt={name}
@@ -83,7 +89,7 @@ export default function StickyBuyBar({
           <p className="text-[11px] sm:text-xs font-semibold text-gray-900 truncate leading-tight">
             {name}
           </p>
-          <div className="flex items-baseline gap-1.5 mt-0.5">
+          <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap">
             <span className="text-sm sm:text-base font-extrabold text-gray-900">
               ₹{Number(price || 0).toFixed(0)}
             </span>
@@ -119,15 +125,15 @@ export default function StickyBuyBar({
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={onAddToCart}
+              aria-label="Add to cart"
               className="inline-flex items-center justify-center gap-1 border border-primary-500 text-primary-500 hover:bg-primary-50 text-[11px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition active:scale-95"
             >
-              <FiShoppingCart size={12} className="hidden sm:inline" />
+              <FiShoppingCart size={12} />
               <span className="hidden sm:inline">Add</span>
-              <span className="sm:hidden">+ Cart</span>
             </button>
             <button
               onClick={onBuyNow}
-              className="inline-flex items-center justify-center gap-1 bg-primary-500 hover:bg-primary-600 text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition shadow active:scale-95"
+              className="inline-flex items-center justify-center gap-1 bg-primary-500 hover:bg-primary-600 text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition shadow active:scale-95 whitespace-nowrap"
             >
               ⚡ Buy Now
             </button>
