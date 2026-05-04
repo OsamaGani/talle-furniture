@@ -233,7 +233,12 @@ export default function ProductDetail() {
       <div className="grid md:grid-cols-2 gap-5 md:gap-8">
         {/* Images */}
         <div className="md:sticky md:top-32 md:self-start">
-          <div className="aspect-square max-h-[280px] sm:max-h-[400px] md:max-h-[520px] border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+          {/* Image height capped on desktop so the price/CTA sit on the
+              same screen as the photo. md:max-h-[380px] is the sweet spot
+              — big enough to show product detail, small enough that the
+              right column doesn't disappear below the fold on a 14-inch
+              laptop screen. */}
+          <div className="aspect-square max-h-[280px] sm:max-h-[360px] md:max-h-[380px] mx-auto md:max-w-[420px] border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4">
             <img src={resolveImage(activeImg || displayImages[0])} alt={product.name} className="max-w-full max-h-full object-contain" />
           </div>
           {displayImages.length > 1 && (
@@ -284,7 +289,7 @@ export default function ProductDetail() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs sm:text-sm text-gray-500 uppercase">{product.brand}</p>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mt-1">{product.name}</h1>
+              <h1 className="text-base sm:text-lg md:text-xl font-bold mt-1">{product.name}</h1>
             </div>
             <button
               onClick={() => toggleWishlist(product)}
@@ -319,27 +324,27 @@ export default function ProductDetail() {
               when the customer has picked a coloured variant with its own
               price. effectiveBasePrice / effectiveDiscount are derived
               above; they fall back cleanly to the product-level values. */}
-          <div className="mt-4">
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">₹{final.toFixed(0)}</span>
+          <div className="mt-3">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">₹{final.toFixed(0)}</span>
               {effectiveDiscount > 0 && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">₹{effectiveBasePrice.toFixed(0)}</span>
-                  <span className="text-sm sm:text-base font-bold text-emerald-600">{effectiveDiscount}% off</span>
+                  <span className="text-sm text-gray-400 line-through">₹{effectiveBasePrice.toFixed(0)}</span>
+                  <span className="text-xs sm:text-sm font-bold text-emerald-600">{effectiveDiscount}% off</span>
                 </>
               )}
             </div>
             {effectiveDiscount > 0 && (
-              <p className="text-sm text-emerald-700 font-semibold mt-1">
+              <p className="text-xs text-emerald-700 font-semibold mt-0.5">
                 You save ₹{(effectiveBasePrice - final).toFixed(0)}
               </p>
             )}
             {hasVariantOverride && selectedColor && (
-              <p className="text-xs text-primary-600 font-medium mt-1">
+              <p className="text-[11px] text-primary-600 font-medium mt-0.5">
                 Price for {selectedColor}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Inclusive of all taxes</p>
+            <p className="text-[11px] text-gray-500 mt-0.5">Inclusive of all taxes</p>
           </div>
 
           {product.wholesalePrice > 0 && product.wholesaleMinQty > 0 && (
