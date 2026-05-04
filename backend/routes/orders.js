@@ -20,8 +20,22 @@ const TAX_RATE = 0.18;
 const round2 = (n) => +Number(n).toFixed(2);
 
 // Compute the unit price the customer should actually pay for this product
-// at this quantity, respecting wholesale eligibility and discount.
-function unitPriceFor(product, qty, user) {
+// at this quantity, respecting wholesale eligibility, the product-level
+// discount, and any colour-variant price/discount override.
+//
+// Variant pricing rules:
+//   * variant.price > 0      → use that as the base instead of product.price
+//   * variant.discount > 0   → use that as the discount instead of product.discount
+//   * either of those zero/missing → fall back to the product-level value
+//   * wholesale price stays product-level (wholesale buyers usually order
+//     mixed colours; per-colour B2B pricing isn't needed yet)
+function unitPriceFor(product, qty, user, color) {
+  const variant = color
+    ? (product.colorVariants || []).find((v) => v.color.toLowerCase() === color.toLowerCase())
+    : null;
+  const basePrice = (variant && variant.price > 0) ? variant.price : product.price;
+  const discount  = (variant && variant.discount != null && variant.discount > 0) ? variant.discount : product.discount;
+
   const isApprovedWholesale =
     user.accountType === 'wholesale' &&
     user.wholesaleApproved === true &&
@@ -30,8 +44,8 @@ function unitPriceFor(product, qty, user) {
     qty >= product.wholesaleMinQty;
 
   if (isApprovedWholesale) return round2(product.wholesalePrice);
-  if (product.discount > 0) return round2(product.price - (product.price * product.discount) / 100);
-  return round2(product.price);
+  if (discount > 0) return round2(basePrice - (basePrice * discount) / 100);
+  return round2(basePrice);
 }
 
 router.post('/', protect, asyncHandler(async (req, res) => {
@@ -73,17 +87,8 @@ router.post('/', protect, asyncHandler(async (req, res) => {
       }
       reserved.push({ id: updated._id, qty });
 
-      const unit = unitPriceFor(updated, qty, req.user);
-      const isWholesalePrice =
-        req.user.accountType === 'wholesale' &&
-        req.user.wholesaleApproved === true &&
-        updated.wholesalePrice > 0 &&
-        qty >= updated.wholesaleMinQty;
-
-      // Validate the colour the customer picked: must be one the product
-      // actually offers (case-insensitive match). Falls back to '' silently
-      // for products without colour options or if the client sent an
-      // unrecognised value, so the order still completes.
+      // Validate the colour FIRST so unitPriceFor can apply variant
+      // pricing if the customer picked a coloured variant with its own price.
       let color = String(it?.color || '').trim().slice(0, 40);
       if (color && Array.isArray(updated.colors) && updated.colors.length > 0) {
         const match = updated.colors.find((c) => c.toLowerCase() === color.toLowerCase());
@@ -91,6 +96,13 @@ router.post('/', protect, asyncHandler(async (req, res) => {
       } else if (color && (!updated.colors || updated.colors.length === 0)) {
         color = '';
       }
+
+      const unit = unitPriceFor(updated, qty, req.user, color);
+      const isWholesalePrice =
+        req.user.accountType === 'wholesale' &&
+        req.user.wholesaleApproved === true &&
+        updated.wholesalePrice > 0 &&
+        qty >= updated.wholesaleMinQty;
 
       safeItems.push({
         product: updated._id,

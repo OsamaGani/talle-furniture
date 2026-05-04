@@ -76,13 +76,27 @@ export function CartProvider({ children }) {
 
   const addToCart = (product, qty = 1, color = '') => {
     const targetLineId = lineIdFor(product._id, color);
+    // Resolve variant-level price/discount overrides if the customer picked
+    // a coloured variant. Falls back to the product's main price + discount.
+    // Mirrors the server-side unitPriceFor() so cart preview == final charge.
+    const variant = color
+      ? (product.colorVariants || []).find((v) => v.color.toLowerCase() === color.toLowerCase())
+      : null;
+    const effPrice = (variant && variant.price > 0) ? variant.price : product.price;
+    const effDiscount = (variant && variant.discount > 0) ? variant.discount : product.discount;
+    const productForPricing = {
+      ...product,
+      price: effPrice,
+      discount: effDiscount,
+    };
+
     setItems((prev) => {
       const existing = prev.find((p) => p.lineId === targetLineId);
       const newQty = (existing?.qty || 0) + qty;
-      const { price, isWholesalePrice } = computeUnitPrice(product, newQty, isWholesale);
-      const basePrice = product.discount > 0
-        ? +(product.price - (product.price * product.discount) / 100).toFixed(2)
-        : product.price;
+      const { price, isWholesalePrice } = computeUnitPrice(productForPricing, newQty, isWholesale);
+      const basePrice = effDiscount > 0
+        ? +(effPrice - (effPrice * effDiscount) / 100).toFixed(2)
+        : effPrice;
 
       if (existing) {
         return prev.map((p) =>

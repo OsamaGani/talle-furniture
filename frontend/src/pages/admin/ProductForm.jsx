@@ -71,8 +71,13 @@ export default function ProductForm() {
             // before that field existed, hydrate from the legacy colors[]
             // array so the admin sees their old data with empty image lists.
             colorVariants: Array.isArray(data.colorVariants) && data.colorVariants.length > 0
-              ? data.colorVariants.map((v) => ({ color: v.color, images: Array.isArray(v.images) ? v.images : [] }))
-              : (Array.isArray(data.colors) ? data.colors.map((c) => ({ color: c, images: [] })) : []),
+              ? data.colorVariants.map((v) => ({
+                  color: v.color,
+                  images: Array.isArray(v.images) ? v.images : [],
+                  price: v.price || 0,
+                  discount: v.discount || 0,
+                }))
+              : (Array.isArray(data.colors) ? data.colors.map((c) => ({ color: c, images: [], price: 0, discount: 0 })) : []),
           });
           // If the saved brand isn't in the loaded brand list, open custom-input mode
           // so the existing value is editable instead of silently disappearing.
@@ -158,6 +163,8 @@ export default function ProductForm() {
           .map((v) => ({
             color: String(v.color || '').trim(),
             images: Array.isArray(v.images) ? v.images.filter(Boolean) : [],
+            price: +v.price || 0,
+            discount: +v.discount || 0,
           }))
           .filter((v) => v.color),
       };
@@ -377,6 +384,51 @@ export default function ProductForm() {
                         <FiX size={14} /> Remove
                       </button>
                     </div>
+
+                    {/* Per-variant price overrides — leave blank/zero to
+                        use the product's main price + discount. */}
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide block mb-1">
+                          Price for {v.color} <span className="font-normal text-gray-400">(₹, optional)</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className="input"
+                          value={v.price ?? 0}
+                          onChange={(e) => {
+                            const next = [...form.colorVariants];
+                            next[idx] = { ...next[idx], price: e.target.value === '' ? 0 : +e.target.value };
+                            setForm({ ...form, colorVariants: next });
+                          }}
+                          placeholder={`Default: ₹${(+form.price || 0).toFixed(2)}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide block mb-1">
+                          Discount <span className="font-normal text-gray-400">(% optional)</span>
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          className="input"
+                          value={v.discount ?? 0}
+                          onChange={(e) => {
+                            const next = [...form.colorVariants];
+                            next[idx] = { ...next[idx], discount: e.target.value === '' ? 0 : +e.target.value };
+                            setForm({ ...form, colorVariants: next });
+                          }}
+                          placeholder={`Default: ${form.discount || 0}%`}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">
+                      Leave blank or 0 to use the product's main price (₹{(+form.price || 0).toFixed(2)}{form.discount > 0 ? `, ${form.discount}% off` : ''}).
+                    </p>
+
                     <ImageUploader
                       label={`Photos for ${v.color}`}
                       multiple

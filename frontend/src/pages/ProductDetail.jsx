@@ -75,14 +75,23 @@ export default function ProductDetail() {
   if (loading) return <Loader size="lg" />;
   if (!product) return <p className="text-center py-20">Not found</p>;
 
-  const final = product.discount > 0 ? +(product.price - (product.price * product.discount) / 100).toFixed(2) : product.price;
-
-  // Resolve which gallery to show. If the customer has selected a colour
-  // AND that variant has its own images, use those. Otherwise fall back
-  // to the product's master image set so the page never goes empty.
+  // Resolve which colour variant the customer currently has selected (if any).
   const activeVariant = (product.colorVariants || []).find(
     (v) => v.color.toLowerCase() === (selectedColor || '').toLowerCase()
   );
+  // Effective price + discount: prefer variant overrides when present,
+  // fall back to the product's main values. Mirrors unitPriceFor() on the
+  // server so what the customer sees == what they're charged.
+  const effectiveBasePrice = (activeVariant && activeVariant.price > 0) ? activeVariant.price : product.price;
+  const effectiveDiscount  = (activeVariant && activeVariant.discount > 0) ? activeVariant.discount : product.discount;
+  const final = effectiveDiscount > 0
+    ? +(effectiveBasePrice - (effectiveBasePrice * effectiveDiscount) / 100).toFixed(2)
+    : effectiveBasePrice;
+  const hasVariantOverride = !!(activeVariant && (activeVariant.price > 0 || activeVariant.discount > 0));
+
+  // Gallery resolution. If the customer picked a colour AND that variant
+  // has its own images, use those. Otherwise fall back to the product's
+  // master image set so the page never goes empty.
   const displayImages = (activeVariant?.images && activeVariant.images.length > 0)
     ? activeVariant.images
     : (product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []));
@@ -306,20 +315,28 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          {/* Price block with savings */}
+          {/* Price block with savings — uses the colour-variant override
+              when the customer has picked a coloured variant with its own
+              price. effectiveBasePrice / effectiveDiscount are derived
+              above; they fall back cleanly to the product-level values. */}
           <div className="mt-4">
             <div className="flex items-baseline gap-3 flex-wrap">
               <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">₹{final.toFixed(0)}</span>
-              {product.discount > 0 && (
+              {effectiveDiscount > 0 && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">₹{product.price.toFixed(0)}</span>
-                  <span className="text-sm sm:text-base font-bold text-emerald-600">{product.discount}% off</span>
+                  <span className="text-lg text-gray-400 line-through">₹{effectiveBasePrice.toFixed(0)}</span>
+                  <span className="text-sm sm:text-base font-bold text-emerald-600">{effectiveDiscount}% off</span>
                 </>
               )}
             </div>
-            {product.discount > 0 && (
+            {effectiveDiscount > 0 && (
               <p className="text-sm text-emerald-700 font-semibold mt-1">
-                You save ₹{(product.price - final).toFixed(0)}
+                You save ₹{(effectiveBasePrice - final).toFixed(0)}
+              </p>
+            )}
+            {hasVariantOverride && selectedColor && (
+              <p className="text-xs text-primary-600 font-medium mt-1">
+                Price for {selectedColor}
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">Inclusive of all taxes</p>

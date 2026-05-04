@@ -38,6 +38,12 @@ const productSchema = new mongoose.Schema(
     colorVariants: [{
       color: { type: String, required: true },
       images: { type: [String], default: [] },
+      // Optional per-colour price overrides. Use 0 / null to fall back
+      // to the product-level price + discount. Lets you charge ₹40 for the
+      // red variant and ₹50 for the gold one without splitting the
+      // listing into two products.
+      price: { type: Number, default: 0, min: 0 },
+      discount: { type: Number, default: 0, min: 0, max: 100 },
     }],
     featured: { type: Boolean, default: false },
     bestSeller: { type: Boolean, default: false },
