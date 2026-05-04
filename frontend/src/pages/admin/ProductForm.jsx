@@ -35,7 +35,7 @@ export default function ProductForm() {
     price: 0, discount: 0, wholesalePrice: 0, wholesaleMinQty: 0,
     stock: 0, image: '', images: [],
     featured: false, bestSeller: false, newArrival: false, onDeal: false,
-    colors: [],
+    colorVariants: [],
   });
   const [colorInput, setColorInput] = useState('');
 
@@ -67,7 +67,12 @@ export default function ProductForm() {
             stock: data.stock,
             image: data.image || '', images: data.images || [],
             featured: data.featured, bestSeller: data.bestSeller, newArrival: data.newArrival, onDeal: !!data.onDeal,
-            colors: Array.isArray(data.colors) ? data.colors : [],
+            // Prefer the new structured variants. If the product was saved
+            // before that field existed, hydrate from the legacy colors[]
+            // array so the admin sees their old data with empty image lists.
+            colorVariants: Array.isArray(data.colorVariants) && data.colorVariants.length > 0
+              ? data.colorVariants.map((v) => ({ color: v.color, images: Array.isArray(v.images) ? v.images : [] }))
+              : (Array.isArray(data.colors) ? data.colors.map((c) => ({ color: c, images: [] })) : []),
           });
           // If the saved brand isn't in the loaded brand list, open custom-input mode
           // so the existing value is editable instead of silently disappearing.
@@ -146,7 +151,15 @@ export default function ProductForm() {
         wholesalePrice: +form.wholesalePrice || 0,
         wholesaleMinQty: +form.wholesaleMinQty || 0,
         stock: +form.stock || 0,
-        colors: (form.colors || []).map((c) => String(c).trim()).filter(Boolean),
+        // Variants: clean each one before sending. Server-side pre-save
+        // also dedupes + caps, but doing it here means the payload is
+        // already minimal so the request stays small.
+        colorVariants: (form.colorVariants || [])
+          .map((v) => ({
+            color: String(v.color || '').trim(),
+            images: Array.isArray(v.images) ? v.images.filter(Boolean) : [],
+          }))
+          .filter((v) => v.color),
       };
       if (isEdit) await API.put(`/products/${id}`, payload);
       else await API.post('/products', payload);
@@ -327,48 +340,60 @@ export default function ProductForm() {
           onMainChange={(img) => setForm({ ...form, image: img })}
         />
 
-        {/* Available colours — admin can add as many as the product comes in.
-            Customer Shop page filters by these; product detail page shows
-            them as visual swatches. Either click a quick-pick chip or type
-            a custom colour name and press Enter. */}
+        {/* Colour variants — each row is one colour with its own image
+            uploader. When the customer taps a colour swatch on the
+            product page, the photos swap to that variant's images.
+            Variants without images fall back to the main product photos. */}
         <div className="bg-gray-50 border rounded-lg p-4">
-          <label className="label">Available Colours</label>
+          <label className="label">Colour Variants <span className="font-normal text-gray-500">(optional)</span></label>
           <p className="text-xs text-gray-600 mb-3">
-            Pick from the common chips below or type a custom colour and press Enter.
-            These show up as colour swatches on the product page and let customers filter by colour on Shop.
+            Add a colour for each variant the product comes in, then upload photos showing that
+            specific colour. When a customer taps the colour swatch on the product page,
+            the photos swap to show the colour they selected. Leave variants without
+            colour-specific photos and customers will see the main product photos by default.
           </p>
 
-          {/* Selected colour chips */}
-          {form.colors.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {form.colors.map((c) => {
-                const bg = colorToBackground(c);
+          {/* List of variants */}
+          {form.colorVariants.length > 0 && (
+            <div className="space-y-3 mb-3">
+              {form.colorVariants.map((v, idx) => {
+                const bg = colorToBackground(v.color);
                 return (
-                  <span
-                    key={c}
-                    className="inline-flex items-center gap-1.5 bg-white border rounded-full pl-1.5 pr-2 py-1 text-sm"
-                  >
-                    <span
-                      className={`w-5 h-5 rounded-full border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
-                      style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
-                      title={c}
+                  <div key={idx} className="bg-white border rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-6 h-6 rounded-full border ${isLightColor(v.color) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                          style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+                        />
+                        <span className="font-semibold text-sm">{v.color}</span>
+                        <span className="text-xs text-gray-500">({v.images.length} {v.images.length === 1 ? 'photo' : 'photos'})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, colorVariants: form.colorVariants.filter((_, i) => i !== idx) })}
+                        className="text-red-500 hover:text-red-700 text-xs inline-flex items-center gap-1"
+                      >
+                        <FiX size={14} /> Remove
+                      </button>
+                    </div>
+                    <ImageUploader
+                      label={`Photos for ${v.color}`}
+                      multiple
+                      value={v.images}
+                      onChange={(imgs) => {
+                        const next = [...form.colorVariants];
+                        next[idx] = { ...next[idx], images: imgs };
+                        setForm({ ...form, colorVariants: next });
+                      }}
                     />
-                    {c}
-                    <button
-                      type="button"
-                      onClick={() => setForm({ ...form, colors: form.colors.filter((x) => x !== c) })}
-                      className="text-gray-400 hover:text-red-500"
-                      aria-label={`Remove ${c}`}
-                    >
-                      <FiX size={14} />
-                    </button>
-                  </span>
+                  </div>
                 );
               })}
             </div>
           )}
 
-          {/* Custom colour input */}
+          {/* Add a colour by typing or quick-pick */}
           <div className="flex gap-2 mb-3">
             <input
               type="text"
@@ -379,8 +404,8 @@ export default function ProductForm() {
                 if (e.key === 'Enter' || e.key === ',') {
                   e.preventDefault();
                   const v = colorInput.trim();
-                  if (v && !form.colors.find((c) => c.toLowerCase() === v.toLowerCase())) {
-                    setForm({ ...form, colors: [...form.colors, v] });
+                  if (v && !form.colorVariants.find((cv) => cv.color.toLowerCase() === v.toLowerCase())) {
+                    setForm({ ...form, colorVariants: [...form.colorVariants, { color: v, images: [] }] });
                   }
                   setColorInput('');
                 }
@@ -391,8 +416,8 @@ export default function ProductForm() {
               type="button"
               onClick={() => {
                 const v = colorInput.trim();
-                if (v && !form.colors.find((c) => c.toLowerCase() === v.toLowerCase())) {
-                  setForm({ ...form, colors: [...form.colors, v] });
+                if (v && !form.colorVariants.find((cv) => cv.color.toLowerCase() === v.toLowerCase())) {
+                  setForm({ ...form, colorVariants: [...form.colorVariants, { color: v, images: [] }] });
                 }
                 setColorInput('');
               }}
@@ -403,11 +428,10 @@ export default function ProductForm() {
             </button>
           </div>
 
-          {/* Quick-pick common colours */}
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Quick pick</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Quick add</p>
           <div className="flex flex-wrap gap-1.5">
             {COMMON_COLORS.map((c) => {
-              const already = form.colors.some((x) => x.toLowerCase() === c.toLowerCase());
+              const already = form.colorVariants.some((cv) => cv.color.toLowerCase() === c.toLowerCase());
               const bg = colorToBackground(c);
               return (
                 <button
@@ -415,9 +439,9 @@ export default function ProductForm() {
                   type="button"
                   onClick={() => {
                     if (already) {
-                      setForm({ ...form, colors: form.colors.filter((x) => x.toLowerCase() !== c.toLowerCase()) });
+                      setForm({ ...form, colorVariants: form.colorVariants.filter((cv) => cv.color.toLowerCase() !== c.toLowerCase()) });
                     } else {
-                      setForm({ ...form, colors: [...form.colors, c] });
+                      setForm({ ...form, colorVariants: [...form.colorVariants, { color: c, images: [] }] });
                     }
                   }}
                   className={`inline-flex items-center gap-1.5 border rounded-full px-2 py-1 text-xs transition ${

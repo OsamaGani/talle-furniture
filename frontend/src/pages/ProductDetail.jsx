@@ -40,7 +40,15 @@ export default function ProductDetail() {
     try {
       const { data } = await API.get(`/products/${id}`);
       setProduct(data);
-      setActiveImg(data.image || data.images?.[0] || '');
+      // Pre-select the first colour variant if any. The image swap effect
+      // below will then pick that variant's first image automatically.
+      const firstVariant = data.colorVariants?.[0];
+      const firstColor = firstVariant?.color || data.colors?.[0] || '';
+      setSelectedColor(firstColor);
+      setActiveImg(
+        (firstVariant?.images && firstVariant.images[0]) ||
+        data.image || data.images?.[0] || ''
+      );
       // Remember this product so the homepage "Recently Viewed" rail picks it up.
       addRecentlyViewed(data);
     } catch (e) { toast.error('Product not found'); }
@@ -68,6 +76,20 @@ export default function ProductDetail() {
   if (!product) return <p className="text-center py-20">Not found</p>;
 
   const final = product.discount > 0 ? +(product.price - (product.price * product.discount) / 100).toFixed(2) : product.price;
+
+  // Resolve which gallery to show. If the customer has selected a colour
+  // AND that variant has its own images, use those. Otherwise fall back
+  // to the product's master image set so the page never goes empty.
+  const activeVariant = (product.colorVariants || []).find(
+    (v) => v.color.toLowerCase() === (selectedColor || '').toLowerCase()
+  );
+  const displayImages = (activeVariant?.images && activeVariant.images.length > 0)
+    ? activeVariant.images
+    : (product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []));
+  // List of available colours — prefer the structured variants when present.
+  const availableColors = (product.colorVariants && product.colorVariants.length > 0)
+    ? product.colorVariants.map((v) => v.color)
+    : (product.colors || []);
 
   const checkPin = async () => {
     if (!/^\d{6}$/.test(pin)) {
@@ -203,20 +225,21 @@ export default function ProductDetail() {
         {/* Images */}
         <div className="md:sticky md:top-32 md:self-start">
           <div className="aspect-square max-h-[280px] sm:max-h-[400px] md:max-h-[520px] border rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4">
-            <img src={resolveImage(activeImg)} alt={product.name} className="max-w-full max-h-full object-contain" />
+            <img src={resolveImage(activeImg || displayImages[0])} alt={product.name} className="max-w-full max-h-full object-contain" />
           </div>
-          {product.images?.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="mt-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                {product.images.length} photos · click to preview
+                {displayImages.length} photos
+                {activeVariant ? ` of ${activeVariant.color}` : ''} · click to preview
               </p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                {product.images.map((img, i) => (
+                {displayImages.map((img, i) => (
                   <button
-                    key={i}
+                    key={`${activeVariant?.color || 'main'}-${i}`}
                     onClick={() => setActiveImg(img)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] ${activeImg === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}
-                    aria-label={`View image ${i + 1} of ${product.images.length}`}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] ${(activeImg || displayImages[0]) === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}
+                    aria-label={`View image ${i + 1} of ${displayImages.length}`}
                   >
                     <img src={resolveImage(img)} className="w-full h-full object-contain p-1" alt="" />
                   </button>
@@ -306,25 +329,38 @@ export default function ProductDetail() {
           </div>
 
           {/* Available colours — sits high on the right column so it's
-              visible without scrolling. Only renders when admin has set
-              colours on the product (otherwise hidden cleanly). */}
-          {product.colors?.length > 0 && (
+              visible without scrolling. Tapping a swatch swaps the photo
+              gallery to that variant's images (when admin has uploaded
+              colour-specific photos). Falls back to main photos otherwise. */}
+          {availableColors.length > 0 && (
             <div className="mt-4 border rounded-lg p-3 bg-gray-50/50">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-bold">
-                  Color: <span className="font-medium text-primary-600">{selectedColor || product.colors[0]}</span>
+                  Color: <span className="font-medium text-primary-600">{selectedColor || availableColors[0]}</span>
                 </p>
-                <p className="text-xs text-gray-500">{product.colors.length} option{product.colors.length === 1 ? '' : 's'}</p>
+                <p className="text-xs text-gray-500">{availableColors.length} option{availableColors.length === 1 ? '' : 's'}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.colors.map((c) => {
+                {availableColors.map((c) => {
                   const bg = colorToBackground(c);
-                  const isPicked = (selectedColor || product.colors[0]).toLowerCase() === c.toLowerCase();
+                  const isPicked = (selectedColor || availableColors[0]).toLowerCase() === c.toLowerCase();
                   return (
                     <button
                       key={c}
                       type="button"
-                      onClick={() => setSelectedColor(c)}
+                      onClick={() => {
+                        setSelectedColor(c);
+                        // Jump the gallery to the first photo of this variant.
+                        // If the variant has no photos, fall back to the main set.
+                        const v = (product.colorVariants || []).find(
+                          (cv) => cv.color.toLowerCase() === c.toLowerCase()
+                        );
+                        const nextImg = (v?.images && v.images[0])
+                          || product.image
+                          || product.images?.[0]
+                          || '';
+                        setActiveImg(nextImg);
+                      }}
                       title={c}
                       aria-label={`Select ${c}`}
                       className={`relative inline-flex items-center gap-2 border-2 rounded-full pl-1 pr-3 py-1 text-sm transition ${
@@ -432,13 +468,13 @@ export default function ProductDetail() {
                 <button onClick={() => setQty(Math.min(product.stock, qty + 1))} className="px-2 hover:bg-gray-50 h-full">+</button>
               </div>
               <button
-                onClick={() => addToCart(product, qty, selectedColor || product.colors?.[0] || '')}
+                onClick={() => addToCart(product, qty, selectedColor || availableColors[0] || '')}
                 className="flex items-center justify-center gap-1 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white text-xs font-semibold px-3 h-8 rounded transition"
               >
                 <FiShoppingCart size={12} /> Add to Cart
               </button>
               <button
-                onClick={() => { addToCart(product, qty, selectedColor || product.colors?.[0] || ''); navigate('/checkout'); }}
+                onClick={() => { addToCart(product, qty, selectedColor || availableColors[0] || ''); navigate('/checkout'); }}
                 className="flex items-center justify-center gap-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold px-3 h-8 rounded transition"
               >
                 ⚡ Buy Now

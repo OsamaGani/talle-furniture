@@ -25,12 +25,20 @@ const productSchema = new mongoose.Schema(
     stock: { type: Number, required: true, default: 0 },
     images: [{ type: String }],
     image: { type: String, default: '' },
-    // Colours the product is available in. Stored as plain strings (e.g.
-    // 'Red', 'Pastel Blue') so admins can enter any name. The frontend
-    // maps known color names to swatch hex values for display, falls back
-    // to a neutral chip otherwise. Lowercased + trimmed on save so the
-    // shop filter can match case-insensitively without extra work.
+    // Legacy: simple list of colour names (no per-colour images). Still
+    // populated for backward compat and used by the Shop filter — kept in
+    // sync with colorVariants below via the pre-save hook.
     colors: { type: [String], default: [] },
+    // Colour variants — each variant carries the colour name and its
+    // own gallery. When a customer taps a colour swatch on the product
+    // page we show those images; if a variant has no images we fall back
+    // to the product's main `images` array. Stock + price stay shared
+    // across variants for now (see CLAUDE notes for the full SKU upgrade
+    // path when you actually need it).
+    colorVariants: [{
+      color: { type: String, required: true },
+      images: { type: [String], default: [] },
+    }],
     featured: { type: Boolean, default: false },
     bestSeller: { type: Boolean, default: false },
     newArrival: { type: Boolean, default: false },
@@ -56,8 +64,28 @@ productSchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36);
   }
-  // Normalise colour list so duplicates and casing don't confuse filters.
-  if (Array.isArray(this.colors)) {
+  // Normalise colour variants — dedupe by colour name (case-insensitive),
+  // trim whitespace, drop empties, cap at 12.
+  if (Array.isArray(this.colorVariants) && this.colorVariants.length > 0) {
+    const seen = new Set();
+    this.colorVariants = this.colorVariants
+      .map((v) => ({
+        color: String(v?.color || '').trim(),
+        images: Array.isArray(v?.images) ? v.images.filter(Boolean) : [],
+      }))
+      .filter((v) => {
+        if (!v.color) return false;
+        const key = v.color.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 12);
+    // Keep colors[] in sync so Shop filter (?color=Red) keeps working
+    // without needing to query into the variants array.
+    this.colors = this.colorVariants.map((v) => v.color);
+  } else if (Array.isArray(this.colors)) {
+    // Fallback: legacy product with just the colours array — dedupe in place.
     const seen = new Set();
     this.colors = this.colors
       .map((c) => String(c || '').trim())
