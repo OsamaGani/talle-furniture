@@ -206,12 +206,22 @@ export default function ProductDetail() {
             <img src={resolveImage(activeImg)} alt={product.name} className="max-w-full max-h-full object-contain" />
           </div>
           {product.images?.length > 1 && (
-            <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
-              {product.images.map((img, i) => (
-                <button key={i} onClick={() => setActiveImg(img)} className={`w-20 h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white ${activeImg === img ? 'border-primary-500' : 'border-gray-200'}`}>
-                  <img src={resolveImage(img)} className="w-full h-full object-contain p-1" alt="" />
-                </button>
-              ))}
+            <div className="mt-3">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                {product.images.length} photos · click to preview
+              </p>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(img)}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] ${activeImg === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}
+                    aria-label={`View image ${i + 1} of ${product.images.length}`}
+                  >
+                    <img src={resolveImage(img)} className="w-full h-full object-contain p-1" alt="" />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -295,6 +305,47 @@ export default function ProductDetail() {
             )}
           </div>
 
+          {/* Available colours — sits high on the right column so it's
+              visible without scrolling. Only renders when admin has set
+              colours on the product (otherwise hidden cleanly). */}
+          {product.colors?.length > 0 && (
+            <div className="mt-4 border rounded-lg p-3 bg-gray-50/50">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold">
+                  Color: <span className="font-medium text-primary-600">{selectedColor || product.colors[0]}</span>
+                </p>
+                <p className="text-xs text-gray-500">{product.colors.length} option{product.colors.length === 1 ? '' : 's'}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.colors.map((c) => {
+                  const bg = colorToBackground(c);
+                  const isPicked = (selectedColor || product.colors[0]).toLowerCase() === c.toLowerCase();
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setSelectedColor(c)}
+                      title={c}
+                      aria-label={`Select ${c}`}
+                      className={`relative inline-flex items-center gap-2 border-2 rounded-full pl-1 pr-3 py-1 text-sm transition ${
+                        isPicked
+                          ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-100'
+                          : 'border-gray-200 bg-white hover:border-primary-400'
+                      }`}
+                    >
+                      <span
+                        className={`w-7 h-7 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                        style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+                      />
+                      <span className="font-medium">{c}</span>
+                      {isPicked && <FiCheck size={14} className="text-primary-600" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Delivery PIN check — Flipkart/Amazon pattern */}
           <div className="mt-4 bg-gray-50 border rounded-lg p-3 sm:p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -356,45 +407,6 @@ export default function ProductDetail() {
             <p className="text-sm font-bold mb-1.5">Description</p>
             <p className="text-gray-700 leading-relaxed text-sm">{product.description}</p>
           </div>
-
-          {/* Available colours — visual swatches the customer can hover for
-              the colour name. Selecting a swatch updates a small label so the
-              customer can confirm "yes, I want the red one" before adding to
-              cart. Stock + price stay the same; only the visual variant
-              chosen is for display / future variant routing. */}
-          {product.colors?.length > 0 && (
-            <div className="mt-4 border rounded-lg p-3 bg-gray-50/50">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold">
-                  Color: <span className="font-medium text-primary-600">{selectedColor || product.colors[0]}</span>
-                </p>
-                <p className="text-xs text-gray-500">{product.colors.length} option{product.colors.length === 1 ? '' : 's'}</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {product.colors.map((c) => {
-                  const bg = colorToBackground(c);
-                  const isPicked = (selectedColor || product.colors[0]).toLowerCase() === c.toLowerCase();
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setSelectedColor(c)}
-                      title={c}
-                      aria-label={`Select ${c}`}
-                      className={`relative w-10 h-10 rounded-full border-2 transition hover:scale-110 ${
-                        isPicked ? 'border-primary-500 ring-2 ring-primary-200' : (isLightColor(c) ? 'border-gray-300' : 'border-white shadow-md')
-                      }`}
-                      style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 5px,#fff 5px 10px)' }}
-                    >
-                      {isPicked && (
-                        <span className="absolute inset-0 flex items-center justify-center text-white text-sm drop-shadow font-bold">✓</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* Specifications */}
           <div className="mt-4 border rounded-lg overflow-hidden">
