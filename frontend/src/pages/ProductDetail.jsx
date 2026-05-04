@@ -95,25 +95,27 @@ export default function ProductDetail() {
     : effectiveBasePrice;
   const hasVariantOverride = !!(activeVariant && (activeVariant.price > 0 || activeVariant.discount > 0));
 
-  // Gallery resolution — main image(s) come first, then the selected
-  // variant's images appended after. Customers always see the hero shot
-  // as the leading thumbnail; variant-specific photos ONLY appear once
-  // a colour swatch is tapped. Both product.image and product.images
-  // contribute to the main set so the hero shot survives even when admin
-  // also filled the multi-gallery field.
+  // Gallery resolution — exclusive switch:
+  //   • No colour picked → show main images (product.image + product.images)
+  //   • Colour picked    → show ONLY that variant's images
+  // The main image acts as the "cover" photo; once the customer commits
+  // to a colour, the thumbnails switch fully to that colour's photos so
+  // they're not distracted by the cover shot mixed in.
   const mainImages = [
     ...(product.image ? [product.image] : []),
     ...(product.images || []),
   ];
-  const variantImages = (activeVariant?.images && activeVariant.images.length > 0)
-    ? activeVariant.images
-    : [];
-  // Set-dedupe in case the same URL appears in main + variant (admin
-  // uploaded the same file twice).
-  let displayImages = [...new Set([...mainImages, ...variantImages])];
-  // Final safety net: if a product somehow has no main image AND no
-  // active variant images (admin only filled OTHER colour variants),
-  // borrow the first photo we can find so the gallery never renders empty.
+  // Dedupe in case product.image is also the first entry of product.images.
+  const dedupedMain = [...new Set(mainImages)];
+  let displayImages;
+  if (activeVariant?.images && activeVariant.images.length > 0) {
+    displayImages = activeVariant.images;
+  } else {
+    displayImages = dedupedMain;
+  }
+  // Final safety net: if a product has no main image AND no colour is
+  // picked yet (admin only filled colour variants), borrow the first
+  // photo we can find so the gallery never renders empty.
   if (displayImages.length === 0) {
     const anyVariantImg = (product.colorVariants || []).find((v) => v.images?.length)?.images[0];
     if (anyVariantImg) displayImages = [anyVariantImg];
@@ -276,7 +278,8 @@ export default function ProductDetail() {
           {displayImages.length > 1 && (
             <div className="mt-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                {displayImages.length} photos · click to preview
+                {displayImages.length} photos
+                {activeVariant ? ` of ${activeVariant.color}` : ''} · click to preview
               </p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {displayImages.map((img, i) => (
