@@ -36,6 +36,21 @@ router.get(
     if (newArrival === 'true') filter.newArrival = true;
     // ?onDeal=true → admin-curated "Today's Deals" rail on the homepage.
     if (req.query.onDeal === 'true') filter.onDeal = true;
+    // ?color=Red or ?color=Red,Blue (any-match). Case-insensitive — colours
+    // are stored mixed-case (whatever admin typed) but matched insensitively.
+    if (req.query.color) {
+      const wanted = String(req.query.color)
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+        .slice(0, 6);
+      if (wanted.length > 0) {
+        // Build case-insensitive regex array — Mongo's $in doesn't accept
+        // regex flag-modifiers natively, so use $or of $regex matches.
+        const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        filter.colors = { $in: wanted.map((c) => new RegExp(`^${escapeRe(c)}$`, 'i')) };
+      }
+    }
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = +minPrice;

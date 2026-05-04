@@ -4,8 +4,9 @@ import API from '../../api/axios';
 import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
-import { FiPlus, FiSettings } from 'react-icons/fi';
+import { FiPlus, FiSettings, FiX } from 'react-icons/fi';
 import { allSubCategoryNames } from '../../config/departments';
+import { COMMON_COLORS, colorToBackground, isLightColor } from '../../utils/colors';
 
 // Fallback list — used only if /api/categories fails or is empty.
 // Combines legacy parent-level categories with all new toyzone-style sub-categories.
@@ -34,7 +35,9 @@ export default function ProductForm() {
     price: 0, discount: 0, wholesalePrice: 0, wholesaleMinQty: 0,
     stock: 0, image: '', images: [],
     featured: false, bestSeller: false, newArrival: false, onDeal: false,
+    colors: [],
   });
+  const [colorInput, setColorInput] = useState('');
 
   const loadCategories = async () => {
     try {
@@ -64,6 +67,7 @@ export default function ProductForm() {
             stock: data.stock,
             image: data.image || '', images: data.images || [],
             featured: data.featured, bestSeller: data.bestSeller, newArrival: data.newArrival, onDeal: !!data.onDeal,
+            colors: Array.isArray(data.colors) ? data.colors : [],
           });
           // If the saved brand isn't in the loaded brand list, open custom-input mode
           // so the existing value is editable instead of silently disappearing.
@@ -142,6 +146,7 @@ export default function ProductForm() {
         wholesalePrice: +form.wholesalePrice || 0,
         wholesaleMinQty: +form.wholesaleMinQty || 0,
         stock: +form.stock || 0,
+        colors: (form.colors || []).map((c) => String(c).trim()).filter(Boolean),
       };
       if (isEdit) await API.put(`/products/${id}`, payload);
       else await API.post('/products', payload);
@@ -314,13 +319,123 @@ export default function ProductForm() {
         </div>
 
         <ImageUploader
-          label="Product Images (upload from your computer)"
+          label="Product Images (upload from your computer — front, back, side, packaging, etc.)"
           multiple
           value={form.images}
           onChange={(imgs) => setForm({ ...form, images: imgs, image: form.image && imgs.includes(form.image) ? form.image : (imgs[0] || '') })}
           mainImage={form.image}
           onMainChange={(img) => setForm({ ...form, image: img })}
         />
+
+        {/* Available colours — admin can add as many as the product comes in.
+            Customer Shop page filters by these; product detail page shows
+            them as visual swatches. Either click a quick-pick chip or type
+            a custom colour name and press Enter. */}
+        <div className="bg-gray-50 border rounded-lg p-4">
+          <label className="label">Available Colours</label>
+          <p className="text-xs text-gray-600 mb-3">
+            Pick from the common chips below or type a custom colour and press Enter.
+            These show up as colour swatches on the product page and let customers filter by colour on Shop.
+          </p>
+
+          {/* Selected colour chips */}
+          {form.colors.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {form.colors.map((c) => {
+                const bg = colorToBackground(c);
+                return (
+                  <span
+                    key={c}
+                    className="inline-flex items-center gap-1.5 bg-white border rounded-full pl-1.5 pr-2 py-1 text-sm"
+                  >
+                    <span
+                      className={`w-5 h-5 rounded-full border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                      style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+                      title={c}
+                    />
+                    {c}
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, colors: form.colors.filter((x) => x !== c) })}
+                      className="text-gray-400 hover:text-red-500"
+                      aria-label={`Remove ${c}`}
+                    >
+                      <FiX size={14} />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Custom colour input */}
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              className="input flex-1"
+              value={colorInput}
+              onChange={(e) => setColorInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault();
+                  const v = colorInput.trim();
+                  if (v && !form.colors.find((c) => c.toLowerCase() === v.toLowerCase())) {
+                    setForm({ ...form, colors: [...form.colors, v] });
+                  }
+                  setColorInput('');
+                }
+              }}
+              placeholder="Type a colour name and press Enter (e.g. Mint Green)"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const v = colorInput.trim();
+                if (v && !form.colors.find((c) => c.toLowerCase() === v.toLowerCase())) {
+                  setForm({ ...form, colors: [...form.colors, v] });
+                }
+                setColorInput('');
+              }}
+              disabled={!colorInput.trim()}
+              className="bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white px-4 rounded-md text-sm"
+            >
+              Add
+            </button>
+          </div>
+
+          {/* Quick-pick common colours */}
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Quick pick</p>
+          <div className="flex flex-wrap gap-1.5">
+            {COMMON_COLORS.map((c) => {
+              const already = form.colors.some((x) => x.toLowerCase() === c.toLowerCase());
+              const bg = colorToBackground(c);
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    if (already) {
+                      setForm({ ...form, colors: form.colors.filter((x) => x.toLowerCase() !== c.toLowerCase()) });
+                    } else {
+                      setForm({ ...form, colors: [...form.colors, c] });
+                    }
+                  }}
+                  className={`inline-flex items-center gap-1.5 border rounded-full px-2 py-1 text-xs transition ${
+                    already
+                      ? 'bg-primary-500 border-primary-500 text-white'
+                      : 'bg-white border-gray-200 hover:border-primary-400 text-gray-700'
+                  }`}
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-full border ${isLightColor(c) ? 'border-gray-300' : 'border-white/70'}`}
+                    style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 3px,#fff 3px 6px)' }}
+                  />
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="flex flex-wrap gap-x-6 gap-y-3 pt-2">
           <label className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="accent-primary-500" /> Featured</label>

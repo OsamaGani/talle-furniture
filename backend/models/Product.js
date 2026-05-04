@@ -25,6 +25,12 @@ const productSchema = new mongoose.Schema(
     stock: { type: Number, required: true, default: 0 },
     images: [{ type: String }],
     image: { type: String, default: '' },
+    // Colours the product is available in. Stored as plain strings (e.g.
+    // 'Red', 'Pastel Blue') so admins can enter any name. The frontend
+    // maps known color names to swatch hex values for display, falls back
+    // to a neutral chip otherwise. Lowercased + trimmed on save so the
+    // shop filter can match case-insensitively without extra work.
+    colors: { type: [String], default: [] },
     featured: { type: Boolean, default: false },
     bestSeller: { type: Boolean, default: false },
     newArrival: { type: Boolean, default: false },
@@ -49,6 +55,20 @@ productSchema.set('toObject', { virtuals: true });
 productSchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36);
+  }
+  // Normalise colour list so duplicates and casing don't confuse filters.
+  if (Array.isArray(this.colors)) {
+    const seen = new Set();
+    this.colors = this.colors
+      .map((c) => String(c || '').trim())
+      .filter((c) => {
+        if (!c) return false;
+        const key = c.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 12);
   }
   next();
 });

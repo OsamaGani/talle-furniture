@@ -6,6 +6,7 @@ import Loader from '../components/Loader';
 import { FiFilter, FiX } from 'react-icons/fi';
 import { allSubCategoryNames } from '../config/departments';
 import SEO from '../components/SEO';
+import { COMMON_COLORS, colorToBackground, isLightColor } from '../utils/colors';
 
 const legacyCategories = ['Construction', 'Games', 'Pretend Play', 'Learning & Education', 'Vehicles', 'Active Play', 'Wooden Toys', 'Dolls', 'Action Figures', 'Ride Ons', 'Outdoor Toys', 'Books', 'Baby & Toddler'];
 const categories = Array.from(new Set([...legacyCategories, ...allSubCategoryNames])).sort();
@@ -28,8 +29,9 @@ export default function Shop() {
   const featured = params.get('featured') || '';
   const bestSeller = params.get('bestSeller') || '';
   const newArrival = params.get('newArrival') || '';
+  const color = params.get('color') || '';
 
-  useEffect(() => { setPage(1); }, [keyword, category, brand, ageGroup, sort]);
+  useEffect(() => { setPage(1); }, [keyword, category, brand, ageGroup, sort, color]);
 
   useEffect(() => {
     (async () => {
@@ -44,6 +46,7 @@ export default function Shop() {
         if (featured) q.set('featured', featured);
         if (bestSeller) q.set('bestSeller', bestSeller);
         if (newArrival) q.set('newArrival', newArrival);
+        if (color) q.set('color', color);
         q.set('page', page);
         q.set('limit', 24);
         const { data } = await API.get(`/products?${q.toString()}`);
@@ -52,7 +55,7 @@ export default function Shop() {
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
-  }, [keyword, category, brand, ageGroup, sort, featured, bestSeller, newArrival, page]);
+  }, [keyword, category, brand, ageGroup, sort, featured, bestSeller, newArrival, color, page]);
 
   const updateParam = (key, value) => {
     const np = new URLSearchParams(params);
@@ -84,6 +87,7 @@ export default function Shop() {
       <FilterGroup title="Category" items={categories} active={category} onChange={(v) => updateParam('category', v)} />
       <FilterGroup title="Brand" items={brands} active={brand} onChange={(v) => updateParam('brand', v)} />
       <FilterGroup title="Age Group" items={ages} active={ageGroup} onChange={(v) => updateParam('ageGroup', v)} />
+      <ColorFilter active={color} onChange={(v) => updateParam('color', v)} />
       <button onClick={clearAll} className="text-primary-500 hover:underline">Clear All Filters</button>
     </div>
   );
@@ -176,6 +180,46 @@ function FilterGroup({ title, items, active, onChange }) {
           <li><button onClick={() => onChange('')} className="text-xs text-primary-500 hover:underline mt-1">Clear</button></li>
         )}
       </ul>
+    </div>
+  );
+}
+
+// Visual colour filter — clicking a swatch toggles it as the active filter.
+// Single-select to keep the URL clean (one ?color= param). Common colours
+// only; if a customer wants something exotic they can always type the
+// keyword in the search bar.
+function ColorFilter({ active, onChange }) {
+  return (
+    <div>
+      <h3 className="font-bold mb-2">Color</h3>
+      <div className="flex flex-wrap gap-1.5">
+        {COMMON_COLORS.map((c) => {
+          const bg = colorToBackground(c);
+          const isActive = active.toLowerCase() === c.toLowerCase();
+          return (
+            <button
+              key={c}
+              type="button"
+              onClick={() => onChange(isActive ? '' : c)}
+              title={c}
+              aria-label={c}
+              className={`relative w-8 h-8 rounded-full border-2 transition hover:scale-110 ${
+                isActive ? 'border-primary-500 ring-2 ring-primary-200' : (isLightColor(c) ? 'border-gray-300' : 'border-white shadow-sm')
+              }`}
+              style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+            >
+              {isActive && (
+                <span className="absolute inset-0 flex items-center justify-center text-white drop-shadow text-xs">✓</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      {active && (
+        <button onClick={() => onChange('')} className="text-xs text-primary-500 hover:underline mt-2">
+          Clear color
+        </button>
+      )}
     </div>
   );
 }

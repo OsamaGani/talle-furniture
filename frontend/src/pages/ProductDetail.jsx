@@ -11,6 +11,7 @@ import { resolveImage } from '../utils/imageUrl';
 import toast from 'react-hot-toast';
 import SEO, { SITE_URL, SITE_NAME } from '../components/SEO';
 import { addRecentlyViewed } from '../utils/recentlyViewed';
+import { colorToBackground, isLightColor } from '../utils/colors';
 
 export default function ProductDetail() {
   // Route param is "slug" but we accept any product identifier (slug or
@@ -24,6 +25,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [related, setRelated] = useState({ similar: [], moreFromBrand: [], trending: [] });
@@ -354,6 +356,45 @@ export default function ProductDetail() {
             <p className="text-sm font-bold mb-1.5">Description</p>
             <p className="text-gray-700 leading-relaxed text-sm">{product.description}</p>
           </div>
+
+          {/* Available colours — visual swatches the customer can hover for
+              the colour name. Selecting a swatch updates a small label so the
+              customer can confirm "yes, I want the red one" before adding to
+              cart. Stock + price stay the same; only the visual variant
+              chosen is for display / future variant routing. */}
+          {product.colors?.length > 0 && (
+            <div className="mt-4 border rounded-lg p-3 bg-gray-50/50">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold">
+                  Color: <span className="font-medium text-primary-600">{selectedColor || product.colors[0]}</span>
+                </p>
+                <p className="text-xs text-gray-500">{product.colors.length} option{product.colors.length === 1 ? '' : 's'}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.colors.map((c) => {
+                  const bg = colorToBackground(c);
+                  const isPicked = (selectedColor || product.colors[0]).toLowerCase() === c.toLowerCase();
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setSelectedColor(c)}
+                      title={c}
+                      aria-label={`Select ${c}`}
+                      className={`relative w-10 h-10 rounded-full border-2 transition hover:scale-110 ${
+                        isPicked ? 'border-primary-500 ring-2 ring-primary-200' : (isLightColor(c) ? 'border-gray-300' : 'border-white shadow-md')
+                      }`}
+                      style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 5px,#fff 5px 10px)' }}
+                    >
+                      {isPicked && (
+                        <span className="absolute inset-0 flex items-center justify-center text-white text-sm drop-shadow font-bold">✓</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Specifications */}
           <div className="mt-4 border rounded-lg overflow-hidden">
