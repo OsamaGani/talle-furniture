@@ -247,6 +247,27 @@ export default function ProductDetail() {
               </div>
             </div>
           )}
+
+          {/* Mobile-only colour picker — sits right under the gallery so
+              customers on phones don't have to scroll past the whole image
+              and price block to find it. The desktop version below the
+              price (in the info column) is hidden on mobile via md:block. */}
+          {availableColors.length > 0 && (
+            <div className="md:hidden mt-4 border rounded-lg p-3 bg-gray-50/50">
+              <ColorSwatchPanel
+                colors={availableColors}
+                selectedColor={selectedColor}
+                onSelect={(c) => {
+                  setSelectedColor(c);
+                  const v = (product.colorVariants || []).find(
+                    (cv) => cv.color.toLowerCase() === c.toLowerCase()
+                  );
+                  const nextImg = (v?.images && v.images[0]) || product.image || product.images?.[0] || '';
+                  setActiveImg(nextImg);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Info */}
@@ -328,57 +349,24 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Available colours — sits high on the right column so it's
-              visible without scrolling. Tapping a swatch swaps the photo
-              gallery to that variant's images (when admin has uploaded
-              colour-specific photos). Falls back to main photos otherwise. */}
+          {/* Desktop-only colour picker — sits in the right info column
+              next to the price. Mobile users get the same panel rendered
+              right under the image gallery (above this column) so the
+              swatches are reachable without scrolling. */}
           {availableColors.length > 0 && (
-            <div className="mt-4 border rounded-lg p-3 bg-gray-50/50">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold">
-                  Color: <span className="font-medium text-primary-600">{selectedColor || availableColors[0]}</span>
-                </p>
-                <p className="text-xs text-gray-500">{availableColors.length} option{availableColors.length === 1 ? '' : 's'}</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {availableColors.map((c) => {
-                  const bg = colorToBackground(c);
-                  const isPicked = (selectedColor || availableColors[0]).toLowerCase() === c.toLowerCase();
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => {
-                        setSelectedColor(c);
-                        // Jump the gallery to the first photo of this variant.
-                        // If the variant has no photos, fall back to the main set.
-                        const v = (product.colorVariants || []).find(
-                          (cv) => cv.color.toLowerCase() === c.toLowerCase()
-                        );
-                        const nextImg = (v?.images && v.images[0])
-                          || product.image
-                          || product.images?.[0]
-                          || '';
-                        setActiveImg(nextImg);
-                      }}
-                      title={c}
-                      aria-label={`Select ${c}`}
-                      className={`relative inline-flex items-center gap-2 border-2 rounded-full pl-1 pr-3 py-1 text-sm transition ${
-                        isPicked
-                          ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-100'
-                          : 'border-gray-200 bg-white hover:border-primary-400'
-                      }`}
-                    >
-                      <span
-                        className={`w-7 h-7 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
-                        style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
-                      />
-                      <span className="font-medium">{c}</span>
-                      {isPicked && <FiCheck size={14} className="text-primary-600" />}
-                    </button>
+            <div className="hidden md:block mt-4 border rounded-lg p-3 bg-gray-50/50">
+              <ColorSwatchPanel
+                colors={availableColors}
+                selectedColor={selectedColor}
+                onSelect={(c) => {
+                  setSelectedColor(c);
+                  const v = (product.colorVariants || []).find(
+                    (cv) => cv.color.toLowerCase() === c.toLowerCase()
                   );
-                })}
-              </div>
+                  const nextImg = (v?.images && v.images[0]) || product.image || product.images?.[0] || '';
+                  setActiveImg(nextImg);
+                }}
+              />
             </div>
           )}
 
@@ -649,6 +637,50 @@ function ProductRow({ title, subtitle, products, viewAllHref, accent = 'primary'
 const Info = ({ label, value }) => (
   <div className="border-b pb-1"><span className="text-gray-500">{label}:</span> <span className="font-medium">{value}</span></div>
 );
+// Colour swatch panel rendered in two places (mobile under gallery + desktop
+// in info column). Identical UI, just controlled by parent state so both
+// instances stay in sync.
+function ColorSwatchPanel({ colors, selectedColor, onSelect }) {
+  const current = selectedColor || colors[0];
+  return (
+    <>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-bold">
+          Color: <span className="font-medium text-primary-600">{current}</span>
+        </p>
+        <p className="text-xs text-gray-500">{colors.length} option{colors.length === 1 ? '' : 's'}</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {colors.map((c) => {
+          const bg = colorToBackground(c);
+          const isPicked = current.toLowerCase() === c.toLowerCase();
+          return (
+            <button
+              key={c}
+              type="button"
+              onClick={() => onSelect(c)}
+              title={c}
+              aria-label={`Select ${c}`}
+              className={`relative inline-flex items-center gap-2 border-2 rounded-full pl-1 pr-3 py-1 text-sm transition ${
+                isPicked
+                  ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-100'
+                  : 'border-gray-200 bg-white hover:border-primary-400'
+              }`}
+            >
+              <span
+                className={`w-7 h-7 rounded-full inline-block border ${isLightColor(c) ? 'border-gray-300' : 'border-white shadow-inner'}`}
+                style={bg ? { background: bg } : { background: 'repeating-linear-gradient(45deg,#e5e7eb 0 4px,#fff 4px 8px)' }}
+              />
+              <span className="font-medium">{c}</span>
+              {isPicked && <FiCheck size={14} className="text-primary-600" />}
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 const SpecRow = ({ label, value }) => (
   <tr className="border-b last:border-0">
     <td className="px-3 py-2 text-gray-500 w-1/3">{label}</td>
