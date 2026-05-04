@@ -308,6 +308,11 @@ export default function ProductDetail() {
                 selectedColor={selectedColor}
                 onSelect={(c) => {
                   setSelectedColor(c);
+                  if (!c) {
+                    // Customer cleared the colour — return to the main hero shot.
+                    setActiveImg(product.image || product.images?.[0] || '');
+                    return;
+                  }
                   const v = (product.colorVariants || []).find(
                     (cv) => cv.color.toLowerCase() === c.toLowerCase()
                   );
@@ -427,6 +432,11 @@ export default function ProductDetail() {
                 selectedColor={selectedColor}
                 onSelect={(c) => {
                   setSelectedColor(c);
+                  if (!c) {
+                    // Customer cleared the colour — return to the main hero shot.
+                    setActiveImg(product.image || product.images?.[0] || '');
+                    return;
+                  }
                   const v = (product.colorVariants || []).find(
                     (cv) => cv.color.toLowerCase() === c.toLowerCase()
                   );
@@ -523,29 +533,13 @@ export default function ProductDetail() {
                 <button onClick={() => setQty(Math.min(product.stock, qty + 1))} className="px-2 hover:bg-gray-50 h-full">+</button>
               </div>
               <button
-                onClick={() => {
-                  // Require an explicit colour pick when the product has options —
-                  // we no longer auto-select the first colour, so a missing pick
-                  // means the customer didn't decide. Toast + abort.
-                  if (availableColors.length > 0 && !selectedColor) {
-                    toast.error('Please select a colour first');
-                    return;
-                  }
-                  addToCart(product, qty, selectedColor || '');
-                }}
+                onClick={() => addToCart(product, qty, selectedColor || '')}
                 className="flex items-center justify-center gap-1 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white text-xs font-semibold px-3 h-8 rounded transition"
               >
                 <FiShoppingCart size={12} /> Add to Cart
               </button>
               <button
-                onClick={() => {
-                  if (availableColors.length > 0 && !selectedColor) {
-                    toast.error('Please select a colour first');
-                    return;
-                  }
-                  addToCart(product, qty, selectedColor || '');
-                  navigate('/checkout');
-                }}
+                onClick={() => { addToCart(product, qty, selectedColor || ''); navigate('/checkout'); }}
                 className="flex items-center justify-center gap-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold px-3 h-8 rounded transition"
               >
                 ⚡ Buy Now
@@ -724,16 +718,17 @@ const Info = ({ label, value }) => (
 // in info column). Identical UI, just controlled by parent state so both
 // instances stay in sync.
 function ColorSwatchPanel({ colors, selectedColor, onSelect }) {
-  // selectedColor stays empty until the customer explicitly picks one.
-  // We DON'T fall back to colors[0] here — the heading should read
-  // "Select a colour" so it's obvious a choice is required.
+  // selectedColor stays empty until the customer explicitly taps a
+  // swatch. Empty = "main / default" version of the product. Tapping an
+  // already-picked swatch deselects it, returning to the main view —
+  // that's the customer's escape hatch back to the cover image.
   return (
     <>
       <div className="flex items-center justify-between mb-1.5">
         <p className="text-xs font-bold">
           {selectedColor
             ? <>Color: <span className="font-medium text-primary-600">{selectedColor}</span></>
-            : <span className="text-gray-700">Select a colour</span>}
+            : <span className="text-gray-700">Available colours <span className="font-normal text-gray-500">(optional — tap to choose)</span></span>}
         </p>
         <p className="text-[10px] text-gray-500">{colors.length} option{colors.length === 1 ? '' : 's'}</p>
       </div>
@@ -745,9 +740,9 @@ function ColorSwatchPanel({ colors, selectedColor, onSelect }) {
             <button
               key={c}
               type="button"
-              onClick={() => onSelect(c)}
-              title={c}
-              aria-label={`Select ${c}`}
+              onClick={() => onSelect(isPicked ? '' : c)}
+              title={isPicked ? `Tap again to clear ${c}` : c}
+              aria-label={isPicked ? `Clear ${c} selection` : `Select ${c}`}
               className={`relative inline-flex items-center gap-1.5 border-2 rounded-full pl-0.5 pr-2.5 py-0.5 text-xs transition ${
                 isPicked
                   ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-100'
