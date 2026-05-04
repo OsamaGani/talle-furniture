@@ -45,9 +45,19 @@ export default function ProductDetail() {
       const firstVariant = data.colorVariants?.[0];
       const firstColor = firstVariant?.color || data.colors?.[0] || '';
       setSelectedColor(firstColor);
+      // Default the gallery to the main "hero" image — that's the first
+      // thumbnail customers see on load. If the product has no main image
+      // we fall back, in order, to: the first multi-image gallery entry,
+      // the pre-selected variant's first image, and finally any variant
+      // that has at least one image (so a variants-only product never
+      // shows empty).
+      const anyVariantImg = (data.colorVariants || []).find((v) => v.images?.length)?.images[0];
       setActiveImg(
+        data.image ||
+        data.images?.[0] ||
         (firstVariant?.images && firstVariant.images[0]) ||
-        data.image || data.images?.[0] || ''
+        anyVariantImg ||
+        ''
       );
       // Remember this product so the homepage "Recently Viewed" rail picks it up.
       addRecentlyViewed(data);
@@ -89,12 +99,26 @@ export default function ProductDetail() {
     : effectiveBasePrice;
   const hasVariantOverride = !!(activeVariant && (activeVariant.price > 0 || activeVariant.discount > 0));
 
-  // Gallery resolution. If the customer picked a colour AND that variant
-  // has its own images, use those. Otherwise fall back to the product's
-  // master image set so the page never goes empty.
-  const displayImages = (activeVariant?.images && activeVariant.images.length > 0)
+  // Gallery resolution — main image(s) come first, then the selected
+  // variant's images appended after. Customers always see the hero shot
+  // as the leading thumbnail AND can flip through the colour-specific
+  // photos. Set-dedupe handles the case where admin uploaded the same
+  // file in both the main slot and a variant slot.
+  const mainImages = (product.images && product.images.length > 0)
+    ? product.images
+    : (product.image ? [product.image] : []);
+  const variantImages = (activeVariant?.images && activeVariant.images.length > 0)
     ? activeVariant.images
-    : (product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []));
+    : [];
+  let displayImages = [...new Set([...mainImages, ...variantImages])];
+  // Final safety net: if a product somehow has no main image AND the
+  // active variant has no images (admin only uploaded photos to OTHER
+  // variants), borrow the first photo we can find so the gallery
+  // never renders empty.
+  if (displayImages.length === 0) {
+    const anyVariantImg = (product.colorVariants || []).find((v) => v.images?.length)?.images[0];
+    if (anyVariantImg) displayImages = [anyVariantImg];
+  }
   // List of available colours — prefer the structured variants when present.
   const availableColors = (product.colorVariants && product.colorVariants.length > 0)
     ? product.colorVariants.map((v) => v.color)
@@ -253,13 +277,12 @@ export default function ProductDetail() {
           {displayImages.length > 1 && (
             <div className="mt-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                {displayImages.length} photos
-                {activeVariant ? ` of ${activeVariant.color}` : ''} · click to preview
+                {displayImages.length} photos · click to preview
               </p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {displayImages.map((img, i) => (
                   <button
-                    key={`${activeVariant?.color || 'main'}-${i}`}
+                    key={img}
                     onClick={() => setActiveImg(img)}
                     style={{ animationDelay: `${i * 70}ms` }}
                     className={`w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-lg overflow-hidden flex-shrink-0 bg-white transition hover:scale-[1.04] animate-imgFade ${(activeImg || displayImages[0]) === img ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'}`}

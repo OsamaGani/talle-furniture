@@ -60,7 +60,18 @@ export default function ProductCard({ product }) {
         className="block aspect-square overflow-hidden bg-white relative"
       >
         <img
-          src={resolveImage(product.image || product.images?.[0])}
+          // Fallback chain handles three upload patterns equally well:
+          //   1. legacy main image upload  → product.image
+          //   2. multi-image gallery       → product.images[0]
+          //   3. NEW colour-variant only   → product.colorVariants[0].images[0]
+          // Without (3) products that admin uploads through the new variant
+          // form (without re-uploading anything in the main image area)
+          // would render the placeholder on every list / search / home rail.
+          src={resolveImage(
+            product.image
+            || product.images?.[0]
+            || product.colorVariants?.find?.((v) => v.images?.length)?.images[0]
+          )}
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
