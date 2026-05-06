@@ -13,7 +13,6 @@ import toast from 'react-hot-toast';
 import SEO, { SITE_URL, SITE_NAME } from '../components/SEO';
 import { addRecentlyViewed } from '../utils/recentlyViewed';
 import { colorToBackground, isLightColor } from '../utils/colors';
-import StickyBuyBar from '../components/StickyBuyBar';
 import { waLink } from '../config/contact';
 
 export default function ProductDetail() {
@@ -36,10 +35,6 @@ export default function ProductDetail() {
   const [pin, setPin] = useState('');
   const [pinCheck, setPinCheck] = useState(null); // { city, state, etaText } | { error }
   const [pinChecking, setPinChecking] = useState(false);
-
-  // Anchor for the StickyBuyBar — points to the in-page Add-to-Cart /
-  // Buy Now block. The bar shows once this anchor scrolls out of view.
-  const buyAnchorRef = useRef(null);
 
   const load = async () => {
     setLoading(true);
@@ -561,7 +556,7 @@ export default function ProductDetail() {
           )}
 
           {product.stock > 0 ? (
-            <div ref={buyAnchorRef} className="mt-5 flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+            <div className="mt-5 flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
               <div className="flex items-center border border-gray-300 rounded h-8 text-xs">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-2 hover:bg-gray-50 h-full">−</button>
                 <span className="px-2 font-semibold">{qty}</span>
@@ -581,7 +576,7 @@ export default function ProductDetail() {
               </button>
             </div>
           ) : (
-            <button ref={buyAnchorRef} disabled className="mt-6 bg-gray-300 text-gray-500 text-xs font-bold px-4 py-2 rounded cursor-not-allowed">
+            <button disabled className="mt-6 bg-gray-300 text-gray-500 text-xs font-bold px-4 py-2 rounded cursor-not-allowed">
               Out of Stock
             </button>
           )}
@@ -680,23 +675,6 @@ export default function ProductDetail() {
         />
       )}
 
-      {/* Sticky Buy Bar — slides up from the bottom once the customer
-          scrolls past the in-page Add to Cart / Buy Now block. Keeps
-          the buy action one tap away no matter how far down they
-          scroll (gallery → price → description → specs → reviews →
-          related products is a long page on mobile). */}
-      <StickyBuyBar
-        anchorRef={buyAnchorRef}
-        image={activeImg || displayImages[0]}
-        name={effectiveName}
-        price={final}
-        originalPrice={effectiveBasePrice}
-        discount={effectiveDiscount}
-        stock={product.stock}
-        priceLabel={hasVariantOverride && selectedColor ? `Price for ${selectedColor}` : ''}
-        onAddToCart={() => addToCart(product, qty, selectedColor || '')}
-        onBuyNow={() => { addToCart(product, qty, selectedColor || ''); navigate('/checkout'); }}
-      />
     </div>
   );
 }
