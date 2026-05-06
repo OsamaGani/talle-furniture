@@ -312,7 +312,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile search */}
-        <div className="md:hidden px-4 pb-3">
+        <div className="md:hidden px-4 pb-2.5">
           <form onSubmit={handleSearch} className="relative">
             <input
               value={keyword}
@@ -325,6 +325,28 @@ export default function Navbar() {
             </button>
           </form>
         </div>
+
+        {/* Mobile-only horizontal category strip — quick shortcuts under
+            the search bar so phone users don't have to open the hamburger
+            for the most common destinations. Mirrors the Flipkart /
+            Myntra / Meesho mobile pattern. Hidden on md+ where the full
+            categories nav is visible. */}
+        <nav className="md:hidden border-t bg-gradient-to-r from-primary-50 via-pink-50 to-amber-50">
+          <div
+            className="flex items-center gap-1 overflow-x-auto px-3 py-2 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none' }}
+            aria-label="Quick categories"
+          >
+            <MobileChip to="/shop?discount=true" highlight>🔥 70% Off</MobileChip>
+            <MobileChip to="/shop?bestSeller=true">⭐ Best Sellers</MobileChip>
+            <MobileChip to="/shop?newArrival=true">✨ New</MobileChip>
+            <MobileChip to="/action-toys">🎯 Action Toys</MobileChip>
+            <MobileChip to="/shop?category=Books">📚 Books</MobileChip>
+            <MobileChip to="/shop?category=Dolls">👗 Dolls</MobileChip>
+            <MobileChip to="/shop?category=Vehicles">🏎 Vehicles</MobileChip>
+            <MobileChip to="/wholesale" purple>🛍 Wholesale</MobileChip>
+          </div>
+        </nav>
       </div>
 
       {/* Categories nav */}
@@ -602,10 +624,31 @@ export default function Navbar() {
 function NavItem({ to, label, highlight, end }) {
   return (
     <li>
-      <NavLink to={to} end={end} className={({ isActive }) =>
-        `inline-block px-3 py-3 hover:text-primary-500 transition ${isActive ? 'text-primary-500' : ''} ${highlight ? 'text-primary-500' : ''}`
-      }>
-        {label}
+      <NavLink
+        to={to}
+        end={end}
+        className={({ isActive }) =>
+          `relative inline-block px-3 py-3 transition group ${
+            isActive ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
+          } ${highlight ? 'text-primary-500 font-bold' : ''}`
+        }
+      >
+        {({ isActive }) => (
+          <>
+            <span className={highlight ? 'animate-pulse' : ''}>{label}</span>
+            {/* Animated underline — full-width when active, hover-grows from
+                center when inactive. Skipped on highlight items so the red
+                pulse stays the focus there. */}
+            {!highlight && (
+              <span
+                className={`absolute left-3 right-3 -bottom-px h-[2px] bg-primary-500 transform origin-center transition-transform duration-300 ${
+                  isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+                aria-hidden
+              />
+            )}
+          </>
+        )}
       </NavLink>
     </li>
   );
@@ -613,11 +656,54 @@ function NavItem({ to, label, highlight, end }) {
 
 function DropdownTrigger({ label, active, onHover }) {
   return (
-    <li onMouseEnter={onHover}>
-      <button className={`inline-flex items-center gap-1 px-3 py-3 hover:text-primary-500 transition ${active ? 'text-primary-500' : ''}`}>
-        {label} <FiChevronDown size={14} className={`transition ${active ? 'rotate-180' : ''}`} />
+    <li onMouseEnter={onHover} className="relative">
+      <button
+        className={`inline-flex items-center gap-1 px-3 py-3 transition group ${
+          active ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
+        }`}
+      >
+        {label}
+        <FiChevronDown
+          size={14}
+          className={`transition-transform duration-300 ${active ? 'rotate-180' : ''}`}
+        />
+        {/* Same animated underline as NavItem so dropdowns visually match */}
+        <span
+          className={`absolute left-3 right-3 -bottom-px h-[2px] bg-primary-500 transform origin-center transition-transform duration-300 ${
+            active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+          }`}
+          aria-hidden
+        />
       </button>
     </li>
+  );
+}
+
+// Compact pill rendered in the mobile-only category strip. Highlight
+// variant tints red for sale items; purple variant marks the wholesale
+// shortcut to match the desktop wholesale link styling.
+function MobileChip({ to, children, highlight, purple }) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `inline-flex items-center gap-1 flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition active:scale-95 ${
+          highlight
+            ? isActive
+              ? 'bg-primary-500 text-white shadow'
+              : 'bg-white border border-primary-200 text-primary-600 hover:bg-primary-500 hover:text-white hover:border-primary-500'
+            : purple
+              ? isActive
+                ? 'bg-purple-600 text-white shadow'
+                : 'bg-white border border-purple-200 text-purple-700 hover:bg-purple-50'
+              : isActive
+                ? 'bg-gray-900 text-white shadow'
+                : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-400'
+        }`
+      }
+    >
+      {children}
+    </NavLink>
   );
 }
 
