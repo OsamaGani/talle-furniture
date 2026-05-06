@@ -177,68 +177,38 @@ export default function Navbar() {
       {/* Main bar */}
       <div className="border-b">
         <div className={`max-w-7xl mx-auto px-3 sm:px-4 flex items-center gap-3 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
-          {/* Logo — subtle group-hover scale gives the wordmark some life
-              without being distracting. The little dot under "Mall" is a
-              decorative accent that animates on hover. */}
-          <Link to="/" className="group flex items-center gap-1 flex-shrink-0 transition-transform duration-300 hover:scale-[1.03]">
+          <Link to="/" className="flex items-center gap-1 flex-shrink-0">
             <span className={`font-extrabold text-primary-500 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Toy</span>
-            <span className={`font-extrabold text-gray-900 transition-all relative ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>
-              Mall
-              <span className="absolute -bottom-0.5 right-0 w-1.5 h-1.5 rounded-full bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden></span>
-            </span>
+            <span className={`font-extrabold text-gray-900 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Mall</span>
           </Link>
 
-          {/* Search — focus ring expands, the search icon button has a slight
-              hover lift, and a subtle inset shadow when the input is focused. */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl relative group">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl relative">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search for toys, brands and more..."
-              className="w-full border-2 border-gray-200 group-focus-within:border-primary-500 rounded-full pl-5 pr-14 py-2.5 focus:outline-none focus:ring-4 focus:ring-primary-100 transition-all duration-200 placeholder:text-gray-400"
+              className="w-full border-2 border-primary-500 rounded-full pl-5 pr-14 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-200"
             />
-            <button
-              type="submit"
-              aria-label="Search"
-              className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 hover:bg-primary-600 text-white p-2.5 rounded-full transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg"
-            >
+            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 hover:bg-primary-600 text-white p-2.5 rounded-full transition">
               <FiSearch />
             </button>
           </form>
 
-          <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-            <Link
-              to="/wishlist"
-              className={`relative hidden sm:flex flex-col items-center justify-center text-[11px] font-medium px-3 py-1.5 rounded-xl transition-all duration-200 hover:bg-primary-50 active:scale-95 ${
-                wishCount > 0 ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
-              }`}
-            >
-              <FiHeart size={22} className={wishCount > 0 ? 'fill-current' : ''} />
-              <span className="mt-0.5">Wishlist</span>
+          <div className="flex items-center gap-3 sm:gap-5 ml-auto">
+            <Link to="/wishlist" className="relative hidden sm:flex flex-col items-center text-xs hover:text-primary-500">
+              <FiHeart size={22} className={wishCount > 0 ? 'fill-current text-primary-500' : ''} />
+              <span>Wishlist</span>
               {wishCount > 0 && (
-                <span className="absolute top-0 right-1 bg-primary-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center font-bold ring-2 ring-white animate-scaleIn">
-                  {wishCount > 99 ? '99+' : wishCount}
+                <span className="absolute -top-1 right-2 bg-primary-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {wishCount}
                 </span>
               )}
             </Link>
 
             <div className="relative" ref={userRef}>
-              <button
-                onClick={() => setOpenUser(!openUser)}
-                className={`flex flex-col items-center justify-center text-[11px] font-medium px-3 py-1.5 rounded-xl transition-all duration-200 hover:bg-primary-50 active:scale-95 ${
-                  openUser ? 'text-primary-500 bg-primary-50' : 'text-gray-700 hover:text-primary-500'
-                }`}
-              >
-                {/* Logged-in users get a coloured initial avatar in place of
-                    the generic person icon — small but very personal touch. */}
-                {user ? (
-                  <span className="w-[22px] h-[22px] rounded-full bg-gradient-to-br from-primary-500 to-pink-500 text-white text-[11px] font-extrabold flex items-center justify-center shadow-sm">
-                    {user.name?.[0]?.toUpperCase() || 'U'}
-                  </span>
-                ) : (
-                  <FiUser size={22} />
-                )}
-                <span className="mt-0.5 max-w-[72px] truncate">{user ? user.name.split(' ')[0] : 'Login'}</span>
+              <button onClick={() => setOpenUser(!openUser)} className="flex flex-col items-center text-xs hover:text-primary-500">
+                <FiUser size={22} />
+                <span>{user ? user.name.split(' ')[0] : 'Login'}</span>
               </button>
               {openUser && (
                 <>
@@ -325,28 +295,18 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link
-              to="/cart"
-              className={`relative flex flex-col items-center justify-center text-[11px] font-medium px-3 py-1.5 rounded-xl transition-all duration-200 hover:bg-primary-50 active:scale-95 ${
-                itemCount > 0 ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
-              }`}
-            >
+            <Link to="/cart" className="relative flex flex-col items-center text-xs hover:text-primary-500">
               <FiShoppingCart size={22} />
-              <span className="mt-0.5">Cart</span>
+              <span>Cart</span>
               {itemCount > 0 && (
-                <span className="absolute top-0 right-1 bg-primary-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center font-bold ring-2 ring-white animate-scaleIn">
-                  {itemCount > 99 ? '99+' : itemCount}
+                <span className="absolute -top-1 right-0 bg-primary-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {itemCount}
                 </span>
               )}
             </Link>
 
-            <button
-              className="md:hidden ml-1 p-2 rounded-xl text-gray-700 hover:bg-gray-100 hover:text-primary-500 transition active:scale-95"
-              onClick={() => setOpenMenu(!openMenu)}
-              aria-label={openMenu ? 'Close menu' : 'Open menu'}
-              aria-expanded={openMenu}
-            >
-              {openMenu ? <FiX size={22} /> : <FiMenu size={22} />}
+            <button className="md:hidden" onClick={() => setOpenMenu(!openMenu)}>
+              {openMenu ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
           </div>
         </div>
