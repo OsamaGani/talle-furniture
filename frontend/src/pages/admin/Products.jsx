@@ -151,6 +151,30 @@ export default function AdminProducts() {
     }
   };
 
+  // Bulk-promote: flip the same flag on every selected product. Used by the
+  // toolbar to mass-add chairs to New Arrivals / Best Sellers / Featured /
+  // Today's Deals collections. value=true adds, value=false removes.
+  const [bulkPromoting, setBulkPromoting] = useState(false);
+  const bulkSetFlag = async (field, value) => {
+    const n = selected.size;
+    if (n === 0) return;
+    setBulkPromoting(true);
+    const ids = Array.from(selected);
+    let ok = 0, fail = 0;
+    for (let i = 0; i < ids.length; i += 8) {
+      const batch = ids.slice(i, i + 8);
+      const results = await Promise.allSettled(
+        batch.map((id) => API.put(`/products/${id}`, { [field]: value }))
+      );
+      for (const r of results) (r.status === 'fulfilled' ? ok++ : fail++);
+    }
+    setBulkPromoting(false);
+    const verb = value ? 'added to' : 'removed from';
+    if (ok > 0) toast.success(`${ok} product${ok === 1 ? '' : 's'} ${verb} ${FLAG_LABELS[field]}s`);
+    if (fail > 0) toast.error(`${fail} update${fail === 1 ? '' : 's'} failed`);
+    load();
+  };
+
   return (
     <div>
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
@@ -219,28 +243,58 @@ export default function AdminProducts() {
       </div>
 
       {/* Bulk-action toolbar — only renders when at least one product is ticked.
-          Lets the admin wipe stale / off-brand products in one shot instead of
-          clicking 30 delete buttons one at a time. */}
+          Two rows of actions:
+            1. Promote: mass-assign selected chairs to a collection (New
+               Arrivals / Best Sellers / Featured / Today's Deals).
+            2. Destructive: clear selection or delete everything ticked.
+          Bulk-promote is the workflow you use to populate the homepage rails
+          without editing each product one at a time. */}
       {selected.size > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-red-50 border-2 border-red-200 rounded-lg px-4 py-3 mb-3 animate-fadeIn">
-          <p className="text-sm font-semibold text-red-800">
-            {selected.size} product{selected.size === 1 ? '' : 's'} selected
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSelected(new Set())}
-              className="text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-1.5"
-            >
-              Clear
-            </button>
-            <button
-              onClick={bulkDelete}
-              disabled={bulkDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-md inline-flex items-center gap-2 text-sm shadow disabled:opacity-60"
-            >
-              <FiTrash2 /> {bulkDeleting ? 'Deleting…' : `Delete ${selected.size} selected`}
-            </button>
+        <div className="bg-primary-50 border-2 border-primary-200 rounded-lg p-3 sm:p-4 mb-3 animate-fadeIn">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <p className="text-sm font-semibold text-primary-700">
+              {selected.size} product{selected.size === 1 ? '' : 's'} selected
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelected(new Set())}
+                className="text-xs sm:text-sm font-semibold text-gray-700 hover:text-gray-900 px-2 py-1"
+              >
+                Clear
+              </button>
+              <button
+                onClick={bulkDelete}
+                disabled={bulkDeleting || bulkPromoting}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-md inline-flex items-center gap-1.5 text-xs sm:text-sm shadow disabled:opacity-60"
+              >
+                <FiTrash2 /> {bulkDeleting ? 'Deleting…' : `Delete ${selected.size}`}
+              </button>
+            </div>
           </div>
+
+          {/* Promote row — 4 add buttons + 4 remove buttons, paired. */}
+          <div className="border-t border-primary-200 pt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <BulkFlagButton
+              label="✨ New Arrivals" onAdd={() => bulkSetFlag('newArrival', true)}
+              onRemove={() => bulkSetFlag('newArrival', false)} busy={bulkPromoting}
+            />
+            <BulkFlagButton
+              label="⭐ Best Sellers" onAdd={() => bulkSetFlag('bestSeller', true)}
+              onRemove={() => bulkSetFlag('bestSeller', false)} busy={bulkPromoting}
+            />
+            <BulkFlagButton
+              label="🌟 Featured" onAdd={() => bulkSetFlag('featured', true)}
+              onRemove={() => bulkSetFlag('featured', false)} busy={bulkPromoting}
+            />
+            <BulkFlagButton
+              label="⚡ Today's Deals" onAdd={() => bulkSetFlag('onDeal', true)}
+              onRemove={() => bulkSetFlag('onDeal', false)} busy={bulkPromoting}
+            />
+          </div>
+          <p className="text-[10px] sm:text-xs text-gray-600 mt-2">
+            <strong>Add</strong> puts every selected chair into that homepage rail.
+            <strong className="ml-2">Remove</strong> takes them out. Existing items in the rail aren't touched.
+          </p>
         </div>
       )}
 
@@ -338,5 +392,31 @@ function FlagPill({ active, label, onClick, activeColor }) {
     >
       {label}
     </button>
+  );
+}
+
+// Paired Add/Remove buttons for a single collection flag. Used in the
+// bulk-action toolbar so the admin can mass-toggle every ticked product
+// into or out of a homepage rail in two clicks instead of N.
+function BulkFlagButton({ label, onAdd, onRemove, busy }) {
+  return (
+    <div className="bg-white border border-primary-100 rounded-md overflow-hidden flex">
+      <button
+        onClick={onAdd}
+        disabled={busy}
+        className="flex-1 py-1.5 px-2 text-[11px] sm:text-xs font-semibold text-emerald-700 hover:bg-emerald-50 disabled:opacity-50 text-center border-r border-primary-100"
+        title={`Add selected to ${label}`}
+      >
+        + {label}
+      </button>
+      <button
+        onClick={onRemove}
+        disabled={busy}
+        className="py-1.5 px-2 text-[11px] sm:text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+        title={`Remove selected from ${label}`}
+      >
+        −
+      </button>
+    </div>
   );
 }
