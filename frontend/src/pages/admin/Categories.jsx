@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import API from '../../api/axios';
 import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
-import { FiTrash2, FiPlus, FiEdit2, FiSearch, FiHome, FiStar } from 'react-icons/fi';
+import { FiTrash2, FiPlus, FiEdit2, FiSearch, FiHome, FiStar, FiPackage, FiExternalLink } from 'react-icons/fi';
 import { PLACEHOLDER } from '../../utils/imageUrl';
 
 export default function AdminCategories() {
@@ -16,11 +17,25 @@ export default function AdminCategories() {
   const [selected, setSelected] = useState(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
 
+  // Product count per category. Fetched once (all products, name+category
+  // only) and aggregated client-side — one round-trip instead of N category
+  // counts. Used to render the "23 products" badge next to each row.
+  const [counts, setCounts] = useState({});
+
   const load = async () => {
     setLoading(true);
     try {
-      const { data } = await API.get('/categories');
-      setList(data);
+      const [{ data: cats }, { data: prodResp }] = await Promise.all([
+        API.get('/categories'),
+        API.get('/products?limit=500'),
+      ]);
+      setList(cats);
+      const map = {};
+      for (const p of (prodResp.products || [])) {
+        if (!p.category) continue;
+        map[p.category] = (map[p.category] || 0) + 1;
+      }
+      setCounts(map);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -169,7 +184,7 @@ export default function AdminCategories() {
                   </th>
                   <th className="p-3">Image</th>
                   <th>Name</th>
-                  <th>Slug</th>
+                  <th className="text-center">Products</th>
                   <th className="text-center">On Home</th>
                   <th></th>
                 </tr>
@@ -189,8 +204,19 @@ export default function AdminCategories() {
                     <td className="p-3">
                       <img src={c.image || PLACEHOLDER} className="w-10 h-10 rounded object-cover" alt="" />
                     </td>
-                    <td className="font-medium">{c.name}</td>
-                    <td className="text-gray-500">{c.slug}</td>
+                    <td>
+                      <p className="font-medium">{c.name}</p>
+                      <p className="text-[10px] text-gray-400 font-mono">{c.slug}</p>
+                    </td>
+                    <td className="text-center">
+                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
+                        (counts[c.name] || 0) > 0
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        <FiPackage size={11} /> {counts[c.name] || 0}
+                      </span>
+                    </td>
                     <td className="text-center">
                       <button
                         onClick={() => toggleHome(c)}
@@ -207,9 +233,31 @@ export default function AdminCategories() {
                         {c.featuredOnHome ? `#${c.homeOrder}` : 'Off'}
                       </button>
                     </td>
-                    <td className="p-3 flex gap-1">
-                      <button onClick={() => edit(c)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><FiEdit2 /></button>
-                      <button onClick={() => remove(c._id)} className="p-2 text-red-600 hover:bg-red-50 rounded"><FiTrash2 /></button>
+                    <td className="p-3">
+                      <div className="flex gap-1 items-center justify-end">
+                        {/* Direct workflow: add a chair to THIS category in
+                            one click — ProductForm reads ?category= from
+                            the URL and pre-fills the dropdown. */}
+                        <Link
+                          to={`/admin/products/new?category=${encodeURIComponent(c.name)}&from=/admin/categories`}
+                          title={`Add a new chair to "${c.name}"`}
+                          className="inline-flex items-center gap-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold px-2.5 py-1.5 rounded shadow-sm"
+                        >
+                          <FiPlus size={12} /> Chair
+                        </Link>
+                        {/* See the public category page customers land on
+                            when they click this tile on the homepage. */}
+                        <a
+                          href={`/shop?category=${encodeURIComponent(c.name)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          title="Open the public category page in a new tab"
+                          className="p-2 text-emerald-700 hover:bg-emerald-50 rounded"
+                        >
+                          <FiExternalLink />
+                        </a>
+                        <button onClick={() => edit(c)} title="Edit category" className="p-2 text-blue-600 hover:bg-blue-50 rounded"><FiEdit2 /></button>
+                        <button onClick={() => remove(c._id)} title="Delete category" className="p-2 text-red-600 hover:bg-red-50 rounded"><FiTrash2 /></button>
+                      </div>
                     </td>
                   </tr>
                 ))}
