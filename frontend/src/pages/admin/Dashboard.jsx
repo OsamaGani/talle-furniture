@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../api/axios';
 import Loader from '../../components/Loader';
+import toast from 'react-hot-toast';
 import {
   FiBox, FiShoppingBag, FiUsers, FiDollarSign, FiTrendingUp,
-  FiCalendar, FiX,
+  FiCalendar, FiX, FiAlertTriangle, FiRefreshCw, FiTrash2,
 } from 'react-icons/fi';
 
 // ---- Date range helpers ----
@@ -277,8 +278,13 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Danger Zone — destructive one-click ops surfaced with strong
+          visual warning + typed-confirm guard. Useful when you need to
+          purge legacy Toy Mall seed data and start the catalog fresh. */}
+      <DangerZone />
+
       {/* Recent orders — filtered by the same range */}
-      <div className="bg-white border rounded-lg p-4 sm:p-5">
+      <div className="bg-white border rounded-lg p-4 sm:p-5 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-bold text-base sm:text-lg flex items-center gap-2">
             <FiTrendingUp /> Recent Orders
@@ -320,6 +326,152 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// Danger Zone — destructive admin actions surfaced behind a typed-confirm
+// guard so accidental clicks can't wipe the catalog. Three buttons:
+//
+//   1. "Re-seed missing defaults" — idempotent, safe to spam. Adds the
+//      Talle default brands / categories / admin user if they're missing.
+//   2. "Wipe all products + categories + brands" — destructive. Keeps
+//      users and orders so customers aren't affected.
+//   3. "Wipe & re-seed from scratch" — combines #2 then #1. The nuclear
+//      "reset to factory Talle catalog" button.
+//
+// All three hit /api/admin/catalog/* which require admin auth.
+function DangerZone() {
+  const [busy, setBusy] = useState('');     // '' | 'wipe' | 'reseed' | 'reset'
+  const [lastResult, setLastResult] = useState(null);
+
+  const runReseed = async () => {
+    if (busy) return;
+    setBusy('reseed');
+    try {
+      const { data } = await API.post('/admin/catalog/reseed');
+      setLastResult({ kind: 'success', ...data });
+      toast.success(`Re-seed complete · ${data.totals.products}p / ${data.totals.categories}c / ${data.totals.brands}b`);
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Re-seed failed';
+      setLastResult({ kind: 'error', message: msg });
+      toast.error(msg);
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const runDestructive = async (path, kindLabel) => {
+    if (busy) return;
+    const typed = window.prompt(
+      `This will permanently delete every product, category and brand from the database.\n\n` +
+      `Users and orders will NOT be deleted.\n\n` +
+      `Type WIPE to confirm:`
+    );
+    if (typed !== 'WIPE') {
+      toast('Cancelled — nothing was deleted.');
+      return;
+    }
+    setBusy(kindLabel);
+    try {
+      const { data } = await API.post(path, { confirm: 'WIPE' });
+      setLastResult({ kind: 'success', ...data });
+      toast.success(data.message || 'Done');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Action failed';
+      setLastResult({ kind: 'error', message: msg });
+      toast.error(msg);
+    } finally {
+      setBusy('');
+    }
+  };
+
+  return (
+    <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 sm:p-5 mt-6">
+      <h2 className="font-bold text-base sm:text-lg flex items-center gap-2 text-red-800">
+        <FiAlertTriangle /> Danger Zone
+      </h2>
+      <p className="text-xs sm:text-sm text-red-700 mt-1">
+        Destructive operations. Users and orders are preserved — only the
+        catalog (products / categories / brands / wholesale tiles) is touched.
+      </p>
+
+      <div className="grid sm:grid-cols-3 gap-3 mt-4">
+        {/* 1. Safe re-seed */}
+        <button
+          onClick={runReseed}
+          disabled={!!busy}
+          className="bg-white border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 rounded-lg p-3 text-left transition disabled:opacity-50"
+        >
+          <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+            <FiRefreshCw className={busy === 'reseed' ? 'animate-spin' : ''} />
+            Re-seed missing defaults
+          </div>
+          <p className="text-[11px] sm:text-xs text-gray-600 mt-1 leading-snug">
+            Safe. Adds the Talle default brands, chair categories and admin
+            user if they're missing. Won't overwrite anything.
+          </p>
+        </button>
+
+        {/* 2. Wipe only */}
+        <button
+          onClick={() => runDestructive('/admin/catalog/wipe', 'wipe')}
+          disabled={!!busy}
+          className="bg-white border-2 border-orange-300 hover:border-orange-500 hover:bg-orange-50 rounded-lg p-3 text-left transition disabled:opacity-50"
+        >
+          <div className="flex items-center gap-2 text-orange-700 font-bold text-sm">
+            <FiTrash2 className={busy === 'wipe' ? 'animate-pulse' : ''} />
+            Wipe catalog only
+          </div>
+          <p className="text-[11px] sm:text-xs text-gray-600 mt-1 leading-snug">
+            Destructive. Deletes every product, category, brand and wholesale
+            tile. Leaves the database empty for manual repopulation.
+          </p>
+        </button>
+
+        {/* 3. Wipe + re-seed */}
+        <button
+          onClick={() => runDestructive('/admin/catalog/wipe-and-reseed', 'reset')}
+          disabled={!!busy}
+          className="bg-white border-2 border-red-400 hover:border-red-600 hover:bg-red-100 rounded-lg p-3 text-left transition disabled:opacity-50"
+        >
+          <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
+            <FiAlertTriangle className={busy === 'reset' ? 'animate-pulse' : ''} />
+            Reset to clean Talle catalog
+          </div>
+          <p className="text-[11px] sm:text-xs text-gray-600 mt-1 leading-snug">
+            Wipes everything then reseeds with the current Talle demo chairs,
+            sofas, tables and categories. Best for nuking legacy Toy Mall data.
+          </p>
+        </button>
+      </div>
+
+      {lastResult && (
+        <div
+          className={`mt-4 rounded-md p-3 text-sm ${
+            lastResult.kind === 'success'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+              : 'bg-red-100 border border-red-300 text-red-800'
+          }`}
+        >
+          <p className="font-semibold">{lastResult.message || (lastResult.kind === 'success' ? 'Done' : 'Error')}</p>
+          {lastResult.deleted && (
+            <p className="text-xs mt-1">
+              Deleted — {lastResult.deleted.products} products,
+              {' '}{lastResult.deleted.categories} categories,
+              {' '}{lastResult.deleted.brands} brands,
+              {' '}{lastResult.deleted.wholesaleTiles} wholesale tiles.
+            </p>
+          )}
+          {lastResult.totals && (
+            <p className="text-xs mt-1">
+              Catalog now holds — {lastResult.totals.products} products,
+              {' '}{lastResult.totals.categories} categories,
+              {' '}{lastResult.totals.brands} brands.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

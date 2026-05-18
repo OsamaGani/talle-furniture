@@ -34,6 +34,11 @@ export default function AdminProducts() {
   const [category, setCategory] = useState('');
   const [counts, setCounts] = useState({ all: 0, newArrival: 0, bestSeller: 0, featured: 0, onDeal: 0 });
   const [quickOpen, setQuickOpen] = useState(false);
+  // Bulk-select state. Set<string> of product._id values that are ticked.
+  // Cleared whenever the visible list changes so we never accidentally
+  // act on a selection from a previous filter / tab.
+  const [selected, setSelected] = useState(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -69,6 +74,54 @@ export default function AdminProducts() {
   };
 
   useEffect(() => { load(); }, [keyword, tab, category]);
+
+  // Whenever the visible product list changes, drop any selection that no
+  // longer matches a visible row. Keeps the bulk-action toolbar honest.
+  useEffect(() => {
+    const visibleIds = new Set(products.map((p) => p._id));
+    setSelected((prev) => {
+      const next = new Set();
+      for (const id of prev) if (visibleIds.has(id)) next.add(id);
+      return next;
+    });
+  }, [products]);
+
+  const toggleOne = (id) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
+  const toggleAllVisible = () => {
+    setSelected((prev) => {
+      if (prev.size === products.length && products.length > 0) return new Set();
+      return new Set(products.map((p) => p._id));
+    });
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    const n = selected.size;
+    if (!confirm(`Delete ${n} product${n === 1 ? '' : 's'}? This cannot be undone.`)) return;
+    setBulkDeleting(true);
+    let ok = 0;
+    let fail = 0;
+    // Fire deletes in parallel but cap concurrency to ~8 so we don't
+    // hammer the backend with 200 simultaneous requests on big cleanups.
+    const ids = Array.from(selected);
+    const CONCURRENCY = 8;
+    for (let i = 0; i < ids.length; i += CONCURRENCY) {
+      const batch = ids.slice(i, i + CONCURRENCY);
+      const results = await Promise.allSettled(batch.map((id) => API.delete(`/products/${id}`)));
+      for (const r of results) (r.status === 'fulfilled' ? ok++ : fail++);
+    }
+    setBulkDeleting(false);
+    setSelected(new Set());
+    if (ok > 0) toast.success(`Deleted ${ok} product${ok === 1 ? '' : 's'}`);
+    if (fail > 0) toast.error(`${fail} delete${fail === 1 ? '' : 's'} failed`);
+    load();
+  };
 
   const remove = async (id) => {
     if (!confirm('Delete this product?')) return;
@@ -165,11 +218,46 @@ export default function AdminProducts() {
         )}
       </div>
 
+      {/* Bulk-action toolbar — only renders when at least one product is ticked.
+          Lets the admin wipe stale / off-brand products in one shot instead of
+          clicking 30 delete buttons one at a time. */}
+      {selected.size > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-red-50 border-2 border-red-200 rounded-lg px-4 py-3 mb-3 animate-fadeIn">
+          <p className="text-sm font-semibold text-red-800">
+            {selected.size} product{selected.size === 1 ? '' : 's'} selected
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSelected(new Set())}
+              className="text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-1.5"
+            >
+              Clear
+            </button>
+            <button
+              onClick={bulkDelete}
+              disabled={bulkDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-md inline-flex items-center gap-2 text-sm shadow disabled:opacity-60"
+            >
+              <FiTrash2 /> {bulkDeleting ? 'Deleting…' : `Delete ${selected.size} selected`}
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? <Loader /> : (
         <div className="bg-white border rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b text-left">
               <tr>
+                <th className="p-3 w-8">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all visible products"
+                    checked={products.length > 0 && selected.size === products.length}
+                    onChange={toggleAllVisible}
+                    className="accent-primary-500 w-4 h-4 cursor-pointer"
+                  />
+                </th>
                 <th className="p-3">Image</th>
                 <th>Name</th>
                 <th>Category</th>
@@ -181,7 +269,19 @@ export default function AdminProducts() {
             </thead>
             <tbody>
               {products.map((p) => (
-                <tr key={p._id} className="border-b last:border-0 hover:bg-gray-50">
+                <tr
+                  key={p._id}
+                  className={`border-b last:border-0 hover:bg-gray-50 ${selected.has(p._id) ? 'bg-red-50/40' : ''}`}
+                >
+                  <td className="p-3 w-8">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${p.name}`}
+                      checked={selected.has(p._id)}
+                      onChange={() => toggleOne(p._id)}
+                      className="accent-primary-500 w-4 h-4 cursor-pointer"
+                    />
+                  </td>
                   <td className="p-3">
                     <img src={resolveImage(p.image || p.images?.[0])} className="w-12 h-12 rounded object-contain bg-gray-50 p-1" alt="" />
                   </td>
@@ -215,7 +315,7 @@ export default function AdminProducts() {
                 </tr>
               ))}
               {products.length === 0 && (
-                <tr><td colSpan="7" className="text-center py-12">
+                <tr><td colSpan="8" className="text-center py-12">
                   <p className="text-gray-500">No products in this view.</p>
                   <Link to="/admin/products/new" className="text-primary-500 hover:underline text-sm mt-2 inline-block">+ Add a product</Link>
                 </td></tr>
