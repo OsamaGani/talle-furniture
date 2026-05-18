@@ -169,10 +169,22 @@ export default function Home() {
   return (
     <div>
       <SEO
-        title="Talle Furniture Mart · Chair Manufacturer & Repair in Mumbai · Office, Gaming, Banquet Chairs"
-        description="Talle Furniture Mart — buy executive, ergonomic, gaming, dining, banquet and recliner chairs online. Trusted chair manufacturer & repair specialist in Sakinaka, Mumbai. Reupholstery, hydraulic & cushion replacement available. Free delivery over ₹2,999."
+        title="Talle Furniture Mart — Office Chair Manufacturer & Repair, Mumbai"
+        description="Mumbai chair manufacturer & repair workshop in Saki Naka. Office, ergonomic, banquet, dining, sofas & tables — custom orders, doorstep repair, reupholstery. Trusted by WeWork & 200+ Mumbai businesses."
         path="/"
-        keywords="buy chairs online mumbai, office chair manufacturer mumbai, ergonomic chair india, executive chair, premium ergohuman chair, cushion series chair, training room chair, tandem seating bench, gaming chair india, banquet chair manufacturer, tiffany chair wholesale, recliner sofa mumbai, 3-seater sofa mumbai, l-shaped couch, curved couch, wooden dining table sheesham, coffee table mumbai, side table set, office desk l-shape, conference table 8-seater, dining chair set, cafeteria chair stackable, chair repair sakinaka, chair reupholstery mumbai, hydraulic chair replacement, mesh office chair, customised office chair, wooden dining chair manufacturer, restaurant chair supplier mumbai, talle furniture mart, chair shop sakinaka, wholesale chairs mumbai, banquet hall chair manufacturer, salon chair mumbai, bar stool online india, d2d chair service mumbai, coworking chair supplier"
+        keywords="office chair manufacturer mumbai, chair repair sakinaka, chair manufacturer mumbai, ergonomic chair manufacturer, executive chair supplier mumbai, bulk office chairs mumbai, chair reupholstery mumbai, banquet chair manufacturer, restaurant chair supplier, customised office chair, wooden dining table mumbai, conference table supplier, talle furniture mart, b2b chair supplier mumbai, hydraulic chair replacement, coworking chair supplier, training room chair, tandem seating supplier, d2d chair service mumbai"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          'url': 'https://tallefurnituremart.com',
+          'name': 'Talle Furniture Mart',
+          'description': 'Own-manufactured office, ergonomic, banquet, dining chairs + sofas & tables. Expert chair repair & reupholstery in Mumbai.',
+          'potentialAction': {
+            '@type': 'SearchAction',
+            'target': { '@type': 'EntryPoint', 'urlTemplate': 'https://tallefurnituremart.com/shop?keyword={search_term_string}' },
+            'query-input': 'required name=search_term_string',
+          },
+        }}
       />
       {/* Hero carousel */}
       <section className="bg-gray-50">

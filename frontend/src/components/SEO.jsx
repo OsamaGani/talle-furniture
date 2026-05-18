@@ -9,11 +9,12 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 // Title is appended with the brand on every page — "<page> · Talle Furniture Mart" —
 // so search results show the brand even on long-tail product pages.
+// Sweet spot: 50–60 chars before Google truncates with "...".
 export default function SEO({
   title,
   description,
   image,
-  path,                 // e.g. "/shop", "/product/lego-classic-bricks"
+  path,                 // e.g. "/shop", "/product/talle-aero-executive"
   noIndex = false,
   type = 'website',     // 'website' | 'product' | 'article'
   jsonLd,               // raw object — gets stringified into a <script type="application/ld+json">
@@ -21,7 +22,7 @@ export default function SEO({
 }) {
   const fullTitle = title
     ? (title.includes(SITE_NAME) ? title : `${title} · ${SITE_NAME}`)
-    : `${SITE_NAME} — Buy Office, Gaming, Banquet & Recliner Chairs Online in Mumbai`;
+    : `${SITE_NAME} — Office Chair Manufacturer & Repair, Mumbai`;
   const fullUrl = `${SITE_URL}${path || ''}`;
   const ogImage = image || DEFAULT_OG_IMAGE;
 

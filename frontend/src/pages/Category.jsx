@@ -135,8 +135,8 @@ export default function Category() {
   return (
     <div className="bg-white">
       <SEO
-        title={`${cat.name} — Buy ${cat.name} Online in India`}
-        description={`Shop ${cat.name.toLowerCase()} at Talle Furniture Mart. ${cat.tagline || ''} Best prices, top chair brands, fast delivery across Mumbai & India, Cash on Delivery available, expert repair service.`.trim()}
+        title={`${cat.name} — Mumbai Manufacturer · Talle`}
+        description={`Buy ${cat.name.toLowerCase()} — own-manufactured by Talle Furniture Mart in Saki Naka, Mumbai. ${cat.tagline || ''} Free Mumbai delivery on ₹2,999+, COD, 6-month warranty.`.trim()}
         path={`/category/${slug}`}
       />
       {/* Hero */}

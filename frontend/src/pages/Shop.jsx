@@ -78,16 +78,16 @@ export default function Shop() {
 
   // Build a search-friendly title from whichever filters are active so each
   // permutation of the shop URL gets its own indexable page in Google.
+  // Sweet spot: 50–60 chars before truncation.
   const seoTitle = keyword
-    ? `${keyword} — Shop Chairs Online`
-    : (brand && category) ? `${brand} ${category} — Shop Online India`
-    : brand ? `${brand} Chairs — Buy Online in India`
-    : category ? `${category} — Buy Online in India`
-    : material ? `${material} Chairs — Shop Online`
-    : 'Shop All Chairs Online — Best Prices in Mumbai';
+    ? `${keyword} — Shop Chairs Mumbai`
+    : (brand && category) ? `${brand} ${category} — Mumbai`
+    : category ? `${category} — Buy Online · Mumbai Manufacturer`
+    : material ? `${material} Chairs — Talle Mumbai`
+    : 'Shop All Chairs, Sofas & Tables — Talle Mumbai';
   const seoDescription = keyword
-    ? `Shop ${keyword} at Talle Furniture Mart. Best prices on chairs in Mumbai with fast delivery and Cash on Delivery.`
-    : `Browse ${headerLabel.toLowerCase()} at Talle Furniture Mart — top chair brands, free Mumbai delivery on ₹2,999+, COD available, expert repair service.`;
+    ? `Shop ${keyword} at Talle Furniture Mart — Mumbai's own chair manufacturer. Free Mumbai delivery on ₹2,999+, COD, expert repair.`
+    : `Browse ${headerLabel.toLowerCase()} — own-manufactured in Saki Naka, Mumbai. Free Mumbai delivery on ₹2,999+, COD available, 6-month warranty.`;
 
   const FilterPanel = (
     <div className="space-y-6 text-sm">

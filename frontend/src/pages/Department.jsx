@@ -148,7 +148,7 @@ export default function Department() {
   const seoTitle = activeSub
     ? `${activeSub.name} — Buy Online in India`
     : `${dept.title} — Shop ${dept.title} Online India`;
-  const seoDescription = `Shop ${dept.title.toLowerCase()} at Talle Furniture Mart. ${dept.subtitle || ''} Top brands, best prices, fast delivery across Mumbai & India, Cash on Delivery and repair service available.`.trim();
+  const seoDescription = `Shop ${dept.name.toLowerCase()} — own-manufactured in Saki Naka, Mumbai by Talle Furniture Mart. ${dept.blurb || ''} Free Mumbai delivery on ₹2,999+, COD, expert repair service.`.trim();
 
   return (
     <div className="bg-white">

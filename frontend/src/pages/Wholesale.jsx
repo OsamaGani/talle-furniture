@@ -49,10 +49,10 @@ export default function Wholesale() {
   return (
     <div>
       <SEO
-        title="Wholesale Chairs Mumbai · Bulk Office, Banquet & Restaurant Chair Supplier"
-        description="Wholesale chairs for offices, banquet halls, restaurants and resellers across India. Own-manufactured Talle seating — trusted by WeWork, Roller Bearing, Upstep Academy and 200+ Mumbai offices. Best bulk rates, free Mumbai delivery on ₹2,999+, GST invoices, direct WhatsApp to the founder."
+        title="Wholesale Office, Banquet & Restaurant Chairs — Talle Mumbai"
+        description="Bulk chair supplier for Mumbai offices, banquet halls and restaurants. Own-manufactured Talle seating — trusted by WeWork, Roller Bearing & 300+ businesses. GST invoices, white-glove delivery, direct line to the founder."
         path="/wholesale"
-        keywords="wholesale chairs mumbai, bulk office chairs supplier, bulk banquet chairs, restaurant chair wholesaler mumbai, tiffany chair wholesale, executive chair supplier india, gaming chair distributor, ergonomic chair bulk, chair manufacturer mumbai, b2b chair supplier, gst invoice wholesale chairs, office chair distributor sakinaka, banquet hall chair supplier, hotel chair manufacturer, cafe chair supplier mumbai"
+        keywords="wholesale chairs mumbai, bulk office chairs supplier, banquet chair manufacturer, restaurant chair wholesaler mumbai, b2b chair supplier mumbai, gst invoice wholesale chairs, office chair distributor sakinaka, hotel chair manufacturer, coworking chair supplier, tandem seating bulk, conference table supplier, training room chair bulk, customised office chair manufacturer"
       />
       {/* Hero */}
       <section className="bg-gradient-to-br from-purple-700 via-pink-600 to-primary-500 text-white">

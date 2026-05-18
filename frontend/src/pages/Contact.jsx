@@ -45,8 +45,9 @@ export default function Contact() {
   return (
     <div>
       <SEO
-        title={`Contact Talle Furniture Mart — Sakinaka, Mumbai | ${PHONE_PRIMARY_DISPLAY}`}
-        description={`Get in touch with Talle Furniture Mart for chair orders, wholesale enquiries, or repair quotes. Visit our workshop in Sakinaka, Mumbai or call ${PHONE_PRIMARY_DISPLAY}.`}
+        title={`Contact — Talle Furniture Mart, Saki Naka Mumbai | ${PHONE_PRIMARY_DISPLAY}`}
+        description={`Chair orders, wholesale enquiries or repair quotes — call ${PHONE_PRIMARY_DISPLAY}, WhatsApp us, or visit our Saki Naka workshop. Open 24×7. Doorstep service across Mumbai.`}
+        keywords="contact talle furniture mart, chair shop sakinaka phone, chair manufacturer mumbai contact, chair repair quote mumbai, abdul rab talle furniture, chair workshop sakinaka address"
         path="/contact"
       />
       <PageHeader

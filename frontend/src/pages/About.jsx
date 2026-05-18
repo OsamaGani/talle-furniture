@@ -22,10 +22,10 @@ export default function About() {
   return (
     <div>
       <SEO
-        title="About Talle Furniture Mart — Chair Manufacturer & Repair in Sakinaka, Mumbai"
-        description="Talle Furniture Mart is a family-run chair specialist in Sakinaka, Mumbai. We manufacture, retail and repair executive, ergonomic, gaming, banquet and dining chairs. 15+ years, 4.8★ on Justdial, BIFMA-grade parts, doorstep repair across Mumbai."
+        title="About Us — Chair Manufacturer & Repair Workshop, Saki Naka Mumbai"
+        description="Talle Furniture Mart is a family-run chair manufacturer & repair workshop in Saki Naka, Mumbai. 15+ years, 4.9★ Google rating (213 reviews), founded by Abdul Rab. Office, banquet, restaurant chairs + D2D repair."
         path="/about"
-        keywords="talle furniture mart, chair manufacturer mumbai, chair repair sakinaka, chair shop andheri east, office chair supplier mumbai, ergonomic chair manufacturer india, banquet chair manufacturer, gaming chair shop mumbai, chair reupholstery, family run furniture shop mumbai"
+        keywords="talle furniture mart, abdul rab chair manufacturer, chair manufacturer sakinaka, chair repair mumbai, office chair workshop mumbai, ergonomic chair maker india, banquet chair manufacturer, family run furniture workshop mumbai, chair reupholstery sakinaka, d2d chair service mumbai"
       />
       <PageHeader
         title="Specialist in Office Chairs & Repairs — Mumbai"

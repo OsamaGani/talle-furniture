@@ -8,13 +8,29 @@
     <meta name="application-name" content="Talle Furniture Mart" />
     <meta name="apple-mobile-web-app-title" content="Talle Furniture Mart" />
 
-    <!-- Default SEO — overridden per-page by react-helmet-async. Crawlers
-         that don't execute JS still see this baseline. -->
-    <title>Talle Furniture Mart — Buy Office, Gaming, Banquet & Recliner Chairs Online · Chair Repair Mumbai</title>
-    <meta name="description" content="Talle Furniture Mart — Mumbai's own-manufactured chair specialist. Executive, ergonomic, gaming, dining, banquet, customised office and wooden chairs — trusted by WeWork, Roller Bearing, Upstep Academy, Respo Financial and 200+ Mumbai businesses. D2D service across Mumbai, expert chair repair, hydraulic replacement and reupholstery. Free Mumbai delivery on ₹2,999+, COD in Mumbai, 70/30 payment outside city, GST invoices." />
-    <meta name="keywords" content="buy chairs online mumbai, office chair manufacturer mumbai, ergonomic chair india, executive chair, premium ergohuman chair, cushion series chair, training room chair stackable, tandem seating waiting bench, gaming chair india, banquet chair manufacturer, tiffany chair wholesale, recliner sofa mumbai, 3-seater sofa, l-shaped sectional couch, curved couch sofa, wooden dining table sheesham mumbai, coffee table walnut, side table nesting set, office desk l-shape, conference table 8-seater, dining chair set, cafeteria stackable chair, chair repair sakinaka, chair reupholstery mumbai, hydraulic chair replacement, mesh office chair, customised office chair, wooden dining chair manufacturer, restaurant chair supplier mumbai, talle furniture mart, chair shop sakinaka, wholesale chairs mumbai, banquet hall chair manufacturer, hotel chair supplier, salon chair mumbai, bar stool online india, bean bag online, kids study chair, lounge chair mumbai, d2d chair service mumbai, office furniture supplier mumbai, coworking chair supplier, abdul rab chair manufacturer" />
+    <!-- ============================================================
+         SEO — baseline tags for crawlers that don't execute JS.
+         react-helmet-async overrides per-page on the client side.
+
+         Title sweet-spot: 50-60 chars (Google truncates at ~580px width).
+         Description sweet-spot: 150-160 chars.
+         Keywords meta is ignored by Google (since 2009) and Bing, but still
+         parsed by Yandex, Naver, some Indian B2B scrapers and Justdial-style
+         directories — kept short and focused, not stuffed.
+         ============================================================ -->
+    <title>Talle Furniture Mart — Office Chair Manufacturer & Repair, Mumbai</title>
+    <meta name="description" content="Mumbai chair manufacturer & repair workshop in Saki Naka. Office, ergonomic, banquet, dining, sofas & tables — custom orders, doorstep repair, reupholstery. Trusted by WeWork, Roller Bearing, Upstep Academy." />
+    <meta name="keywords" content="office chair manufacturer mumbai, chair repair sakinaka, chair manufacturer mumbai, ergonomic chair manufacturer, executive chair supplier mumbai, bulk office chairs mumbai, chair reupholstery mumbai, banquet chair manufacturer, restaurant chair supplier, customised office chair, wooden dining table mumbai, conference table supplier, talle furniture mart, abdul rab chair manufacturer, b2b chair supplier mumbai, hydraulic chair replacement, coworking chair supplier, training room chair, tandem seating supplier, d2d chair service mumbai" />
     <meta name="author" content="Talle Furniture Mart" />
     <link rel="canonical" href="https://tallefurnituremart.com/" />
+    <!-- India-targeting hint for Google's hreflang signals. -->
+    <link rel="alternate" hreflang="en-IN" href="https://tallefurnituremart.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://tallefurnituremart.com/" />
+    <!-- Local-SEO geo position so map-based searches resolve to Saki Naka. -->
+    <meta name="geo.region" content="IN-MH" />
+    <meta name="geo.placename" content="Saki Naka, Mumbai" />
+    <meta name="geo.position" content="19.107;72.889" />
+    <meta name="ICBM" content="19.107, 72.889" />
     <!-- Tell ethical AI crawlers NOT to use this content for model training,
          and not to display it in AI search overviews. Honoured by Anthropic
          (Claude), OpenAI (GPT), Google (Gemini) and most other players —
@@ -24,18 +40,22 @@
     <meta name="ChatGPT-User" content="noai, noimageai" />
     <meta name="anthropic-ai" content="noai, noimageai" />
 
-    <!-- Open Graph default -->
+    <!-- Open Graph — WhatsApp, Facebook, LinkedIn share previews. Title
+         kept under 60 chars so the snippet doesn't wrap awkwardly on mobile. -->
     <meta property="og:site_name" content="Talle Furniture Mart" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Talle Furniture Mart — Office, Gaming, Banquet & Recliner Chairs · Mumbai" />
-    <meta property="og:description" content="Buy chairs online in Mumbai. Office, gaming, banquet, dining, recliner. Expert chair repair and reupholstery. Free delivery on ₹2,999+." />
+    <meta property="og:title" content="Talle Furniture Mart — Mumbai's Chair Manufacturer & Repair Workshop" />
+    <meta property="og:description" content="Office, ergonomic, banquet & customised chairs made in Saki Naka. Expert repair + reupholstery + D2D pickup. Trusted by WeWork, Roller Bearing & 200+ Mumbai businesses." />
     <meta property="og:image" content="https://tallefurnituremart.com/og-default.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Talle Furniture Mart workshop and chair catalogue" />
     <meta property="og:locale" content="en_IN" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Talle Furniture Mart — Office, Gaming, Banquet & Recliner Chairs · Mumbai" />
-    <meta name="twitter:description" content="Buy chairs online in Mumbai. Office, gaming, banquet, dining, recliner. Expert repair and reupholstery." />
+    <meta name="twitter:title" content="Talle Furniture Mart — Chair Manufacturer & Repair, Mumbai" />
+    <meta name="twitter:description" content="Office, ergonomic, banquet & customised chairs made in Saki Naka. Expert repair, reupholstery & D2D service across Mumbai." />
     <meta name="twitter:image" content="https://tallefurnituremart.com/og-default.jpg" />
 
     <!-- LocalBusiness JSON-LD — drives "chair shop near me" / "chair repair
@@ -88,6 +108,26 @@
       ],
       "currenciesAccepted": "INR",
       "paymentAccepted": "Cash on Delivery, Razorpay, UPI, Cards, Net Banking",
+      "founder": { "@type": "Person", "name": "Abdul Rab" },
+      "knowsAbout": [
+        "Office chair manufacturing",
+        "Ergonomic chair design",
+        "Chair reupholstery",
+        "Hydraulic cylinder replacement",
+        "Banquet chair manufacturing",
+        "Custom furniture for offices"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Talle Chair Services",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Office Chair Manufacturing", "description": "Executive, ergonomic and workstation chairs made-to-order in Saki Naka, Mumbai." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Chair Repair & Hydraulic Replacement", "description": "BIFMA-grade gas-lift replacement, wheel & base repair with doorstep pickup in Mumbai." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Reupholstery & Cushion Service", "description": "Full chair reupholstery in mesh, fabric or PU leather. 7-day turnaround." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Customised Office Chairs", "description": "Bulk custom chair orders with branding, fabric and colour choices for offices, banquet halls and restaurants." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wholesale Furniture Supply", "description": "Bulk supply of office, banquet, restaurant and dining chairs + sofas and tables across India." } }
+        ]
+      },
       "sameAs": [
         "https://www.instagram.com/talle_furniture_mart",
         "https://www.justdial.com/Mumbai/Talle-Furniture-Mart-Sakinaka"
