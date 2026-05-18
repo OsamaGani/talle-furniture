@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import API from '../api/axios';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
-import { FiFilter, FiX } from 'react-icons/fi';
+import { FiFilter, FiX, FiPlus } from 'react-icons/fi';
 import { allSubCategoryNames, materials } from '../config/departments';
 import SEO from '../components/SEO';
 import { COMMON_COLORS, colorToBackground, isLightColor } from '../utils/colors';
+import { useAuth } from '../context/AuthContext';
 
 const categories = Array.from(new Set(allSubCategoryNames)).sort();
 // Talle is the only brand (own manufacturing) — kept for legacy products
@@ -17,6 +18,7 @@ const brands = ['Talle', 'Other'];
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(1);
@@ -107,6 +109,20 @@ export default function Shop() {
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold truncate max-w-full">{headerLabel}</h1>
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Admin shortcut — shown only when the logged-in user is an
+              admin AND we're filtering by a specific category. Drops the
+              admin straight into the New Product form with that category
+              pre-selected, so populating a category from the live page is
+              a single click. */}
+          {user?.isAdmin && category && (
+            <Link
+              to={`/admin/products/new?category=${encodeURIComponent(category)}&from=/shop?category=${encodeURIComponent(category)}`}
+              className="inline-flex items-center gap-1.5 bg-primary-500 hover:bg-primary-600 text-white font-bold px-3 py-2 rounded text-xs sm:text-sm shadow"
+              title={`Add a new product to "${category}"`}
+            >
+              <FiPlus size={14} /> Add to {category}
+            </Link>
+          )}
           <button onClick={() => setShowFilter(true)} className="lg:hidden flex items-center gap-1.5 border px-3 py-2 rounded text-sm">
             <FiFilter size={14} /> Filters
           </button>
@@ -119,6 +135,26 @@ export default function Shop() {
           </select>
         </div>
       </div>
+
+      {/* Empty-category nudge for admins. If a category has zero products
+          and the viewer is an admin, surface a helpful CTA instead of just
+          the generic 'No products found' message. */}
+      {!loading && user?.isAdmin && category && products.length === 0 && (
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5 sm:p-6 mb-4 text-center">
+          <p className="text-base sm:text-lg font-bold text-amber-800">
+            "{category}" has no products yet
+          </p>
+          <p className="text-sm text-amber-700 mt-1">
+            Customers landed here from the homepage and are seeing an empty page. Add at least one product to fill it.
+          </p>
+          <Link
+            to={`/admin/products/new?category=${encodeURIComponent(category)}&from=/shop?category=${encodeURIComponent(category)}`}
+            className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-full shadow mt-3"
+          >
+            <FiPlus /> Add the first {category} product
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden lg:block">{FilterPanel}</aside>
