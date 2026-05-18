@@ -3,14 +3,14 @@ import API from '../../api/axios';
 import Loader from '../../components/Loader';
 import ImageUploader from '../../components/ImageUploader';
 import toast from 'react-hot-toast';
-import { FiTrash2, FiPlus, FiEdit2, FiSearch } from 'react-icons/fi';
+import { FiTrash2, FiPlus, FiEdit2, FiSearch, FiHome, FiStar } from 'react-icons/fi';
 import { PLACEHOLDER } from '../../utils/imageUrl';
 
 export default function AdminCategories() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
-  const [form, setForm] = useState({ name: '', image: '', description: '' });
+  const [form, setForm] = useState({ name: '', image: '', description: '', featuredOnHome: false, homeOrder: 999 });
   const [editing, setEditing] = useState(null);
   // Bulk-select state — same pattern as admin/Products.
   const [selected, setSelected] = useState(new Set());
@@ -82,13 +82,33 @@ export default function AdminCategories() {
       if (editing) await API.put(`/categories/${editing}`, form);
       else await API.post('/categories', form);
       toast.success(editing ? 'Updated' : 'Created');
-      setForm({ name: '', image: '', description: '' });
+      setForm({ name: '', image: '', description: '', featuredOnHome: false, homeOrder: 999 });
       setEditing(null);
       load();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
-  const edit = (c) => { setForm({ name: c.name, image: c.image, description: c.description }); setEditing(c._id); };
+  const edit = (c) => {
+    setForm({
+      name: c.name,
+      image: c.image,
+      description: c.description,
+      featuredOnHome: !!c.featuredOnHome,
+      homeOrder: typeof c.homeOrder === 'number' ? c.homeOrder : 999,
+    });
+    setEditing(c._id);
+  };
+
+  // Inline toggle for "Show on Homepage" — clicked from the table row so
+  // the admin can flip categories on/off the homepage in one click without
+  // opening the full edit form.
+  const toggleHome = async (c) => {
+    try {
+      await API.put(`/categories/${c._id}`, { featuredOnHome: !c.featuredOnHome });
+      toast.success(`${c.name} ${!c.featuredOnHome ? 'added to' : 'removed from'} homepage`);
+      load();
+    } catch (err) { toast.error('Failed'); }
+  };
 
   const remove = async (id) => {
     if (!confirm('Delete?')) return;
@@ -150,6 +170,7 @@ export default function AdminCategories() {
                   <th className="p-3">Image</th>
                   <th>Name</th>
                   <th>Slug</th>
+                  <th className="text-center">On Home</th>
                   <th></th>
                 </tr>
               </thead>
@@ -170,6 +191,22 @@ export default function AdminCategories() {
                     </td>
                     <td className="font-medium">{c.name}</td>
                     <td className="text-gray-500">{c.slug}</td>
+                    <td className="text-center">
+                      <button
+                        onClick={() => toggleHome(c)}
+                        title={c.featuredOnHome
+                          ? `On homepage (order ${c.homeOrder}) — click to remove`
+                          : 'Click to feature on homepage Shop By Category rail'}
+                        className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full border transition ${
+                          c.featuredOnHome
+                            ? 'bg-amber-100 text-amber-700 border-amber-300 shadow-sm'
+                            : 'bg-white text-gray-400 border-gray-200 hover:border-amber-300 hover:text-amber-700'
+                        }`}
+                      >
+                        {c.featuredOnHome ? <FiStar className="fill-current" /> : <FiStar />}
+                        {c.featuredOnHome ? `#${c.homeOrder}` : 'Off'}
+                      </button>
+                    </td>
                     <td className="p-3 flex gap-1">
                       <button onClick={() => edit(c)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><FiEdit2 /></button>
                       <button onClick={() => remove(c._id)} className="p-2 text-red-600 hover:bg-red-50 rounded"><FiTrash2 /></button>
@@ -177,7 +214,7 @@ export default function AdminCategories() {
                   </tr>
                 ))}
                 {visible.length === 0 && (
-                  <tr><td colSpan="5" className="text-center py-10 text-gray-500">
+                  <tr><td colSpan="6" className="text-center py-10 text-gray-500">
                     {keyword ? `No categories match "${keyword}"` : 'No categories yet — add one on the right.'}
                   </td></tr>
                 )}
@@ -190,9 +227,40 @@ export default function AdminCategories() {
           <div><label className="label">Name</label><input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
           <ImageUploader label="Category Image" value={form.image} onChange={(img) => setForm({ ...form, image: img })} />
           <div><label className="label">Description</label><textarea className="input" rows="2" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+
+          {/* Homepage tile controls — tick to surface this category in the
+              public "Shop By Category" rail. homeOrder controls position
+              (lower = earlier; up to 8 categories shown). */}
+          <div className="border-t pt-3 space-y-2">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.featuredOnHome}
+                onChange={(e) => setForm({ ...form, featuredOnHome: e.target.checked })}
+                className="accent-primary-500 w-4 h-4 mt-0.5"
+              />
+              <div className="text-sm">
+                <span className="font-semibold flex items-center gap-1.5 text-gray-900"><FiHome size={14} /> Feature on Homepage</span>
+                <p className="text-xs text-gray-500 mt-0.5">Show this category as a tile in the "Shop By Category" rail on the homepage.</p>
+              </div>
+            </label>
+            {form.featuredOnHome && (
+              <div>
+                <label className="label">Display order</label>
+                <input
+                  type="number" min="0" max="999"
+                  className="input"
+                  value={form.homeOrder}
+                  onChange={(e) => setForm({ ...form, homeOrder: Number(e.target.value) || 999 })}
+                />
+                <p className="text-xs text-gray-500 mt-1">Lower numbers appear first. Up to 8 categories shown on the homepage.</p>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <button className="btn-primary flex-1" type="submit">{editing ? 'Update' : 'Create'}</button>
-            {editing && <button type="button" onClick={() => { setEditing(null); setForm({ name: '', image: '', description: '' }); }} className="border px-3 rounded">Cancel</button>}
+            {editing && <button type="button" onClick={() => { setEditing(null); setForm({ name: '', image: '', description: '', featuredOnHome: false, homeOrder: 999 }); }} className="border px-3 rounded">Cancel</button>}
           </div>
         </form>
       </div>

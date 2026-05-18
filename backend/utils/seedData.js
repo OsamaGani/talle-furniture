@@ -5,15 +5,18 @@ const Brand = require('../models/Brand');
 const WholesaleCategory = require('../models/WholesaleCategory');
 const Order = require('../models/Order');
 
+// `featuredOnHome` + `homeOrder` here pre-populate the public "Shop By
+// Category" homepage rail with 8 tiles on a fresh seed. Admin can change
+// the selection at any time from /admin/categories without code edits.
 const categories = [
   { name: 'General', image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=600' },
-  { name: 'Executive Chairs', image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=600' },
+  { name: 'Executive Chairs', image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=600', featuredOnHome: true, homeOrder: 1 },
   { name: 'Ergonomic Chairs', image: 'https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=600' },
   { name: 'Workstation Chairs', image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600' },
   { name: 'Visitor Chairs', image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=600' },
   { name: 'Mesh Chairs', image: 'https://images.unsplash.com/photo-1505797149-35ebcfa1c2bd?w=600' },
-  { name: 'Pro Gaming Chairs', image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600' },
-  { name: 'Recliners', image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=600' },
+  { name: 'Pro Gaming Chairs', image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600', featuredOnHome: true, homeOrder: 5 },
+  { name: 'Recliners', image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=600', featuredOnHome: true, homeOrder: 4 },
   { name: 'Lounge Chairs', image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600' },
   { name: 'Accent Chairs', image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600' },
   { name: 'Dining Chairs', image: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=600' },
@@ -25,20 +28,23 @@ const categories = [
   { name: 'Salon Chairs', image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600' },
   { name: 'Bean Bags', image: 'https://images.unsplash.com/photo-1567016526105-22da7c13161a?w=600' },
   // New from the futuristicconcepts.in feature comparison
-  { name: 'Premium / Ergohuman',   image: 'https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=600' },
+  // Using a different photo (gaming-chair shot) for Premium / Ergohuman
+  // because the original mesh-chair image rendered nearly-white on the
+  // round-tile background and looked broken to admins.
+  { name: 'Premium / Ergohuman',   image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600', featuredOnHome: true, homeOrder: 2 },
   { name: 'Cushion Series',        image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=600' },
-  { name: 'Training Room Chairs',  image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=600' },
-  { name: 'Tandem Seating',        image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=600' },
+  { name: 'Training Room Chairs',  image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=600', featuredOnHome: true, homeOrder: 3 },
+  { name: 'Tandem Seating',        image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=600' },
   { name: 'Cafeteria Chairs',      image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600' },
   // Sofas & Couches
   { name: '3-Seater Sofa',         image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600' },
-  { name: 'L-Shaped Couch',        image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600' },
+  { name: 'L-Shaped Couch',        image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600', featuredOnHome: true, homeOrder: 6 },
   { name: 'Curved Couch',          image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600' },
   // Tables & Desks
-  { name: 'Wooden Dining Tables',  image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=600' },
+  { name: 'Wooden Dining Tables',  image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=600', featuredOnHome: true, homeOrder: 7 },
   { name: 'Coffee Tables',         image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=600' },
   { name: 'Side Tables',           image: 'https://images.unsplash.com/photo-1567016526105-22da7c13161a?w=600' },
-  { name: 'Office Desks',          image: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=600' },
+  { name: 'Office Desks',          image: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=600', featuredOnHome: true, homeOrder: 8 },
 ];
 
 // Talle does its own manufacturing â€” no resold brands.

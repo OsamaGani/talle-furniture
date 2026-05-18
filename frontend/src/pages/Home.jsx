@@ -65,15 +65,19 @@ const sideCards = [
   },
 ];
 
-const homeCategories = [
-  { name: 'Executive Chairs',     img: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400' },
-  { name: 'Premium / Ergohuman',  img: 'https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=400' },
-  { name: 'Training Room Chairs', img: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=400' },
-  { name: 'Tandem Seating',       img: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400' },
-  { name: 'Recliners',            img: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400' },
-  { name: 'L-Shaped Couch',       img: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400' },
-  { name: 'Wooden Dining Tables', img: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400' },
-  { name: 'Office Desks',         img: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=400' },
+// Fallback "Shop By Category" tile list — used only if /api/categories
+// fails or no category has featuredOnHome=true. Once the admin ticks the
+// "Feature on Homepage" toggle on /admin/categories the rail switches to
+// the live DB-driven list (filtered + sorted by homeOrder).
+const fallbackHomeCategories = [
+  { name: 'Executive Chairs',     image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400' },
+  { name: 'Premium / Ergohuman',  image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400' },
+  { name: 'Training Room Chairs', image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=400' },
+  { name: 'Tandem Seating',       image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400' },
+  { name: 'Recliners',            image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400' },
+  { name: 'L-Shaped Couch',       image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400' },
+  { name: 'Wooden Dining Tables', image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400' },
+  { name: 'Office Desks',         image: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=400' },
 ];
 
 // Trusted-by client list — real B2B customers we've manufactured for.
@@ -122,6 +126,11 @@ export default function Home() {
   const [bestSellers, setBestSellers] = useState(cached?.bestSellers || []);
   const [newArrivals, setNewArrivals] = useState(cached?.newArrivals || []);
   const [todaysDeals, setTodaysDeals] = useState(cached?.todaysDeals || []);
+  // Admin-controlled "Shop By Category" tiles. Falls back to the hardcoded
+  // list (above) until admin marks categories as featuredOnHome in
+  // /admin/categories. Cached alongside the product rails so repeat visits
+  // render instantly without waiting for the API round-trip.
+  const [homeCategories, setHomeCategories] = useState(cached?.homeCategories || fallbackHomeCategories);
   // "loading" only applies when there's no cache to fall back on. With
   // cache, we never show a blocking loader — we just refresh in the
   // background and the user sees the new data appear.
@@ -136,22 +145,38 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const [a, b, c, d] = await Promise.all([
+        const [a, b, c, d, cat] = await Promise.all([
           API.get('/products?featured=true&limit=8'),
           API.get('/products?bestSeller=true&limit=8'),
           API.get('/products?newArrival=true&limit=8'),
           API.get('/products?onDeal=true&sort=price-asc&limit=8'),
+          // Pull the full category list and filter client-side. Light enough
+          // (one fetch, ~3 KB) that a dedicated endpoint isn't worth the
+          // extra route. Sorted by homeOrder ascending, capped at 8 tiles.
+          API.get('/categories'),
         ]);
+        const featuredCats = (cat.data || [])
+          .filter((c) => c.featuredOnHome)
+          .sort((x, y) => (x.homeOrder ?? 999) - (y.homeOrder ?? 999))
+          .slice(0, 8)
+          .map((c) => ({ name: c.name, image: c.image }));
+        // Only switch away from the hardcoded fallback if the admin has
+        // actually configured some homepage tiles — otherwise leave the
+        // demo grid visible so a fresh install doesn't show a blank rail.
+        const liveHomeCategories = featuredCats.length > 0 ? featuredCats : fallbackHomeCategories;
+
         const fresh = {
           featured: a.data.products,
           bestSellers: b.data.products,
           newArrivals: c.data.products,
           todaysDeals: d.data.products,
+          homeCategories: liveHomeCategories,
         };
         setFeatured(fresh.featured);
         setBestSellers(fresh.bestSellers);
         setNewArrivals(fresh.newArrivals);
         setTodaysDeals(fresh.todaysDeals);
+        setHomeCategories(fresh.homeCategories);
         writeHomeCache(fresh);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
@@ -291,7 +316,13 @@ export default function Home() {
             <Reveal key={c.name} delay={i * 60}>
               <Link to={`/shop?category=${encodeURIComponent(c.name)}`} className="text-center group block">
                 <div className="aspect-square rounded-full bg-gray-50 overflow-hidden mb-2 border-2 border-transparent group-hover:border-primary-500 transition group-hover:shadow-xl">
-                  <img src={c.img} alt={c.name} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                  <img
+                    src={c.image || c.img}
+                    alt={c.name}
+                    loading="lazy"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.classList.add('flex','items-center','justify-center','text-3xl'); e.target.parentElement.textContent = '🪑'; }}
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                  />
                 </div>
                 <p className="text-sm font-medium group-hover:text-primary-500">{c.name}</p>
               </Link>
