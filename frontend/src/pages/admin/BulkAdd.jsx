@@ -25,16 +25,24 @@ const blankRow = () => ({
   stock: 0, image: '', uploading: false,
 });
 
+// Locked canonical brand list — Talle does its own manufacturing so the
+// only sensible values are 'Talle' (in-house) and 'Other' (one-off
+// external supply). Static so leftover toy-brand rows in the DB never
+// pollute this dropdown.
+const FURNITURE_BRANDS = ['Talle', 'Other'];
+
 export default function BulkAdd() {
   const navigate = useNavigate();
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Brands locked to the canonical list — no API call, no Toy Mall leftovers.
+  const [brands] = useState(FURNITURE_BRANDS);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Shared settings — applied to all rows
+  // Shared settings — applied to all rows. Default brand to 'Talle' so
+  // the admin doesn't have to pick it every time.
   const [shared, setShared] = useState({
     category: '',
-    brand: '',
+    brand: 'Talle',
     material: '',
     featured: false,
     bestSeller: false,
@@ -42,16 +50,6 @@ export default function BulkAdd() {
   });
 
   const [rows, setRows] = useState([blankRow(), blankRow(), blankRow()]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await API.get('/brands');
-        setBrands(data);
-      } catch (e) { toast.error('Failed to load brands'); }
-      finally { setLoading(false); }
-    })();
-  }, []);
 
   const updateRow = (i, patch) => {
     setRows((rs) => rs.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
@@ -163,7 +161,7 @@ export default function BulkAdd() {
             <label className="label">Brand *</label>
             <select className="input" value={shared.brand} onChange={(e) => setShared({ ...shared, brand: e.target.value })} required>
               <option value="">-- Pick brand --</option>
-              {brands.map((b) => <option key={b._id} value={b.name}>{b.name}</option>)}
+              {brands.map((name) => <option key={name} value={name}>{name}</option>)}
             </select>
           </div>
           <div>

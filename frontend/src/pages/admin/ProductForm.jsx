@@ -8,9 +8,23 @@ import { FiPlus, FiSettings, FiX } from 'react-icons/fi';
 import { allSubCategoryNames } from '../../config/departments';
 import { COMMON_COLORS, colorToBackground, isLightColor } from '../../utils/colors';
 
-// Fallback list — used only if /api/categories fails or is empty.
-// Comes from the chair-shop department hierarchy in config/departments.js.
-const fallbackCategories = Array.from(new Set(allSubCategoryNames)).sort();
+// CANONICAL furniture category list — sourced ONLY from departments.js so
+// the admin form never surfaces leftover toy categories (Construction,
+// Sports Toys, Swords, Ride Ons, etc.) that may still sit in the DB from
+// the legacy Toy Mall seed. We deliberately do NOT load categories from
+// /api/categories here; that endpoint is allowed to contain extra cruft
+// without polluting the create-product UI.
+//
+// 'General' is appended as an escape hatch for service items, parts and
+// anything that doesn't fit the chair / sofa / table taxonomy.
+const FURNITURE_CATEGORIES = Array.from(new Set([...allSubCategoryNames, 'General'])).sort();
+
+// Brand list is also locked. Talle does its own manufacturing so the only
+// values we ever want on a product are 'Talle' (in-house) and 'Other'
+// (one-off external supply). Keeping this static means stale LEGO / Mattel
+// / Funskool brand rows in the DB can't leak into the dropdown either.
+const FURNITURE_BRANDS = ['Talle', 'Other'];
+
 const materialOptions = ['', 'Mesh', 'Leather', 'Faux Leather', 'Fabric', 'Plastic', 'Wood', 'Metal', 'Cushion'];
 
 export default function ProductForm() {
@@ -22,8 +36,11 @@ export default function ProductForm() {
   const redirectTo = searchParams.get('from') || '/admin/products';
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
-  const [brands, setBrands] = useState([]);
-  const [categories, setCategories] = useState(fallbackCategories);
+  // Brands and categories are now driven by the canonical lists above
+  // — not the API. Kept as state so the "Add new" inline-create flow can
+  // still extend the list mid-session without a full reload.
+  const [brands, setBrands] = useState(FURNITURE_BRANDS);
+  const [categories, setCategories] = useState(FURNITURE_CATEGORIES);
   const [showQuickCat, setShowQuickCat] = useState(false);
   const [newCatName, setNewCatName] = useState('');
   const [creatingCat, setCreatingCat] = useState(false);
@@ -38,24 +55,19 @@ export default function ProductForm() {
   });
   const [colorInput, setColorInput] = useState('');
 
-  const loadCategories = async () => {
-    try {
-      const { data } = await API.get('/categories');
-      const names = (data || []).map((c) => c.name).filter(Boolean);
-      if (names.length) setCategories(names);
-    } catch (e) {
-      // keep fallback list
-    }
+  // No-op now — categories come from the canonical FURNITURE_CATEGORIES list.
+  // Kept as a function so the inline "Add new category" flow further down
+  // can still call it (it just resets the state to the canonical list,
+  // dropping any session-local additions).
+  const loadCategories = () => {
+    setCategories(FURNITURE_CATEGORIES);
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const [{ data: bData }] = await Promise.all([
-          API.get('/brands'),
-          loadCategories(),
-        ]);
-        setBrands(bData);
+        // Categories + brands come from the locked canonical lists — no API
+        // call needed. We only hit the API for the edit-mode product load.
         if (isEdit) {
           const { data } = await API.get(`/products/${id}`);
           setForm({
@@ -80,10 +92,10 @@ export default function ProductForm() {
                 }))
               : (Array.isArray(data.colors) ? data.colors.map((c) => ({ color: c, images: [], price: 0, discount: 0, name: '', description: '' })) : []),
           });
-          // If the saved brand isn't in the loaded brand list, open custom-input mode
-          // so the existing value is editable instead of silently disappearing.
-          const knownBrands = (bData || []).map((b) => b.name);
-          if (data.brand && !knownBrands.includes(data.brand)) setCustomBrand(true);
+          // If the saved brand isn't in the canonical brand list (Talle / Other),
+          // open custom-input mode so the existing value is editable instead of
+          // silently disappearing.
+          if (data.brand && !FURNITURE_BRANDS.includes(data.brand)) setCustomBrand(true);
         }
       } catch (e) { toast.error('Failed to load'); }
       finally { setLoading(false); }
@@ -234,8 +246,8 @@ export default function ProductForm() {
                 required
               >
                 <option value="">-- Select Brand --</option>
-                {brands.map((b) => (
-                  <option key={b._id} value={b.name}>{b.name}</option>
+                {brands.map((name) => (
+                  <option key={name} value={name}>{name}</option>
                 ))}
                 <option value="__custom__">+ Add custom brand…</option>
               </select>
