@@ -162,7 +162,7 @@ export default function Navbar() {
       </div>
       {/* Top bar — hides when scrolled */}
       <div className={`bg-gray-900 text-white text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
-        <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+        <div className="max-w-screen-2xl mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Delivery over ₹2,999</span>
             <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 77380 28750</span>
@@ -179,7 +179,7 @@ export default function Navbar() {
 
       {/* Main bar */}
       <div className="border-b">
-        <div className={`max-w-7xl mx-auto px-3 sm:px-4 flex items-center gap-3 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
+        <div className={`max-w-screen-2xl mx-auto px-3 sm:px-4 flex items-center gap-3 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
           <Link to="/" className="flex items-center gap-1 flex-shrink-0">
             <span className={`font-extrabold text-primary-500 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Talle</span>
             <span className={`font-extrabold text-gray-900 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Furniture</span>
@@ -354,12 +354,12 @@ export default function Navbar() {
 
       {/* Categories nav */}
       <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
-        <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-center gap-1 text-sm font-semibold">
+        <div className="max-w-screen-2xl mx-auto px-4">
+          <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap">
             <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
             <NavItem to="/shop" label="All Chairs" />
-            <NavItem to="/action-toys" label="🔧 Repair Service" />
-            <NavItem to="/shop?discount=true" label="🔥 Up to 50% Off" highlight />
+            <NavItem to="/action-toys" label="🔧 Repair" />
+            <NavItem to="/shop?discount=true" label="🔥 50% Off" highlight />
             <DropdownTrigger label="Brands" active={openDropdown === 'brands'} onHover={() => setOpenDropdown('brands')} />
             <DropdownTrigger label="Category" active={openDropdown === 'category'} onHover={() => setOpenDropdown('category')} />
             <DropdownTrigger label="Material" active={openDropdown === 'material'} onHover={() => setOpenDropdown('material')} />
@@ -368,7 +368,7 @@ export default function Navbar() {
             <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
             <li className="ml-auto">
               <NavLink to="/wholesale" className={({ isActive }) =>
-                `inline-block px-4 py-3 text-purple-700 font-bold hover:bg-purple-50 transition ${isActive ? 'bg-purple-50' : ''}`
+                `inline-block whitespace-nowrap px-4 py-3 text-purple-700 font-bold hover:bg-purple-50 transition ${isActive ? 'bg-purple-50' : ''}`
               }>🛍 Wholesale</NavLink>
             </li>
           </ul>
@@ -377,7 +377,7 @@ export default function Navbar() {
         {/* Mega menus */}
         {openDropdown === 'brands' && (
           <div className="absolute left-0 right-0 top-full bg-white shadow-xl border-t z-40 animate-fadeIn">
-            <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="max-w-screen-2xl mx-auto px-4 py-6">
               <h3 className="font-bold mb-3 text-gray-500 uppercase text-xs">Top Brands</h3>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
                 {brands.map((b) => (
@@ -401,7 +401,7 @@ export default function Navbar() {
 
         {openDropdown === 'category' && (
           <div className="absolute left-0 right-0 top-full bg-white shadow-xl border-t z-40 animate-fadeIn">
-            <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="max-w-screen-2xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-gray-900 text-lg">Shop By Department</h3>
                 <Link
@@ -445,7 +445,7 @@ export default function Navbar() {
 
         {openDropdown === 'material' && (
           <div className="absolute left-0 right-0 top-full bg-white shadow-xl border-t z-40 animate-fadeIn">
-            <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="max-w-screen-2xl mx-auto px-4 py-6">
               <h3 className="font-bold mb-3 text-gray-500 uppercase text-xs">Shop by Material</h3>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
                 {materialList.map((m) => (
@@ -626,12 +626,12 @@ export default function Navbar() {
 
 function NavItem({ to, label, highlight, end }) {
   return (
-    <li>
+    <li className="flex-shrink-0">
       <NavLink
         to={to}
         end={end}
         className={({ isActive }) =>
-          `relative inline-block px-3 py-3 transition group ${
+          `relative inline-block whitespace-nowrap px-3 py-3 transition group ${
             isActive ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
           } ${highlight ? 'text-primary-500 font-bold' : ''}`
         }
@@ -659,9 +659,9 @@ function NavItem({ to, label, highlight, end }) {
 
 function DropdownTrigger({ label, active, onHover }) {
   return (
-    <li onMouseEnter={onHover} className="relative">
+    <li onMouseEnter={onHover} className="relative flex-shrink-0">
       <button
-        className={`inline-flex items-center gap-1 px-3 py-3 transition group ${
+        className={`inline-flex items-center gap-1 whitespace-nowrap px-3 py-3 transition group ${
           active ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
         }`}
       >
