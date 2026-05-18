@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome, FiTool, FiStar, FiZap, FiPackage } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -161,63 +161,40 @@ export default function Navbar() {
           ))}
         </div>
       </div>
-      {/* Top utility bar — softer slate instead of pure black, with a thin
-          coloured accent line at the bottom so it ties visually into the
-          brand. Trust signals on the left, quick links on the right. */}
-      <div className={`bg-gradient-to-r from-slate-900 via-gray-900 to-slate-900 text-white text-[11px] sm:text-xs overflow-hidden transition-all duration-300 border-b border-primary-500/40 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
+      {/* Top bar — hides when scrolled */}
+      <div className={`bg-gray-900 text-white text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
         <div className="max-w-screen-2xl mx-auto px-4 py-2 flex justify-between items-center">
-          <div className="flex items-center gap-5 text-gray-300">
-            <span className="hidden sm:flex items-center gap-1.5 hover:text-white transition"><FiTruck size={12} className="text-primary-400" /> Free Delivery over ₹2,999</span>
-            <a href="tel:+919326166875" className="hidden md:flex items-center gap-1.5 hover:text-white transition"><FiPhone size={12} className="text-primary-400" /> +91 93261 66875</a>
+          <div className="flex items-center gap-4">
+            <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Delivery over ₹2,999</span>
+            <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 93261 66875</span>
           </div>
-          <div className="flex items-center gap-4 text-gray-300">
-            <Link to="/wholesale" className="hover:text-yellow-300 font-semibold transition">🛍 Wholesale</Link>
-            <span className="hidden sm:inline text-gray-600">·</span>
-            <Link to="/orders" className="hover:text-white transition">Track Order</Link>
-            <span className="hidden sm:inline text-gray-600">·</span>
-            <Link to="/help" className="hidden sm:inline hover:text-white transition">Help</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/wholesale" className="hover:text-yellow-300 font-semibold">🛍 Wholesale</Link>
+            <span className="hidden sm:inline opacity-50">|</span>
+            <Link to="/orders" className="hover:text-primary-500">Track Order</Link>
+            <span className="hidden sm:inline opacity-50">|</span>
+            <Link to="/help" className="hidden sm:inline hover:text-primary-500">Help</Link>
           </div>
         </div>
       </div>
 
-      {/* Main bar — logo + search + account actions */}
-      <div className="border-b border-gray-100">
-        <div className={`max-w-screen-2xl mx-auto px-3 sm:px-4 flex items-center gap-3 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-3 sm:py-4'}`}>
-          {/* Logo — pairs a chair-glyph monogram badge with the wordmark.
-              The badge gives the brand a distinctive visual anchor instead
-              of relying purely on type. */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group">
-            <span
-              className={`bg-gradient-to-br from-primary-500 to-rose-600 text-white font-black rounded-xl shadow-md flex items-center justify-center transition-all group-hover:shadow-lg group-hover:scale-105 ${
-                scrolled ? 'w-8 h-8 text-base' : 'w-10 h-10 sm:w-11 sm:h-11 text-lg sm:text-xl'
-              }`}
-              aria-hidden
-            >
-              T
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className={`font-extrabold tracking-tight text-gray-900 transition-all ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
-                Talle<span className="text-primary-500">.</span>
-              </span>
-              <span className={`text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-500 transition-all ${scrolled ? 'opacity-0 max-h-0' : 'opacity-100 mt-0.5'}`}>
-                Furniture Mart
-              </span>
-            </span>
+      {/* Main bar */}
+      <div className="border-b">
+        <div className={`max-w-screen-2xl mx-auto px-3 sm:px-4 flex items-center gap-3 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
+          <Link to="/" className="flex items-center gap-1 flex-shrink-0">
+            <span className={`font-extrabold text-primary-500 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Talle</span>
+            <span className={`font-extrabold text-gray-900 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Furniture</span>
           </Link>
 
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl relative">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs, brands, materials..."
-              className="w-full bg-gray-50 hover:bg-white focus:bg-white border border-gray-200 hover:border-gray-300 focus:border-primary-500 rounded-full pl-11 pr-28 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-primary-500/10 transition"
+              className="w-full border-2 border-primary-500 rounded-full pl-5 pr-14 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-200"
             />
-            <button
-              type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-gray-900 hover:bg-primary-500 text-white font-semibold text-xs px-4 py-2 rounded-full transition inline-flex items-center gap-1.5"
-            >
-              <FiSearch size={13} /> Search
+            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 hover:bg-primary-600 text-white p-2.5 rounded-full transition">
+              <FiSearch />
             </button>
           </form>
 
@@ -376,26 +353,24 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* Categories nav — clean white background, restrained icon use,
-          single hot CTA (50% Off) as the only coloured item so it visually
-          dominates. Subtle bottom-bar underline tracks the active item. */}
-      <nav className="hidden md:block border-b border-gray-100 bg-white relative" onMouseLeave={() => setOpenDropdown(null)}>
+      {/* Categories nav */}
+      <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
         <div className="max-w-screen-2xl mx-auto px-4">
-          <ul className="flex items-center gap-0.5 text-sm font-semibold flex-nowrap">
-            <NavItem to="/" label={<span className="inline-flex items-center gap-1.5"><FiHome size={14} /> Home</span>} end />
+          <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap">
+            <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
             <NavItem to="/shop" label="All Chairs" />
-            <NavItem to="/chair-repair" label={<span className="inline-flex items-center gap-1.5"><FiTool size={13} /> Repair</span>} />
-            <NavItem to="/shop?discount=true" label={<span className="inline-flex items-center gap-1.5">🔥 50% Off</span>} highlight />
+            <NavItem to="/chair-repair" label="🔧 Repair" />
+            <NavItem to="/shop?discount=true" label="🔥 50% Off" highlight />
             <DropdownTrigger label="Clients" active={openDropdown === 'clients'} onHover={() => setOpenDropdown('clients')} />
             <DropdownTrigger label="Category" active={openDropdown === 'category'} onHover={() => setOpenDropdown('category')} />
             <DropdownTrigger label="Material" active={openDropdown === 'material'} onHover={() => setOpenDropdown('material')} />
             <NavItem to="/shop?category=Recliners" label="Recliners" />
-            <NavItem to="/shop?bestSeller=true" label={<span className="inline-flex items-center gap-1.5"><FiStar size={12} /> Best Sellers</span>} />
-            <NavItem to="/shop?newArrival=true" label={<span className="inline-flex items-center gap-1.5"><FiZap size={12} /> New Arrivals</span>} />
-            <li className="ml-auto pl-3">
+            <NavItem to="/shop?bestSeller=true" label="⭐ Best Sellers" />
+            <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
+            <li className="ml-auto">
               <NavLink to="/wholesale" className={({ isActive }) =>
-                `inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-1.5 my-1.5 text-purple-700 font-bold text-xs rounded-full border border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition ${isActive ? 'bg-purple-100 border-purple-400' : ''}`
-              }><FiPackage size={12} /> Wholesale</NavLink>
+                `inline-block whitespace-nowrap px-4 py-3 text-purple-700 font-bold hover:bg-purple-50 transition ${isActive ? 'bg-purple-50' : ''}`
+              }>🛍 Wholesale</NavLink>
             </li>
           </ul>
         </div>
@@ -657,24 +632,20 @@ function NavItem({ to, label, highlight, end }) {
         to={to}
         end={end}
         className={({ isActive }) =>
-          `relative inline-block whitespace-nowrap px-3 py-3.5 transition-colors group ${
-            highlight
-              ? 'text-primary-500 font-bold'
-              : isActive
-                ? 'text-gray-900'
-                : 'text-gray-600 hover:text-gray-900'
-          }`
+          `relative inline-block whitespace-nowrap px-3 py-3 transition group ${
+            isActive ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
+          } ${highlight ? 'text-primary-500 font-bold' : ''}`
         }
       >
         {({ isActive }) => (
           <>
             <span className={highlight ? 'animate-pulse' : ''}>{label}</span>
-            {/* Animated underline — full-width when active, hover-grows
-                from center when inactive. Skipped on highlight items so
-                the red pulse stays the focus there. */}
+            {/* Animated underline — full-width when active, hover-grows from
+                center when inactive. Skipped on highlight items so the red
+                pulse stays the focus there. */}
             {!highlight && (
               <span
-                className={`absolute left-3 right-3 -bottom-px h-[2.5px] bg-primary-500 rounded-full transform origin-center transition-transform duration-300 ${
+                className={`absolute left-3 right-3 -bottom-px h-[2px] bg-primary-500 transform origin-center transition-transform duration-300 ${
                   isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                 }`}
                 aria-hidden
@@ -689,20 +660,20 @@ function NavItem({ to, label, highlight, end }) {
 
 function DropdownTrigger({ label, active, onHover }) {
   return (
-    <li onMouseEnter={onHover} className="relative flex-shrink-0 group">
+    <li onMouseEnter={onHover} className="relative flex-shrink-0">
       <button
-        className={`inline-flex items-center gap-1 whitespace-nowrap px-3 py-3.5 transition-colors ${
-          active ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+        className={`inline-flex items-center gap-1 whitespace-nowrap px-3 py-3 transition group ${
+          active ? 'text-primary-500' : 'text-gray-700 hover:text-primary-500'
         }`}
       >
         {label}
         <FiChevronDown
-          size={13}
-          className={`transition-transform duration-300 ${active ? 'rotate-180 text-primary-500' : 'text-gray-400'}`}
+          size={14}
+          className={`transition-transform duration-300 ${active ? 'rotate-180' : ''}`}
         />
         {/* Same animated underline as NavItem so dropdowns visually match */}
         <span
-          className={`absolute left-3 right-3 -bottom-px h-[2.5px] bg-primary-500 rounded-full transform origin-center transition-transform duration-300 ${
+          className={`absolute left-3 right-3 -bottom-px h-[2px] bg-primary-500 transform origin-center transition-transform duration-300 ${
             active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
           }`}
           aria-hidden
