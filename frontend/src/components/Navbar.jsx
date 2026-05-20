@@ -8,7 +8,6 @@ import { departments } from '../config/departments';
 
 // Scrolling announcements shown in the top marquee strip.
 const announcements = [
-  { text: '🛋 BULK BUYING? Get Wholesale Prices for Offices & Banquets — Register & Save Big', href: '/wholesale' },
   { text: '🚚 FREE Delivery on all orders above ₹2,999 across Mumbai',                          href: '/shipping-policy' },
   { text: '🔥 Up to 50% OFF — Mega Chair Sale',                                                 href: '/shop?discount=true' },
   { text: '🔧 Expert Chair Repair & Reupholstery — Doorstep Service in Mumbai',                 href: '/contact' },
@@ -169,8 +168,6 @@ export default function Navbar() {
             <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 93261 66875</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/wholesale" className="hover:text-yellow-300 font-semibold">🛍 Wholesale</Link>
-            <span className="hidden sm:inline opacity-50">|</span>
             <Link to="/orders" className="hover:text-primary-500">Track Order</Link>
             <span className="hidden sm:inline opacity-50">|</span>
             <Link to="/help" className="hidden sm:inline hover:text-primary-500">Help</Link>
@@ -240,9 +237,6 @@ export default function Navbar() {
                           <div className="min-w-0 flex-1">
                             <p className="font-bold text-sm truncate">{user.name}</p>
                             <p className="text-xs text-white/85 truncate">{user.email}</p>
-                            {user.accountType === 'wholesale' && (
-                              <span className="inline-block mt-1 text-[10px] font-extrabold bg-yellow-300 text-gray-900 px-2 py-0.5 rounded-full">WHOLESALE</span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -355,20 +349,13 @@ export default function Navbar() {
             <MobileChip to="/shop?category=Executive%20Chairs">💼 Office</MobileChip>
             <MobileChip to="/shop?category=Pro%20Gaming%20Chairs">🎮 Gaming</MobileChip>
             <MobileChip to="/shop?category=Recliners">🛋 Recliners</MobileChip>
-            <MobileChip to="/wholesale" purple>🛍 Wholesale</MobileChip>
           </div>
         </nav>
       </div>
 
-      {/* Categories nav — 3-col grid (spacer | centered nav | wholesale).
-          Keeps the main nav items truly centred regardless of Wholesale's
-          width, and pins Wholesale to the right where it belongs. */}
+      {/* Categories nav — simple centred flex row. */}
       <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto_1fr] items-center">
-          {/* Left spacer — kept empty so the middle column truly centres */}
-          <div aria-hidden />
-
-          {/* Centered nav list */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap justify-center">
             <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
             <NavItem to="/shop" label="All Chairs" />
@@ -381,13 +368,6 @@ export default function Navbar() {
             <NavItem to="/shop?bestSeller=true" label="⭐ Best Sellers" />
             <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
           </ul>
-
-          {/* Right column — Wholesale always pinned to the right edge */}
-          <div className="justify-self-end">
-            <NavLink to="/wholesale" className={({ isActive }) =>
-              `inline-block whitespace-nowrap px-4 py-3 text-purple-700 font-bold hover:bg-purple-50 transition ${isActive ? 'bg-purple-50' : ''}`
-            }>🛍 Wholesale</NavLink>
-          </div>
         </div>
 
         {/* Mega menus */}
@@ -629,9 +609,6 @@ export default function Navbar() {
                 </div>
               </li>
 
-              <li className="pt-2 border-t mt-2">
-                <Link to="/wholesale" onClick={closeMobileMenu} className="block py-2.5 px-2 rounded text-purple-700 font-bold hover:bg-purple-50 transition">🛍 Wholesale</Link>
-              </li>
             </ul>
           </div>
         </aside>
@@ -699,8 +676,7 @@ function DropdownTrigger({ label, active, onHover }) {
 }
 
 // Compact pill rendered in the mobile-only category strip. Highlight
-// variant tints red for sale items; purple variant marks the wholesale
-// shortcut to match the desktop wholesale link styling.
+// variant tints red for sale items.
 function MobileChip({ to, children, highlight, purple }) {
   return (
     <NavLink

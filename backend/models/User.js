@@ -34,13 +34,6 @@ const userSchema = new mongoose.Schema(
     addresses: [addressItemSchema],
     isAdmin: { type: Boolean, default: false },
     avatar: { type: String, default: '' },
-    accountType: { type: String, enum: ['retail', 'wholesale'], default: 'retail' },
-    businessName: { type: String, default: '' },
-    gstNumber: { type: String, default: '' },
-    // Wholesale customers must be approved by an admin before they get
-    // wholesale prices — otherwise anyone could pick "wholesale" at signup
-    // and unlock bulk pricing instantly.
-    wholesaleApproved: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: false },
     verificationOTP: { type: String, default: '' },
     otpExpiresAt: { type: Date },

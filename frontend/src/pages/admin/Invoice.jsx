@@ -49,7 +49,6 @@ export default function Invoice() {
             <h1 className="text-2xl sm:text-3xl font-extrabold uppercase text-gray-900">Invoice</h1>
             <p className="text-sm font-mono mt-1 break-all sm:break-normal">{order.orderNumber || `#${order._id.slice(-8).toUpperCase()}`}</p>
             <p className="text-xs text-gray-600 mt-1">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-            {order.accountType === 'wholesale' && <p className="text-xs font-bold text-purple-600 mt-1">WHOLESALE INVOICE</p>}
           </div>
         </div>
 
@@ -131,7 +130,6 @@ export default function Invoice() {
                 <td className="p-2">{i + 1}</td>
                 <td className="p-2">
                   {it.name}
-                  {it.isWholesalePrice && <span className="ml-2 text-[10px] text-purple-600 font-bold">(wholesale)</span>}
                   {it.color && <span className="ml-2 text-[10px] text-gray-600">· Colour: <strong>{it.color}</strong></span>}
                 </td>
                 <td className="p-2 text-center">{it.qty}</td>
@@ -149,7 +147,6 @@ export default function Invoice() {
               <div className="flex justify-between gap-2">
                 <p className="font-semibold flex-1 min-w-0">
                   {i + 1}. {it.name}
-                  {it.isWholesalePrice && <span className="ml-1 text-[10px] text-purple-600 font-bold">(wholesale)</span>}
                 </p>
                 <p className="font-bold text-primary-600 whitespace-nowrap">₹{(it.qty * it.price).toFixed(2)}</p>
               </div>

@@ -11,7 +11,6 @@ export default function Privacy() {
       <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
         <li><strong>Account info:</strong> name, email, phone, password (hashed), and optional address.</li>
         <li><strong>Order info:</strong> items purchased, shipping address, payment method, order history.</li>
-        <li><strong>Wholesale info:</strong> business name and GST number (only if you register as a wholesale customer).</li>
         <li><strong>Technical info:</strong> browser, device, and basic usage analytics to keep the site running well.</li>
       </ul>
 

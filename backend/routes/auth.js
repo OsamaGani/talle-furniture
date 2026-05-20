@@ -17,10 +17,6 @@ const userPayload = (user) => ({
   phone: user.phone,
   address: user.address,
   isAdmin: user.isAdmin,
-  accountType: user.accountType,
-  businessName: user.businessName,
-  gstNumber: user.gstNumber,
-  wholesaleApproved: user.wholesaleApproved,
   emailVerified: user.emailVerified,
   token: genToken(user._id),
 });
@@ -30,7 +26,7 @@ const isDev = () => !process.env.SMTP_HOST || !process.env.SMTP_USER;
 router.post(
   '/register',
   asyncHandler(async (req, res) => {
-    const { name, email, password, accountType, businessName, gstNumber } = req.body;
+    const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ message: 'All fields required' });
 
     // Validate email format + reject disposable
@@ -58,9 +54,6 @@ router.post(
       name,
       email: emailCheck.email,
       password,
-      accountType: accountType === 'wholesale' ? 'wholesale' : 'retail',
-      businessName: businessName || '',
-      gstNumber: gstNumber || '',
       verificationOTP: otp,
       otpExpiresAt,
       emailVerified: false,

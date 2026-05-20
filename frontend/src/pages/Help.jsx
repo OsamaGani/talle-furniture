@@ -72,8 +72,6 @@ const categories = [
         a: 'Check spam, then click "Resend OTP" on the verify page. The code is valid for 10 minutes.' },
       { q: 'I forgot my password.',
         a: 'Use "Forgot Password" on the login page (coming soon — for now contact support and we\'ll reset it).' },
-      { q: 'How do I become a wholesale customer?',
-        a: 'On the registration page, choose "Wholesale" and enter your business name + GST number. Best rates for offices, banquet halls, restaurants and resellers. Visit our Wholesale page to learn more.' },
       { q: 'Do you offer chair repair?',
         a: 'Yes — Talle is best known for it. Hydraulic replacement, reupholstery, wheel & base fix, full refurbishing. Doorstep pickup across Mumbai. Visit the Chair Repair page or WhatsApp for a quote.' },
     ],

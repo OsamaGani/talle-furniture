@@ -19,31 +19,21 @@ const TAX_RATE = 0.18;
 
 const round2 = (n) => +Number(n).toFixed(2);
 
-// Compute the unit price the customer should actually pay for this product
-// at this quantity, respecting wholesale eligibility, the product-level
-// discount, and any colour-variant price/discount override.
+// Compute the unit price the customer should actually pay for this product,
+// respecting the product-level discount and any colour-variant price/discount
+// override.
 //
 // Variant pricing rules:
 //   * variant.price > 0      → use that as the base instead of product.price
 //   * variant.discount > 0   → use that as the discount instead of product.discount
 //   * either of those zero/missing → fall back to the product-level value
-//   * wholesale price stays product-level (wholesale buyers usually order
-//     mixed colours; per-colour B2B pricing isn't needed yet)
-function unitPriceFor(product, qty, user, color) {
+function unitPriceFor(product, color) {
   const variant = color
     ? (product.colorVariants || []).find((v) => v.color.toLowerCase() === color.toLowerCase())
     : null;
   const basePrice = (variant && variant.price > 0) ? variant.price : product.price;
   const discount  = (variant && variant.discount != null && variant.discount > 0) ? variant.discount : product.discount;
 
-  const isApprovedWholesale =
-    user.accountType === 'wholesale' &&
-    user.wholesaleApproved === true &&
-    product.wholesalePrice > 0 &&
-    product.wholesaleMinQty > 0 &&
-    qty >= product.wholesaleMinQty;
-
-  if (isApprovedWholesale) return round2(product.wholesalePrice);
   if (discount > 0) return round2(basePrice - (basePrice * discount) / 100);
   return round2(basePrice);
 }
@@ -97,12 +87,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         color = '';
       }
 
-      const unit = unitPriceFor(updated, qty, req.user, color);
-      const isWholesalePrice =
-        req.user.accountType === 'wholesale' &&
-        req.user.wholesaleApproved === true &&
-        updated.wholesalePrice > 0 &&
-        qty >= updated.wholesaleMinQty;
+      const unit = unitPriceFor(updated, color);
 
       safeItems.push({
         product: updated._id,
@@ -110,7 +95,6 @@ router.post('/', protect, asyncHandler(async (req, res) => {
         image: updated.image || (updated.images && updated.images[0]) || '',
         price: unit,
         qty,
-        isWholesalePrice,
         color,
       });
       itemsPrice += unit * qty;
@@ -126,7 +110,6 @@ router.post('/', protect, asyncHandler(async (req, res) => {
       items: safeItems,
       shippingAddress,
       paymentMethod: safeMethod,
-      accountType: req.user.accountType || 'retail',
       itemsPrice,
       shippingPrice,
       taxPrice,

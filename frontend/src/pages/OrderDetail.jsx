@@ -88,9 +88,6 @@ export default function OrderDetail() {
           <h1 className="text-xl md:text-2xl font-bold font-mono">{order.orderNumber || `#${order._id.slice(-8).toUpperCase()}`}</h1>
           <p className="text-sm text-gray-600 mt-1">Placed on {new Date(order.createdAt).toLocaleString()}</p>
         </div>
-        {order.accountType === 'wholesale' && (
-          <span className="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">WHOLESALE ORDER</span>
-        )}
       </div>
 
       <OrderTimeline
@@ -161,7 +158,6 @@ export default function OrderDetail() {
                         Color: <span className="text-gray-900">{it.color}</span>
                       </span>
                     )}
-                    {it.isWholesalePrice && <span className="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.5 rounded font-bold">WHOLESALE</span>}
                   </div>
                 </div>
                 <p className="font-bold">₹{(it.qty * it.price).toFixed(2)}</p>

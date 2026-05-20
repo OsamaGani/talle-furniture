@@ -108,10 +108,10 @@ export default function About() {
       <section className="bg-gray-50 border-y">
         <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-6">
           <Reveal direction="left">
-            <Link to="/wholesale" className="bg-gradient-to-r from-purple-600 to-primary-500 text-white rounded-xl p-8 hover:shadow-xl transition flex items-center justify-between">
+            <Link to="/contact" className="bg-gradient-to-r from-purple-600 to-primary-500 text-white rounded-xl p-8 hover:shadow-xl transition flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-extrabold">Outfitting an office?</h3>
-                <p className="opacity-90 mt-1">Open a wholesale account for the best rates</p>
+                <p className="opacity-90 mt-1">Request a custom-manufacturing quote</p>
               </div>
               <FiArrowRight size={28} />
             </Link>

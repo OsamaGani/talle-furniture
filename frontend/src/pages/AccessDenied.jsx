@@ -44,8 +44,7 @@ export default function AccessDenied() {
           {user && (
             <>
               {' '}
-              You're signed in as <span className="font-semibold text-gray-800">{user.email}</span>
-              {user.accountType ? <> ({user.accountType} account)</> : null}, which doesn't have admin
+              You're signed in as <span className="font-semibold text-gray-800">{user.email}</span>, which doesn't have admin
               privileges.
             </>
           )}

@@ -24,7 +24,7 @@ export default function Refund() {
         <li>Custom-upholstered or made-to-order chairs (we cut fabric specifically for you)</li>
         <li>Reupholstery, repair and other workshop services once started</li>
         <li>Sale or clearance items marked "Final Sale"</li>
-        <li>Wholesale / bulk orders (subject to your wholesale agreement)</li>
+        <li>Bulk / custom-manufacturing orders (subject to your purchase quote)</li>
       </ul>
 
       <h2 className="text-xl font-bold mt-6 mb-2">How to start a return</h2>

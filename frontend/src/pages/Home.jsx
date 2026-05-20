@@ -355,7 +355,7 @@ export default function Home() {
             <UspBadge icon={<FiHeadphones />} title="Talk to a Human"        desc="Call +91 93261 66875"           color="bg-purple-50 text-purple-600" link="/contact" />
           </Reveal>
           <Reveal direction="up" delay={320}>
-            <UspBadge icon={<FiPackage />}    title="Bulk / Wholesale"       desc="Best rates for offices & halls" color="bg-pink-50 text-pink-600" link="/wholesale" />
+            <UspBadge icon={<FiPackage />}    title="Custom Manufacturing"   desc="Made-to-order for any space"    color="bg-pink-50 text-pink-600" link="/contact" />
           </Reveal>
         </div>
       </section>
@@ -423,27 +423,28 @@ export default function Home() {
       {/* Video showcase */}
       <VideoShowcase />
 
-      {/* Wholesale promo banner */}
+      {/* Custom Manufacturing promo banner — Talle offers made-to-order
+          and B2B custom manufacturing on enquiry. */}
       <section className="max-w-7xl mx-auto px-4 py-12">
-        <Link to="/wholesale" className="block relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-700 via-pink-600 to-primary-500 text-white p-8 md:p-12 hover:shadow-2xl transition group">
+        <Link to="/contact" className="block relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-700 via-orange-600 to-primary-500 text-white p-8 md:p-12 hover:shadow-2xl transition group">
           <div className="grid md:grid-cols-2 gap-6 items-center relative z-10">
             <div>
-              <span className="inline-block bg-yellow-400 text-gray-900 text-xs font-extrabold px-3 py-1 rounded-full mb-3">FOR SHOPS &amp; RESELLERS</span>
+              <span className="inline-block bg-yellow-400 text-gray-900 text-xs font-extrabold px-3 py-1 rounded-full mb-3">FOR OFFICES &amp; HALLS</span>
               <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
-                Open a <span className="text-yellow-300">Wholesale</span> Account
+                Need a <span className="text-yellow-300">Custom</span> Order?
               </h2>
-              <p className="mt-3 text-lg opacity-95">Best rates for offices, banquet halls, restaurants and resellers. Free Mumbai delivery on bulk orders. GST invoices. Custom branding available.</p>
+              <p className="mt-3 text-lg opacity-95">Made-to-order chairs and tables for offices, banquet halls, restaurants and event venues. Pan-India delivery. Bring us your spec — we'll build it.</p>
               <div className="flex flex-wrap gap-3 mt-5">
-                <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm font-semibold">✓ Bulk pricing</span>
+                <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm font-semibold">✓ Made-to-order</span>
                 <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm font-semibold">✓ GST invoice</span>
                 <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm font-semibold">✓ Custom branding</span>
               </div>
-              <span className="inline-flex items-center gap-2 mt-6 bg-white text-purple-700 group-hover:bg-yellow-300 group-hover:text-gray-900 font-bold px-6 py-3 rounded-lg transition">
-                Learn More <FiArrowRight />
+              <span className="inline-flex items-center gap-2 mt-6 bg-white text-amber-700 group-hover:bg-yellow-300 group-hover:text-gray-900 font-bold px-6 py-3 rounded-lg transition">
+                Request a Quote <FiArrowRight />
               </span>
             </div>
             <div className="hidden md:flex justify-end">
-              <div className="text-9xl">🛍</div>
+              <div className="text-9xl">🛠</div>
             </div>
           </div>
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>

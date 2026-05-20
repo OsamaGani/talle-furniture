@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -13,15 +12,10 @@ const SHIPPING_FEE = 200;
 const FREE_SHIPPING_THRESHOLD = 2999;
 const TAX_RATE = 0.18;
 
-const computeUnitPrice = (product, qty, isWholesaleAccount) => {
-  const base = product.discount > 0
+const computeUnitPrice = (product) => {
+  return product.discount > 0
     ? +(product.price - (product.price * product.discount) / 100).toFixed(2)
     : product.price;
-  const eligible = isWholesaleAccount && product.wholesalePrice > 0 && product.wholesaleMinQty > 0 && qty >= product.wholesaleMinQty;
-  return {
-    price: eligible ? product.wholesalePrice : base,
-    isWholesalePrice: eligible,
-  };
 };
 
 // Build a stable unique line identifier so the same product in two
@@ -33,9 +27,6 @@ const lineIdFor = (productId, color) => {
 };
 
 export function CartProvider({ children }) {
-  const { user } = useAuth();
-  const isWholesale = user?.accountType === 'wholesale';
-
   const [items, setItems] = useState(() => {
     try {
       const stored = localStorage.getItem('cart');
@@ -54,25 +45,6 @@ export function CartProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
-
-  // Recalculate prices whenever the wholesale flag changes
-  useEffect(() => {
-    setItems((prev) =>
-      prev.map((it) => {
-        const { price, isWholesalePrice } = computeUnitPrice(
-          {
-            price: it.basePrice ?? it.price,
-            discount: 0,
-            wholesalePrice: it.wholesalePrice,
-            wholesaleMinQty: it.wholesaleMinQty,
-          },
-          it.qty,
-          isWholesale
-        );
-        return { ...it, price, isWholesalePrice };
-      })
-    );
-  }, [isWholesale]);
 
   const addToCart = (product, qty = 1, color = '') => {
     const targetLineId = lineIdFor(product._id, color);
@@ -93,14 +65,12 @@ export function CartProvider({ children }) {
     setItems((prev) => {
       const existing = prev.find((p) => p.lineId === targetLineId);
       const newQty = (existing?.qty || 0) + qty;
-      const { price, isWholesalePrice } = computeUnitPrice(productForPricing, newQty, isWholesale);
-      const basePrice = effDiscount > 0
-        ? +(effPrice - (effPrice * effDiscount) / 100).toFixed(2)
-        : effPrice;
+      const price = computeUnitPrice(productForPricing);
+      const basePrice = price;
 
       if (existing) {
         return prev.map((p) =>
-          p.lineId === targetLineId ? { ...p, qty: newQty, price, isWholesalePrice } : p
+          p.lineId === targetLineId ? { ...p, qty: newQty, price } : p
         );
       }
       return [
@@ -114,9 +84,6 @@ export function CartProvider({ children }) {
           basePrice,
           price,
           qty: newQty,
-          wholesalePrice: product.wholesalePrice || 0,
-          wholesaleMinQty: product.wholesaleMinQty || 0,
-          isWholesalePrice,
         },
       ];
     });
@@ -131,17 +98,7 @@ export function CartProvider({ children }) {
     setItems((prev) =>
       prev.map((it) => {
         if (it.lineId !== lineId && it.product !== lineId) return it;
-        const { price, isWholesalePrice } = computeUnitPrice(
-          {
-            price: it.basePrice ?? it.price,
-            discount: 0,
-            wholesalePrice: it.wholesalePrice,
-            wholesaleMinQty: it.wholesaleMinQty,
-          },
-          qty,
-          isWholesale
-        );
-        return { ...it, qty, price, isWholesalePrice };
+        return { ...it, qty };
       })
     );
   };
@@ -185,7 +142,6 @@ export function CartProvider({ children }) {
         amountToFreeShipping,
         FREE_SHIPPING_THRESHOLD,
         SHIPPING_FEE,
-        isWholesale,
         itemCount,
       }}
     >

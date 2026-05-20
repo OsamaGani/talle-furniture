@@ -6,7 +6,6 @@ const orderItemSchema = new mongoose.Schema({
   image: String,
   price: Number,
   qty: { type: Number, required: true, min: 1 },
-  isWholesalePrice: { type: Boolean, default: false },
   // Customer-selected colour at time of order. Stored verbatim (e.g.
   // "Red", "Pastel Blue") so emails / invoices / shipping labels can
   // print the exact name shown on the product page. Empty string when
@@ -62,7 +61,6 @@ const orderSchema = new mongoose.Schema(
       orderId: String,          // razorpay order id
       capturedAt: Date,
     },
-    accountType: { type: String, enum: ['retail', 'wholesale'], default: 'retail' },
     itemsPrice: Number,
     shippingPrice: { type: Number, default: 0 },
     taxPrice: { type: Number, default: 0 },
@@ -108,8 +106,7 @@ orderSchema.pre('save', function (next) {
   if (this.isNew) {
     this.orderNumber = 'TM' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
     this.statusHistory = [{ status: 'pending', note: 'Order placed successfully', at: new Date() }];
-    const days = this.accountType === 'wholesale' ? 7 : 5;
-    this.estimatedDelivery = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    this.estimatedDelivery = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
   }
   next();
 });

@@ -35,9 +35,6 @@ export default function Profile() {
           ) : (
             <a href="/verify-email" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 text-xs font-bold px-3 py-1 rounded-full">⚠ EMAIL NOT VERIFIED</a>
           )}
-          {user?.accountType === 'wholesale' && (
-            <span className="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">🛍 WHOLESALE</span>
-          )}
         </div>
       </div>
       <form onSubmit={submit} className="bg-white border rounded-lg p-6 space-y-4">

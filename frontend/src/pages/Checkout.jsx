@@ -314,7 +314,7 @@ export default function Checkout() {
     setSubmitting(true);
     try {
       const { data: order } = await API.post('/orders', {
-        items: items.map((i) => ({ product: i.product, name: i.name, image: i.image, price: i.price, qty: i.qty, isWholesalePrice: i.isWholesalePrice, color: i.color || '' })),
+        items: items.map((i) => ({ product: i.product, name: i.name, image: i.image, price: i.price, qty: i.qty, color: i.color || '' })),
         shippingAddress,
         paymentMethod,
       });

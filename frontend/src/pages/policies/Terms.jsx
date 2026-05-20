@@ -12,13 +12,13 @@ export default function Terms() {
         <li>You must be at least 18 years old to create an account.</li>
         <li>You're responsible for keeping your password secure.</li>
         <li>The information you provide (name, email, address) must be accurate.</li>
-        <li>One account per person; one wholesale account per business.</li>
+        <li>One account per person.</li>
       </ul>
 
       <h2 className="text-xl font-bold mt-6 mb-2">2. Orders &amp; pricing</h2>
       <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
         <li>All prices are in Indian Rupees (₹) and include applicable taxes unless stated otherwise.</li>
-        <li>Wholesale prices apply only to verified wholesale accounts and only when minimum quantities are met.</li>
+        <li>Bulk and custom-manufacturing orders are priced per quote — contact us for a written estimate before placing the order.</li>
         <li>We reserve the right to refuse, cancel, or limit any order — for example, if a product is mispriced or out of stock.</li>
         <li>An order is confirmed only when you receive an "Order confirmed" email from us.</li>
       </ul>

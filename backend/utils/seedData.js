@@ -2,7 +2,6 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Brand = require('../models/Brand');
-const WholesaleCategory = require('../models/WholesaleCategory');
 const Order = require('../models/Order');
 
 // `featuredOnHome` + `homeOrder` here pre-populate the public "Shop By
@@ -63,7 +62,7 @@ const products = [
     name: 'Talle Aero Executive High-Back Office Chair',
     description: 'Premium executive chair with high-back lumbar support, breathable mesh, adjustable armrests and reclining tilt mechanism. Built for 8+ hour workdays.',
     brand: 'Talle', category: 'Executive Chairs', material: 'Mesh',
-    price: 12999, discount: 25, wholesalePrice: 8499, wholesaleMinQty: 5, stock: 40,
+    price: 12999, discount: 25, stock: 40,
     image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800',
     images: ['https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800'],
     featured: true, bestSeller: true, rating: 4.8, numReviews: 142,
@@ -100,7 +99,7 @@ const products = [
     name: 'Talle Visitor Chair (Set of 2) — Steel Frame',
     description: 'Sturdy visitor / guest chair with cushioned seat & back, durable steel frame and stackable design. Pack of 2.',
     brand: 'Talle', category: 'Visitor Chairs', material: 'Fabric',
-    price: 4999, discount: 20, wholesalePrice: 3299, wholesaleMinQty: 10, stock: 80,
+    price: 4999, discount: 20, stock: 80,
     image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800',
     images: ['https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800'],
     featured: true, rating: 4.5, numReviews: 64,
@@ -146,7 +145,7 @@ const products = [
     name: 'Talle Plastic Dining Chair (Set of 2)',
     description: 'Solid plastic dining chair, ergonomic curved back and broad seat. Stackable, weather-resistant, easy to clean.',
     brand: 'Talle', category: 'Dining Chairs', material: 'Plastic',
-    price: 2999, discount: 10, wholesalePrice: 2199, wholesaleMinQty: 20, stock: 120,
+    price: 2999, discount: 10, stock: 120,
     image: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=800',
     images: ['https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=800'],
     bestSeller: true, rating: 4.3, numReviews: 156,
@@ -173,7 +172,7 @@ const products = [
     name: 'Talle Steel Folding Chair (Set of 4)',
     description: 'Heavy-duty steel folding chair set with cushioned seat. Holds up to 113 kg. Folds flat for storage, ideal for events & extra guests.',
     brand: 'Talle', category: 'Folding Chairs', material: 'Metal',
-    price: 4499, discount: 35, wholesalePrice: 2999, wholesaleMinQty: 10, stock: 75,
+    price: 4499, discount: 35, stock: 75,
     image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=800',
     images: ['https://images.unsplash.com/photo-1503602642458-232111445657?w=800'],
     bestSeller: true, rating: 4.5, numReviews: 209,
@@ -182,7 +181,7 @@ const products = [
     name: 'Talle Tiffany Banquet Chair — Wedding Edition',
     description: 'Elegant gold-finished tiffany chair with cushioned seat. Stackable up to 10. Designed for weddings, banquets and event halls.',
     brand: 'Talle', category: 'Banquet Chairs', material: 'Metal',
-    price: 2499, discount: 12, wholesalePrice: 1699, wholesaleMinQty: 25, stock: 200,
+    price: 2499, discount: 12, stock: 200,
     image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800',
     images: ['https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800'],
     featured: true, rating: 4.6, numReviews: 87,
@@ -247,7 +246,7 @@ const products = [
     name: 'Talle Hydraulic Cylinder Replacement (Class-4)',
     description: 'Heavy-duty BIFMA-grade class-4 hydraulic gas-lift cylinder. Universal fit for office & gaming chairs. Includes professional installation in Mumbai.',
     brand: 'Talle', category: 'General', material: 'Metal',
-    price: 1299, discount: 10, wholesalePrice: 899, wholesaleMinQty: 25, stock: 300,
+    price: 1299, discount: 10, stock: 300,
     image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800',
     images: ['https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800'],
     bestSeller: true, rating: 4.7, numReviews: 168,
@@ -256,7 +255,7 @@ const products = [
     name: 'Talle Premium Caster Wheels (Set of 5)',
     description: 'Smooth-glide polyurethane caster wheels — won\'t scratch hardwood floors. Universal stem fits 95% of office chairs.',
     brand: 'Talle', category: 'General', material: 'Plastic',
-    price: 799, discount: 25, wholesalePrice: 499, wholesaleMinQty: 50, stock: 500,
+    price: 799, discount: 25, stock: 500,
     image: 'https://images.unsplash.com/photo-1505797149-35ebcfa1c2bd?w=800',
     images: ['https://images.unsplash.com/photo-1505797149-35ebcfa1c2bd?w=800'],
     bestSeller: true, newArrival: true, rating: 4.6, numReviews: 233,
@@ -266,7 +265,7 @@ const products = [
     name: 'Talle Ergohuman Pro Premium Chair',
     description: 'Flagship ergonomic chair with synchro-tilt, 4D armrests, adjustable headrest, lumbar support and aluminium base. Built for executives who sit 10+ hours a day.',
     brand: 'Talle', category: 'Premium / Ergohuman', material: 'Mesh',
-    price: 34999, discount: 18, wholesalePrice: 24999, wholesaleMinQty: 5, stock: 12,
+    price: 34999, discount: 18, stock: 12,
     image: 'https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=800',
     images: ['https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=800'],
     featured: true, bestSeller: true, rating: 4.9, numReviews: 87,
@@ -295,7 +294,7 @@ const products = [
     name: 'Talle Training Room Stackable Chair',
     description: 'Lightweight stackable chair with foldable writing tablet, padded seat and chrome legs. Perfect for training rooms, classrooms and seminar halls.',
     brand: 'Talle', category: 'Training Room Chairs', material: 'Fabric',
-    price: 3499, discount: 15, wholesalePrice: 2499, wholesaleMinQty: 20, stock: 150,
+    price: 3499, discount: 15, stock: 150,
     image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800',
     images: ['https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800'],
     bestSeller: true, rating: 4.5, numReviews: 96,
@@ -306,7 +305,7 @@ const products = [
     name: 'Talle Tandem 3-Seater Waiting Bench',
     description: 'Airport / hospital-style 3-seater tandem bench with steel frame and cushioned PU seats. Powder-coated finish, scratch-resistant.',
     brand: 'Talle', category: 'Tandem Seating', material: 'Metal',
-    price: 11999, discount: 12, wholesalePrice: 8999, wholesaleMinQty: 10, stock: 30,
+    price: 11999, discount: 12, stock: 30,
     image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800',
     images: ['https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800'],
     featured: true, rating: 4.6, numReviews: 38,
@@ -315,7 +314,7 @@ const products = [
     name: 'Talle Tandem 4-Seater Lounge Bench',
     description: '4-seater tandem bench with arm dividers and integrated side table. Built for lobbies, lounges and large waiting areas.',
     brand: 'Talle', category: 'Tandem Seating', material: 'Faux Leather',
-    price: 17999, discount: 10, wholesalePrice: 13999, wholesaleMinQty: 8, stock: 18,
+    price: 17999, discount: 10, stock: 18,
     image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800',
     images: ['https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800'],
     newArrival: true, rating: 4.5, numReviews: 22,
@@ -325,7 +324,7 @@ const products = [
     name: 'Talle Cafeteria Stackable Chair (Set of 4)',
     description: 'Heavy-duty stackable cafeteria chair with steel frame and easy-clean polypropylene seat. Built for office canteens and food courts.',
     brand: 'Talle', category: 'Cafeteria Chairs', material: 'Plastic',
-    price: 5499, discount: 18, wholesalePrice: 3999, wholesaleMinQty: 20, stock: 120,
+    price: 5499, discount: 18, stock: 120,
     image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800',
     images: ['https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800'],
     bestSeller: true, rating: 4.4, numReviews: 73,
@@ -394,7 +393,7 @@ const products = [
     name: 'Talle Executive L-Shape Office Desk',
     description: 'L-shape executive desk with cable management, modesty panel and lockable drawer pedestal. Engineered wood, scratch-resistant laminate.',
     brand: 'Talle', category: 'Office Desks', material: 'Wood',
-    price: 24999, discount: 18, wholesalePrice: 18999, wholesaleMinQty: 5, stock: 14,
+    price: 24999, discount: 18, stock: 14,
     image: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800',
     images: ['https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800'],
     featured: true, newArrival: true, rating: 4.7, numReviews: 39,
@@ -403,7 +402,7 @@ const products = [
     name: 'Talle Conference Table (8-Seater Boat-Shape)',
     description: '8-seater boat-shape conference table with integrated cable grommets and wire trays. Engineered wood top, metal frame.',
     brand: 'Talle', category: 'Conference Tables', material: 'Wood',
-    price: 42999, discount: 20, wholesalePrice: 32999, wholesaleMinQty: 3, stock: 6,
+    price: 42999, discount: 20, stock: 6,
     image: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800',
     images: ['https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800'],
     featured: true, rating: 4.8, numReviews: 22,
@@ -506,17 +505,6 @@ async function ensureDefaults() {
     console.log(`ðŸ’° Backfilled isPaid on ${codBackfill.modifiedCount} delivered COD order(s)`);
   }
 
-  // Seed default Hot Wholesale Categories tiles if none exist yet
-  const wcCount = await WholesaleCategory.countDocuments();
-  if (wcCount === 0) {
-    await WholesaleCategory.insertMany([
-      { name: 'Office Chairs',   image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400', link: '/shop?category=Executive%20Chairs', order: 1 },
-      { name: 'Gaming Chairs',   image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400', link: '/shop?category=Pro%20Gaming%20Chairs', order: 2 },
-      { name: 'Banquet Chairs',  image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400', link: '/shop?category=Banquet%20Chairs', order: 3 },
-      { name: 'Recliners',       image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400', link: '/shop?category=Recliners', order: 4 },
-    ]);
-    console.log('ðŸŒ± Seeded 4 wholesale category tiles');
-  }
 }
 
 // Idempotent helpers â€” each one only inserts what's missing. Safe to run on

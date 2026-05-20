@@ -48,7 +48,7 @@ export default function ProductForm() {
   const [customBrand, setCustomBrand] = useState(false);
   const [form, setForm] = useState({
     name: '', description: '', brand: '', category: prefillCategory, material: '',
-    price: 0, discount: 0, wholesalePrice: 0, wholesaleMinQty: 0,
+    price: 0, discount: 0,
     stock: 0, image: '', images: [],
     featured: false, bestSeller: false, newArrival: false, onDeal: false,
     colorVariants: [],
@@ -74,7 +74,6 @@ export default function ProductForm() {
             name: data.name, description: data.description, brand: data.brand,
             category: data.category, material: data.material || '',
             price: data.price, discount: data.discount,
-            wholesalePrice: data.wholesalePrice || 0, wholesaleMinQty: data.wholesaleMinQty || 0,
             stock: data.stock,
             image: data.image || '', images: data.images || [],
             featured: data.featured, bestSeller: data.bestSeller, newArrival: data.newArrival, onDeal: !!data.onDeal,
@@ -166,8 +165,6 @@ export default function ProductForm() {
         category: form.category.trim(),
         price: +form.price,
         discount: +form.discount || 0,
-        wholesalePrice: +form.wholesalePrice || 0,
-        wholesaleMinQty: +form.wholesaleMinQty || 0,
         stock: +form.stock || 0,
         // Variants: clean each one before sending. Server-side pre-save
         // also dedupes + caps, but doing it here means the payload is
@@ -335,21 +332,6 @@ export default function ProductForm() {
           <div>
             <label className="label">Stock *</label>
             <input type="number" min="0" className="input" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required />
-          </div>
-        </div>
-
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <h3 className="font-semibold text-purple-700 mb-2">🛍 Wholesale Pricing (optional)</h3>
-          <p className="text-xs text-gray-600 mb-3">Wholesale customers automatically get this price when buying the minimum quantity.</p>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Wholesale Price (₹)</label>
-              <input type="number" step="0.01" min="0" className="input" value={form.wholesalePrice} onChange={(e) => setForm({ ...form, wholesalePrice: e.target.value })} placeholder="e.g. 10.00" />
-            </div>
-            <div>
-              <label className="label">Minimum Qty for Wholesale</label>
-              <input type="number" min="0" className="input" value={form.wholesaleMinQty} onChange={(e) => setForm({ ...form, wholesaleMinQty: e.target.value })} placeholder="e.g. 10" />
-            </div>
           </div>
         </div>
 

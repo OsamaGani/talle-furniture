@@ -69,11 +69,8 @@ router.get(
       Product.countDocuments(filter),
     ]);
     // Browser & CDN cache for a minute. New product additions take up to a
-    // minute to show up — acceptable trade for snappy repeat loads. Vary
-    // ensures the CDN keys cache by Authorization (admin/wholesale views
-    // can return different prices in future).
+    // minute to show up — acceptable trade for snappy repeat loads.
     res.set('Cache-Control', 'public, max-age=60');
-    res.set('Vary', 'Authorization');
     res.json({ products, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   })
 );

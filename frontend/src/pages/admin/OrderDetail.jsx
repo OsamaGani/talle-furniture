@@ -4,7 +4,7 @@ import API from '../../api/axios';
 import Loader from '../../components/Loader';
 import OrderTimeline from '../../components/OrderTimeline';
 import toast from 'react-hot-toast';
-import { FiPrinter, FiTag, FiArrowLeft, FiUser, FiMapPin, FiPhone, FiMail, FiCreditCard, FiTruck, FiBriefcase } from 'react-icons/fi';
+import { FiPrinter, FiTag, FiArrowLeft, FiUser, FiMapPin, FiPhone, FiMail, FiCreditCard, FiTruck } from 'react-icons/fi';
 import { resolveImage } from '../../utils/imageUrl';
 import PaymentDetails from '../../components/PaymentDetails';
 
@@ -70,9 +70,6 @@ export default function AdminOrderDetail() {
           <p className="text-sm text-gray-600 mt-1">Placed on {new Date(order.createdAt).toLocaleString()}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {order.accountType === 'wholesale' && (
-            <span className="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1"><FiBriefcase /> WHOLESALE</span>
-          )}
           <button onClick={printLabel} className="bg-gray-900 hover:bg-black text-white font-semibold px-4 py-2 rounded inline-flex items-center gap-2 text-sm"><FiTag /> Shipping Label</button>
           <button onClick={printInvoice} className="btn-primary inline-flex items-center gap-2 text-sm"><FiPrinter /> Print Invoice</button>
         </div>
@@ -190,7 +187,6 @@ export default function AdminOrderDetail() {
               <Info icon={<FiUser />} label="Name" value={order.user?.name || 'Guest'} />
               <Info icon={<FiMail />} label="Email" value={order.user?.email} />
               <Info icon={<FiPhone />} label="Phone" value={order.shippingAddress?.phone} />
-              <Info icon={<FiBriefcase />} label="Account Type" value={order.accountType?.toUpperCase() || 'RETAIL'} />
             </div>
           </div>
 
@@ -226,7 +222,6 @@ export default function AdminOrderDetail() {
                           <div className="min-w-0">
                             <Link to={`/product/${it.product}`} className="hover:text-primary-500 block truncate">
                               {it.name}
-                              {it.isWholesalePrice && <span className="ml-2 bg-purple-100 text-purple-700 text-[10px] px-1 py-0.5 rounded font-bold">W</span>}
                             </Link>
                             {/* Colour the customer chose — must be visible to
                                 whoever physically packs the order */}

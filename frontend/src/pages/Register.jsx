@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import PasswordInput, { scorePassword } from '../components/PasswordInput';
 import {
-  FiUser, FiBriefcase, FiMail, FiArrowRight, FiCheck, FiX,
+  FiUser, FiMail, FiArrowRight, FiCheck, FiX,
   FiGift, FiTag, FiTruck, FiZap,
 } from 'react-icons/fi';
 
@@ -14,10 +14,8 @@ const MIN_PASSWORD_SCORE = 3;
 export default function Register() {
   const { register, loading } = useAuth();
   const navigate = useNavigate();
-  const [accountType, setAccountType] = useState('retail');
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirm: '',
-    businessName: '', gstNumber: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [emailError, setEmailError] = useState('');
@@ -39,11 +37,10 @@ export default function Register() {
       return toast.error('Password is too weak — use 8+ chars with mixed case, numbers and a symbol');
     }
     if (form.password !== form.confirm) return toast.error('Passwords do not match');
-    if (accountType === 'wholesale' && !form.businessName) return toast.error('Business name required for wholesale');
 
     setSubmitting(true);
     try {
-      const data = await register({ ...form, accountType });
+      const data = await register(form);
       if (data.devOTP) {
         toast(`📧 Dev OTP: ${data.devOTP} (also in backend console)`, { duration: 12000, icon: '🔐' });
       }
@@ -130,36 +127,6 @@ export default function Register() {
             </p>
           </div>
 
-          {/* Account type toggle */}
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <button
-              type="button"
-              onClick={() => setAccountType('retail')}
-              className={`border-2 rounded-xl p-3 sm:p-4 text-left transition ${
-                accountType === 'retail'
-                  ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <FiUser className="mb-1 text-primary-500" size={20} />
-              <p className="font-semibold text-sm">Retail</p>
-              <p className="text-xs text-gray-500">Personal shopping</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setAccountType('wholesale')}
-              className={`border-2 rounded-xl p-3 sm:p-4 text-left transition ${
-                accountType === 'wholesale'
-                  ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <FiBriefcase className="mb-1 text-purple-500" size={20} />
-              <p className="font-semibold text-sm">Wholesale</p>
-              <p className="text-xs text-gray-500">Bulk pricing for offices &amp; halls</p>
-            </button>
-          </div>
-
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Full Name</label>
@@ -172,30 +139,6 @@ export default function Register() {
                 required
               />
             </div>
-
-            {accountType === 'wholesale' && (
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="label">Business Name *</label>
-                  <input
-                    className="input py-3"
-                    value={form.businessName}
-                    onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-                    placeholder="e.g. Sunrise Office Supplies"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="label">GST <span className="text-xs text-gray-500 font-normal">(optional)</span></label>
-                  <input
-                    className="input py-3"
-                    value={form.gstNumber}
-                    onChange={(e) => setForm({ ...form, gstNumber: e.target.value })}
-                    placeholder="27AABCU9603R1ZM"
-                  />
-                </div>
-              </div>
-            )}
 
             <div>
               <label className="label">
@@ -256,7 +199,7 @@ export default function Register() {
             >
               {submitting
                 ? 'Creating…'
-                : (<>Create {accountType === 'wholesale' ? 'Wholesale' : 'Retail'} Account <FiArrowRight className="group-hover:translate-x-1 transition" /></>)}
+                : (<>Create Account <FiArrowRight className="group-hover:translate-x-1 transition" /></>)}
             </button>
           </form>
 

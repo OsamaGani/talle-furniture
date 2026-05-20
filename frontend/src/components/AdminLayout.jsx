@@ -11,7 +11,6 @@ const links = [
   { to: '/admin/users', label: 'Users', icon: <FiUsers /> },
   { to: '/admin/categories', label: 'Categories', icon: <FiTag /> },
   { to: '/admin/brands', label: 'Brands', icon: <FiAward /> },
-  { to: '/admin/wholesale-categories', label: 'Wholesale Tiles', icon: <FiBriefcase /> },
 ];
 
 export default function AdminLayout({ children }) {

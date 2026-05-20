@@ -410,13 +410,6 @@ export default function ProductDetail() {
             <p className="text-[11px] text-gray-500 mt-0.5">Inclusive of all taxes</p>
           </div>
 
-          {product.wholesalePrice > 0 && product.wholesaleMinQty > 0 && (
-            <div className="mt-3 bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm">
-              <p className="font-semibold text-purple-700">🛍 Wholesale Price: ₹{product.wholesalePrice.toFixed(2)} / unit</p>
-              <p className="text-xs text-purple-600 mt-0.5">When you order {product.wholesaleMinQty}+ units (wholesale account required)</p>
-            </div>
-          )}
-
           {/* Stock indicator */}
           <div className="mt-3">
             {product.stock > 5 && (

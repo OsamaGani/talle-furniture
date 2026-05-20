@@ -9,14 +9,13 @@ const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Brand = require('../models/Brand');
-const WholesaleCategory = require('../models/WholesaleCategory');
 const { protect, admin } = require('../middleware/auth');
 const { seedIfEmpty } = require('../utils/seedData');
 
 const router = express.Router();
 
 // POST /api/admin/catalog/wipe
-// Deletes EVERY product, category, brand and wholesale-category tile.
+// Deletes EVERY product, category and brand.
 // Preserves users + orders so customer accounts and order history survive.
 // Requires JSON body { confirm: "WIPE" } as a typo-guard against accidental
 // hits from somebody who clicked through the confirm dialog without reading.
@@ -28,11 +27,10 @@ router.post(
     if (req.body?.confirm !== 'WIPE') {
       return res.status(400).json({ message: 'Missing or incorrect confirm token. Type WIPE to confirm.' });
     }
-    const [p, c, b, w] = await Promise.all([
+    const [p, c, b] = await Promise.all([
       Product.deleteMany({}),
       Category.deleteMany({}),
       Brand.deleteMany({}),
-      WholesaleCategory.deleteMany({}),
     ]);
     res.json({
       message: 'Catalog wiped',
@@ -40,7 +38,6 @@ router.post(
         products: p.deletedCount,
         categories: c.deletedCount,
         brands: b.deletedCount,
-        wholesaleTiles: w.deletedCount,
       },
     });
   })
@@ -84,7 +81,6 @@ router.post(
       Product.deleteMany({}),
       Category.deleteMany({}),
       Brand.deleteMany({}),
-      WholesaleCategory.deleteMany({}),
     ]);
     await seedIfEmpty();
     const [pc, cc, bc] = await Promise.all([

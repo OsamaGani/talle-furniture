@@ -16,7 +16,6 @@ const ROUTE_LABELS = {
   '/register':       'Create Account',
   '/about':          'About Us',
   '/contact':        'Contact',
-  '/wholesale':      'Wholesale',
   '/help':           'Help Center',
   '/forgot-password':'Reset Password',
   '/shipping-policy':'Shipping Policy',

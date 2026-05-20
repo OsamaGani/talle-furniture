@@ -6,7 +6,7 @@ import { PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL, EMAIL_PRIMARY } from '../conf
 import { colorToBackground, isLightColor } from '../utils/colors';
 
 export default function Cart() {
-  const { items, removeFromCart, updateQty, subtotal, shipping, tax, total, amountToFreeShipping, FREE_SHIPPING_THRESHOLD, isWholesale } = useCart();
+  const { items, removeFromCart, updateQty, subtotal, shipping, tax, total, amountToFreeShipping, FREE_SHIPPING_THRESHOLD } = useCart();
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -25,11 +25,6 @@ export default function Cart() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">Shopping Cart ({items.length})</h1>
-      {isWholesale && (
-        <div className="bg-purple-50 border border-purple-200 text-purple-700 text-sm px-3 py-2 rounded mb-3 inline-block">
-          🛍 Wholesale account active — bulk prices apply when minimum quantities are met
-        </div>
-      )}
 
       {/* Free shipping progress */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-5">
@@ -50,8 +45,6 @@ export default function Cart() {
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         <div className="space-y-3">
           {items.map((it) => {
-            const eligibleForWholesale = isWholesale && it.wholesalePrice > 0 && it.wholesaleMinQty > 0;
-            const qtyToUnlockWholesale = eligibleForWholesale && !it.isWholesalePrice ? it.wholesaleMinQty - it.qty : 0;
             const colorBg = it.color ? colorToBackground(it.color) : null;
             return (
               <div key={it.lineId || it.product} className="bg-white border rounded-lg p-3 sm:p-4 flex gap-3 sm:gap-4">
@@ -72,10 +65,6 @@ export default function Cart() {
                   )}
                   <div className="flex items-baseline gap-2 mt-1 flex-wrap">
                     <p className="text-primary-600 font-bold text-sm sm:text-base">₹{it.price.toFixed(2)}</p>
-                    {it.isWholesalePrice && <span className="bg-purple-100 text-purple-700 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-semibold">WHOLESALE</span>}
-                    {!it.isWholesalePrice && eligibleForWholesale && (
-                      <span className="text-[10px] sm:text-xs text-purple-600">+{qtyToUnlockWholesale} for ₹{it.wholesalePrice}/ea</span>
-                    )}
                   </div>
                   <div className="flex items-center gap-2 sm:gap-3 mt-2">
                     <div className="flex items-center border rounded text-sm">

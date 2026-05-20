@@ -21,7 +21,7 @@ const categories = [
 const materialOptions = ['', 'Mesh', 'Leather', 'Faux Leather', 'Fabric', 'Plastic', 'Wood', 'Metal', 'Cushion'];
 
 const blankRow = () => ({
-  name: '', description: '', price: '', discount: 0, wholesalePrice: 0, wholesaleMinQty: 0,
+  name: '', description: '', price: '', discount: 0,
   stock: 0, image: '', uploading: false,
 });
 
@@ -109,8 +109,6 @@ export default function BulkAdd() {
           material: shared.material,
           price: +r.price,
           discount: +r.discount,
-          wholesalePrice: +r.wholesalePrice,
-          wholesaleMinQty: +r.wholesaleMinQty,
           stock: +r.stock || 10,
           image: r.image,
           images: r.image ? [r.image] : [],
@@ -245,14 +243,6 @@ export default function BulkAdd() {
                 <div>
                   <label className="text-[10px] text-gray-500 uppercase">Stock</label>
                   <input type="number" min="0" className="input text-sm" placeholder="10" value={r.stock} onChange={(e) => updateRow(i, { stock: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-[10px] text-gray-500 uppercase">Wholesale ₹</label>
-                  <input type="number" step="0.01" min="0" className="input text-xs" placeholder="0" value={r.wholesalePrice} onChange={(e) => updateRow(i, { wholesalePrice: e.target.value })} />
-                </div>
-                <div className="col-span-2">
-                  <label className="text-[10px] text-gray-500 uppercase">Min qty for wholesale</label>
-                  <input type="number" min="0" className="input text-xs" placeholder="0" value={r.wholesaleMinQty} onChange={(e) => updateRow(i, { wholesaleMinQty: e.target.value })} />
                 </div>
               </div>
 

@@ -84,7 +84,6 @@ export default function AdminOrders() {
             <tr>
               <th className="p-3">Order</th>
               <th>Customer</th>
-              <th>Type</th>
               <th>Date</th>
               <th>Items</th>
               <th>Total</th>
@@ -106,13 +105,6 @@ export default function AdminOrders() {
                 <td>
                   <p className="font-medium">{o.user?.name || 'Guest'}</p>
                   <p className="text-xs text-gray-500">{o.user?.email}</p>
-                </td>
-                <td>
-                  {o.accountType === 'wholesale' ? (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold">WHOLESALE</span>
-                  ) : (
-                    <span className="text-xs text-gray-500">Retail</span>
-                  )}
                 </td>
                 <td className="text-xs">{new Date(o.createdAt).toLocaleDateString()}</td>
                 <td>{o.items.length}</td>

@@ -11,7 +11,7 @@ export default function Shipping() {
         <li><strong>Free Mumbai delivery</strong> on all orders above ₹2,999.</li>
         <li>Outside Mumbai: shipping calculated at checkout based on chair size and PIN code (chairs are bulky so freight is at cost).</li>
         <li>Local Mumbai delivery includes white-glove unpacking and basic placement assistance.</li>
-        <li>Wholesale orders may have separate freight terms — see your wholesale agreement.</li>
+        <li>Bulk and custom-manufacturing orders may have separate freight terms — agreed at quote time.</li>
       </ul>
 
       <h2 className="text-xl font-bold mt-6 mb-2">Delivery time</h2>
@@ -19,7 +19,7 @@ export default function Shipping() {
         <li>Metro cities (Mumbai, Pune, Delhi, Bangalore, etc.): 2–4 business days</li>
         <li>Non-metro cities: 4–7 business days</li>
         <li>Remote PIN codes: 7–10 business days</li>
-        <li>Wholesale / bulk orders: 5–10 business days based on volume</li>
+        <li>Bulk / custom-manufacturing orders: 5–10 business days based on volume</li>
       </ul>
       <p className="text-gray-700 mb-4">Estimated dates are shown at checkout and on each order page. Delays may occur during festivals, severe weather, or due to courier partner constraints — we'll always keep you posted via email.</p>
 
@@ -33,7 +33,7 @@ export default function Shipping() {
         <li><strong>Mumbai &amp; nearby areas:</strong> Cash on Delivery accepted on most orders. Pay the full amount to the delivery person when the chair arrives.</li>
         <li><strong>Outside Mumbai (pan-India):</strong> 70% advance payment online, 30% balance on delivery. This keeps freight costs covered while you keep some leverage until the chair is in your hands.</li>
         <li>Online prepayment (UPI / card / netbanking via Razorpay) is welcome from any location and unlocks a smoother dispatch.</li>
-        <li>For bulk and wholesale orders, payment terms are agreed at quote time.</li>
+        <li>For bulk and custom-manufacturing orders, payment terms are agreed at quote time.</li>
       </ul>
 
       <h2 className="text-xl font-bold mt-6 mb-2">If your package doesn't arrive</h2>

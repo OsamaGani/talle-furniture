@@ -35,7 +35,6 @@ const ResetPassword   = lazy(() => import('./pages/ResetPassword'));
 const Profile         = lazy(() => import('./pages/Profile'));
 const MyOrders        = lazy(() => import('./pages/MyOrders'));
 const OrderDetail     = lazy(() => import('./pages/OrderDetail'));
-const Wholesale       = lazy(() => import('./pages/Wholesale'));
 const About           = lazy(() => import('./pages/About'));
 const Contact         = lazy(() => import('./pages/Contact'));
 const Help            = lazy(() => import('./pages/Help'));
@@ -59,7 +58,6 @@ const AdminShippingLabel      = lazy(() => import('./pages/admin/ShippingLabel')
 const AdminUsers              = lazy(() => import('./pages/admin/Users'));
 const AdminCategories         = lazy(() => import('./pages/admin/Categories'));
 const AdminBrands             = lazy(() => import('./pages/admin/Brands'));
-const AdminWholesaleCategories = lazy(() => import('./pages/admin/WholesaleCategories'));
 
 export default function App() {
   const { pathname } = useLocation();
@@ -96,7 +94,6 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/wholesale" element={<Wholesale />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/help" element={<Help />} />
@@ -126,7 +123,6 @@ export default function App() {
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/brands" element={<AdminBrands />} />
-            <Route path="/admin/wholesale-categories" element={<AdminWholesaleCategories />} />
           </Route>
           <Route element={<AdminRoute bare />}>
             <Route path="/admin/orders/:id/invoice" element={<AdminInvoice />} />

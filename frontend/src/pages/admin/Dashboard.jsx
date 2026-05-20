@@ -393,7 +393,7 @@ function DangerZone() {
       </h2>
       <p className="text-xs sm:text-sm text-red-700 mt-1">
         Destructive operations. Users and orders are preserved — only the
-        catalog (products / categories / brands / wholesale tiles) is touched.
+        catalog (products / categories / brands) is touched.
       </p>
 
       <div className="grid sm:grid-cols-3 gap-3 mt-4">
@@ -424,8 +424,8 @@ function DangerZone() {
             Wipe catalog only
           </div>
           <p className="text-[11px] sm:text-xs text-gray-600 mt-1 leading-snug">
-            Destructive. Deletes every product, category, brand and wholesale
-            tile. Leaves the database empty for manual repopulation.
+            Destructive. Deletes every product, category and brand. Leaves
+            the database empty for manual repopulation.
           </p>
         </button>
 
@@ -459,8 +459,7 @@ function DangerZone() {
             <p className="text-xs mt-1">
               Deleted — {lastResult.deleted.products} products,
               {' '}{lastResult.deleted.categories} categories,
-              {' '}{lastResult.deleted.brands} brands,
-              {' '}{lastResult.deleted.wholesaleTiles} wholesale tiles.
+              {' '}{lastResult.deleted.brands} brands.
             </p>
           )}
           {lastResult.totals && (
