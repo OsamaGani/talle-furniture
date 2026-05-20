@@ -1,21 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { departments } from '../config/departments';
-
-// Scrolling announcements shown in the top marquee strip.
-const announcements = [
-  { text: '🚚 FREE Delivery on all orders above ₹2,999 across Mumbai',                          href: '/shipping-policy' },
-  { text: '🔥 Up to 50% OFF — Mega Chair Sale',                                                 href: '/shop?discount=true' },
-  { text: '🔧 Expert Chair Repair & Reupholstery — Doorstep Service in Mumbai',                 href: '/contact' },
-  { text: '⭐ New Models every week — Executive, Ergonomic, Premium, Gaming',                  href: '/shop?newArrival=true' },
-  { text: '💯 Own Manufacturing — Trusted by WeWork, Roller Bearing, Upstep Academy & more',     href: '/about' },
-  { text: '🛡 5-Year Warranty on Talle-branded chairs',                                          href: '/refund-policy' },
-  { text: '📞 Need help? Call +91 93261 66875 — we reply fast',                                  href: '/contact' },
-];
 
 // Material filter — replaces the legacy "age group" facet for the chair
 // business. Grouped into 3 sections so the mega-menu mirrors the Category
@@ -179,45 +168,26 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? 'shadow-xl' : 'shadow-sm'}`}>
-      {/* Scrolling announcements strip — hides when scrolled, pauses on hover */}
-      <div className={`overflow-hidden transition-all duration-300 bg-gradient-to-r from-purple-600 via-pink-600 to-primary-500 text-white text-[11px] sm:text-xs font-semibold ${scrolled ? 'max-h-0' : 'max-h-9'}`}>
-        <div className="relative flex w-full overflow-hidden py-2 group">
-          {/* Two identical tracks placed side-by-side; together they animate from
-              translateX(0) to translateX(-50%) which lines copy #2 up exactly
-              where copy #1 started — producing a seamless infinite loop. */}
-          {[0, 1].map((copy) => (
-            <ul
-              key={copy}
-              aria-hidden={copy === 1}
-              className="flex shrink-0 items-center gap-8 pr-8 whitespace-nowrap animate-marquee group-hover:[animation-play-state:paused]"
-            >
-              {announcements.map((a, i) => (
-                <li key={`${copy}-${i}`} className="flex items-center gap-8">
-                  <Link
-                    to={a.href}
-                    className="hover:underline hover:text-yellow-200 transition"
-                  >
-                    {a.text}
-                  </Link>
-                  <span className="opacity-50" aria-hidden>•</span>
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </div>
-      {/* Top bar — hides when scrolled */}
-      <div className={`bg-gray-900 text-white text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
+    <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}>
+      {/* Single thin utility bar — phone + delivery on the left, support
+          links on the right. Replaces the previous scrolling marquee
+          strip AND the duplicate dark utility bar (both were noisy and
+          shouted "flash-sale marketplace"). Hides when scrolled so the
+          sticky main bar stays compact. */}
+      <div className={`bg-gray-900 text-white text-[11px] sm:text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
         <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-2 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Delivery over ₹2,999</span>
-            <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 93261 66875</span>
+            <a href="tel:+919326166875" className="flex items-center gap-1.5 hover:text-primary-400 transition">
+              <FiPhone size={12} /> <span>+91 93261 66875</span>
+            </a>
+            <span className="hidden sm:flex items-center gap-1.5 text-white/80">
+              <FiTruck size={12} /> Free Mumbai delivery on ₹2,999+
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/orders" className="hover:text-primary-500">Track Order</Link>
-            <span className="hidden sm:inline opacity-50">|</span>
-            <Link to="/help" className="hidden sm:inline hover:text-primary-500">Help</Link>
+          <div className="flex items-center gap-4 text-white/90">
+            <Link to="/orders" className="hover:text-primary-400 transition">Track Order</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/help" className="hover:text-primary-400 transition">Help</Link>
           </div>
         </div>
       </div>
@@ -257,13 +227,16 @@ export default function Navbar() {
               integrated with the row instead of floating in a centred
               max-width box. */}
           <form onSubmit={handleSearch} className="hidden md:flex w-full relative">
+            {/* Quieter border treatment — 1 px neutral gray rests state,
+                primary-red only on focus. Reads premium instead of
+                shouting like a sale banner. */}
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs, brands, materials..."
-              className="w-full border-2 border-primary-500 rounded-full pl-5 pr-14 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              className="w-full border border-gray-300 rounded-full pl-5 pr-14 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
             />
-            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 hover:bg-primary-600 text-white p-2.5 rounded-full transition">
+            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 hover:bg-primary-500 text-white p-2.5 rounded-full transition">
               <FiSearch />
             </button>
           </form>
@@ -382,58 +355,54 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile search */}
+        {/* Mobile search — same quiet border treatment as desktop. */}
         <div className="md:hidden px-4 pb-2.5">
           <form onSubmit={handleSearch} className="relative">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs..."
-              className="w-full border-2 border-primary-500 rounded-full pl-4 pr-12 py-2 focus:outline-none"
+              className="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
             />
-            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-full">
+            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 text-white p-2 rounded-full">
               <FiSearch size={14} />
             </button>
           </form>
         </div>
 
-        {/* Mobile-only horizontal category strip — quick shortcuts under
-            the search bar so phone users don't have to open the hamburger
-            for the most common destinations. Mirrors the Flipkart /
-            Myntra / Meesho mobile pattern. Hidden on md+ where the full
-            categories nav is visible. */}
-        <nav className="md:hidden border-t bg-gradient-to-r from-primary-50 via-pink-50 to-amber-50">
+        {/* Mobile-only horizontal category strip — short, focused list of
+            5 destinations under the search bar. Hidden on md+ where the
+            full category nav is visible. Neutral background (was a candy
+            tri-tone gradient) and quieter chips to match the premium
+            navbar treatment. */}
+        <nav className="md:hidden border-t bg-white">
           <div
-            className="flex items-center gap-1 overflow-x-auto px-3 py-2 [&::-webkit-scrollbar]:hidden"
+            className="flex items-center gap-1.5 overflow-x-auto px-3 py-2 [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
             aria-label="Quick categories"
           >
-            <MobileChip to="/shop?discount=true" highlight>🔥 50% Off</MobileChip>
-            <MobileChip to="/shop?bestSeller=true">⭐ Best Sellers</MobileChip>
-            <MobileChip to="/shop?newArrival=true">✨ New</MobileChip>
-            <MobileChip to="/chair-repair">🔧 Repair</MobileChip>
-            <MobileChip to="/shop?category=Executive">💼 Executive</MobileChip>
-            <MobileChip to="/shop?category=Ergonomic">🪑 Ergonomic</MobileChip>
-            <MobileChip to="/shop?category=Premium">✨ Premium</MobileChip>
-            <MobileChip to="/shop?category=Gaming">🎮 Gaming</MobileChip>
+            <MobileChip to="/shop?discount=true" highlight>Sale</MobileChip>
+            <MobileChip to="/chair-repair">Repair</MobileChip>
+            <MobileChip to="/shop?category=Executive">Executive</MobileChip>
+            <MobileChip to="/shop?category=Ergonomic">Ergonomic</MobileChip>
+            <MobileChip to="/shop?category=Premium">Premium</MobileChip>
           </div>
         </nav>
       </div>
 
-      {/* Categories nav — simple centred flex row. */}
-      <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
+      {/* Category nav — slimmed to 6 focused items, no decorative
+          emojis, neutral white background. Premium-brand approach:
+          the dropdowns (Category / Material / Clients) handle deep
+          browsing, the linear links handle the top destinations. */}
+      <nav className="hidden md:block border-b bg-white relative" onMouseLeave={() => setOpenDropdown(null)}>
         <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
-          <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap justify-center">
-            <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
-            <NavItem to="/shop" label="All Chairs" />
-            <NavItem to="/chair-repair" label="🔧 Repair" />
-            <NavItem to="/shop?discount=true" label="🔥 50% Off" highlight />
-            <DropdownTrigger label="Clients" active={openDropdown === 'clients'} onHover={() => setOpenDropdown('clients')} />
+          <ul className="flex items-center gap-2 text-sm font-semibold flex-nowrap justify-center">
+            <NavItem to="/shop" label="Shop" />
+            <NavItem to="/chair-repair" label="Repair" />
             <DropdownTrigger label="Category" active={openDropdown === 'category'} onHover={() => setOpenDropdown('category')} />
             <DropdownTrigger label="Material" active={openDropdown === 'material'} onHover={() => setOpenDropdown('material')} />
-            <NavItem to="/shop?category=Premium" label="Premium" />
-            <NavItem to="/shop?bestSeller=true" label="⭐ Best Sellers" />
-            <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
+            <DropdownTrigger label="Clients" active={openDropdown === 'clients'} onHover={() => setOpenDropdown('clients')} />
+            <NavItem to="/shop?discount=true" label="Sale" highlight />
           </ul>
         </div>
 
