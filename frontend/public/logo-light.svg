@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 86" width="296" height="86">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 88" width="280" height="88">
   <!-- Talle Furniture Mart — light variant (white wordmark on dark bg).
-       viewBox tightened to match /logo.svg exactly so it never reports
-       phantom width in the footer / login left panel / shipping label. -->
+       Same Arial Black + Arial Bold typography stack as /logo.svg so
+       the visual identity stays consistent across both variants. -->
 
   <!-- Mark: rounded charcoal square — same as primary -->
   <rect x="0" y="0" width="86" height="86" rx="12" fill="#111827"/>
@@ -12,24 +12,24 @@
     <line x1="30" y1="52" x2="56" y2="52"/>
     <line x1="56" y1="52" x2="56" y2="68"/>
   </g>
-  <!-- Red accent dot stays red on the dark variant too, since the brand
-       colour pops cleanly against the charcoal mark on every background. -->
+  <!-- Red accent dot stays red on the dark variant too — the brand
+       colour pops cleanly against the charcoal mark on every bg. -->
   <circle cx="30" cy="16" r="3.5" fill="#e53935"/>
 
-  <!-- TALLE wordmark — white -->
-  <text x="102" y="45"
-        font-family="'Poppins', 'Helvetica Neue', Arial, sans-serif"
+  <!-- TALLE wordmark — white, heavyweight, tracked -->
+  <text x="102" y="48"
+        font-family="'Arial Black', 'Helvetica Black', Arial, sans-serif"
         font-size="34"
-        font-weight="800"
-        letter-spacing="4"
+        font-weight="900"
+        letter-spacing="2"
         fill="#ffffff">TALLE</text>
 
   <!-- FURNITURE MART rule + sub-line in white / soft grey -->
-  <line x1="104" y1="55" x2="216" y2="55" stroke="#ffffff" stroke-width="1.5"/>
-  <text x="104" y="73"
-        font-family="'Poppins', 'Helvetica Neue', Arial, sans-serif"
-        font-size="10"
-        font-weight="600"
-        letter-spacing="5"
-        fill="#ffffff" opacity="0.85">FURNITURE MART</text>
+  <line x1="104" y1="58" x2="262" y2="58" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="104" y="78"
+        font-family="'Arial', 'Helvetica', sans-serif"
+        font-size="14"
+        font-weight="700"
+        letter-spacing="2.5"
+        fill="#ffffff" opacity="0.92">FURNITURE MART</text>
 </svg>
