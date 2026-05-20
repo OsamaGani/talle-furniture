@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80">
+  <!-- Option 2: Pure wordmark, no icon
+       Primary use: minimal / luxury feel, looks great in newsletters
+       and on the printed invoice header. -->
+
+  <!-- TALLE in display serif, red, with subtle ampersand-like flourish -->
+  <text x="10" y="48"
+        font-family="'Playfair Display', Georgia, serif"
+        font-size="46"
+        font-weight="900"
+        letter-spacing="2"
+        fill="#e53935">TALLE</text>
+
+  <!-- Thin horizontal divider underneath TALLE -->
+  <line x1="12" y1="56" x2="142" y2="56" stroke="#111827" stroke-width="2"/>
+
+  <!-- FURNITURE MART in small caps below -->
+  <text x="14" y="73"
+        font-family="'Poppins', 'Helvetica Neue', sans-serif"
+        font-size="13"
+        font-weight="700"
+        letter-spacing="6"
+        fill="#111827">FURNITURE MART</text>
+
+  <!-- Tagline aligned to the right of the wordmark -->
+  <text x="190" y="36"
+        font-family="'Poppins', 'Helvetica Neue', sans-serif"
+        font-size="10"
+        font-weight="600"
+        letter-spacing="3"
+        fill="#6b7280">SAKI NAKA · MUMBAI</text>
+  <text x="190" y="52"
+        font-family="'Poppins', 'Helvetica Neue', sans-serif"
+        font-size="10"
+        font-weight="600"
+        letter-spacing="3"
+        fill="#6b7280">EST. 2010</text>
+  <text x="190" y="68"
+        font-family="'Poppins', 'Helvetica Neue', sans-serif"
+        font-size="10"
+        font-weight="600"
+        letter-spacing="3"
+        fill="#e53935">CHAIR SPECIALISTS</text>
+</svg>
