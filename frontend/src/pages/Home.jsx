@@ -156,18 +156,37 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const [a, b, c, d, cat] = await Promise.all([
-          API.get('/products?featured=true&limit=8'),
-          API.get('/products?bestSeller=true&limit=8'),
-          API.get('/products?newArrival=true&limit=8'),
-          API.get('/products?onDeal=true&sort=price-asc&limit=8'),
-          // Pull the full category list and filter client-side. Light enough
-          // (one fetch, ~3 KB) that a dedicated endpoint isn't worth the
-          // extra route. Sorted by homeOrder ascending, capped at 8 tiles.
-          API.get('/categories'),
-        ]);
-        const featuredCats = (cat.data || [])
+      // Promise.allSettled — partial-failure tolerant. With Promise.all,
+      // a single flaky API call (typical on mobile networks) rejected the
+      // whole batch and every product rail stayed as skeletons forever.
+      // Now each rail loads independently: if /products?featured=true
+      // fails but /products?bestSeller=true succeeds, Best Sellers still
+      // renders products while Featured falls back to whatever cached
+      // products it had (or empty if cold visit).
+      const results = await Promise.allSettled([
+        API.get('/products?featured=true&limit=8'),
+        API.get('/products?bestSeller=true&limit=8'),
+        API.get('/products?newArrival=true&limit=8'),
+        API.get('/products?onDeal=true&sort=price-asc&limit=8'),
+        // Full category list (~3 KB) — filtered client-side to find the
+        // ones the admin marked featuredOnHome=true.
+        API.get('/categories'),
+      ]);
+
+      // Helper: pull the products array out of a settled result, falling
+      // back to the existing cached/state value if that one call failed.
+      const productsOr = (settled, fallback) =>
+        settled.status === 'fulfilled' ? (settled.value.data.products || []) : fallback;
+
+      const freshFeatured    = productsOr(results[0], featured);
+      const freshBestSellers = productsOr(results[1], bestSellers);
+      const freshNewArrivals = productsOr(results[2], newArrivals);
+      const freshTodaysDeals = productsOr(results[3], todaysDeals);
+
+      // Categories — same partial-failure logic.
+      let freshHomeCategories = homeCategories;
+      if (results[4].status === 'fulfilled') {
+        const featuredCats = (results[4].value.data || [])
           .filter((c) => c.featuredOnHome)
           .sort((x, y) => (x.homeOrder ?? 999) - (y.homeOrder ?? 999))
           .slice(0, 8)
@@ -175,24 +194,37 @@ export default function Home() {
         // Only switch away from the hardcoded fallback if the admin has
         // actually configured some homepage tiles — otherwise leave the
         // demo grid visible so a fresh install doesn't show a blank rail.
-        const liveHomeCategories = featuredCats.length > 0 ? featuredCats : fallbackHomeCategories;
+        freshHomeCategories = featuredCats.length > 0 ? featuredCats : fallbackHomeCategories;
+      }
 
-        const fresh = {
-          featured: a.data.products,
-          bestSellers: b.data.products,
-          newArrivals: c.data.products,
-          todaysDeals: d.data.products,
-          homeCategories: liveHomeCategories,
-        };
-        setFeatured(fresh.featured);
-        setBestSellers(fresh.bestSellers);
-        setNewArrivals(fresh.newArrivals);
-        setTodaysDeals(fresh.todaysDeals);
-        setHomeCategories(fresh.homeCategories);
-        writeHomeCache(fresh);
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
+      setFeatured(freshFeatured);
+      setBestSellers(freshBestSellers);
+      setNewArrivals(freshNewArrivals);
+      setTodaysDeals(freshTodaysDeals);
+      setHomeCategories(freshHomeCategories);
+
+      // Cache whatever we got — even partial success is better than no
+      // cache for the next mobile visit.
+      writeHomeCache({
+        featured: freshFeatured,
+        bestSellers: freshBestSellers,
+        newArrivals: freshNewArrivals,
+        todaysDeals: freshTodaysDeals,
+        homeCategories: freshHomeCategories,
+      });
+
+      // Log any rail that failed so issues are visible in DevTools
+      // without breaking the page.
+      const railNames = ['Featured', 'Best Sellers', 'New Arrivals', "Today's Deals", 'Categories'];
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.warn(`Home rail "${railNames[i]}" failed to load:`, r.reason?.message || r.reason);
+        }
+      });
+
+      setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // No early bail-out. Skeleton placeholders inside <Section /> handle the

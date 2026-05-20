@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
+  // 30 s ceiling — long enough for Render free-tier cold starts to wake
+  // the backend (typically 20-30 s), short enough that a flaky mobile
+  // network can't leave a request hung forever holding open a connection
+  // and blocking dependent Promise.all calls.
+  timeout: 30_000,
 });
 
 API.interceptors.request.use((config) => {
