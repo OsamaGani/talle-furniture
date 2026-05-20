@@ -2,6 +2,19 @@
 #
 # Order matters: more specific rules first, SPA fallback last.
 
+# === API proxy ===
+# Every /api/* request from the browser is rewritten by Cloudflare's edge
+# to hit the Render backend server-to-server. Two big wins:
+#  1. The browser only ever talks to talle-furniture.pages.dev (same
+#     origin) → no CORS, and Indian mobile carriers can't transparently
+#     proxy / block onrender.com IPs because the phone never connects
+#     to that host directly.
+#  2. Cloudflare's Mumbai edge POP is closer to Indian users than
+#     Render's region → faster perceived latency on every request.
+# The 200 status code makes this a rewrite (the URL bar stays as
+# talle-furniture.pages.dev/api/...) not a 30x redirect.
+/api/*  https://toy-mall.onrender.com/api/:splat  200
+
 # Proxy the sitemap from the backend so search engines see it on the
 # canonical frontend domain. The 200 status makes this a rewrite, not a
 # redirect — Google fetches it from tallefurnituremart.com/sitemap.xml directly.
