@@ -1,25 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 86" width="260" height="86">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 88" width="280" height="88">
   <!-- Talle Furniture Mart — light variant (white wordmark on dark bg).
-       Same architecture as /logo.svg: chair mark + bold TALLE wordmark,
-       no subtitle. -->
+       Same Arial Black + Arial Bold typography stack as /logo.svg so
+       the visual identity stays consistent across both variants. -->
 
   <!-- Mark: rounded charcoal square — same as primary -->
-  <rect x="0" y="0" width="86" height="86" rx="14" fill="#111827"/>
+  <rect x="0" y="0" width="86" height="86" rx="12" fill="#111827"/>
 
-  <!-- Single-line architectural chair drawing in white -->
-  <g fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="square" stroke-linejoin="miter">
-    <line x1="30" y1="22" x2="30" y2="62"/>
-    <line x1="30" y1="54" x2="58" y2="54"/>
-    <line x1="58" y1="54" x2="58" y2="70"/>
+  <!-- Single-line chair drawing in white -->
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <line x1="30" y1="20" x2="30" y2="60"/>
+    <line x1="30" y1="52" x2="56" y2="52"/>
+    <line x1="56" y1="52" x2="56" y2="68"/>
   </g>
-  <!-- Red accent dot — the brand colour stays red on every background -->
-  <circle cx="30" cy="17" r="4" fill="#e53935"/>
+  <!-- Red accent dot stays red on the dark variant too — the brand
+       colour pops cleanly against the charcoal mark on every bg. -->
+  <circle cx="30" cy="16" r="3.5" fill="#e53935"/>
 
-  <!-- TALLE wordmark in white -->
-  <text x="100" y="62"
+  <!-- TALLE wordmark — white, heavyweight, tracked -->
+  <text x="102" y="48"
         font-family="'Arial Black', 'Helvetica Black', Arial, sans-serif"
-        font-size="56"
+        font-size="34"
         font-weight="900"
-        letter-spacing="1"
+        letter-spacing="2"
         fill="#ffffff">TALLE</text>
+
+  <!-- FURNITURE MART rule + sub-line in white / soft grey -->
+  <line x1="104" y1="58" x2="262" y2="58" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="104" y="78"
+        font-family="'Arial', 'Helvetica', sans-serif"
+        font-size="14"
+        font-weight="700"
+        letter-spacing="2.5"
+        fill="#ffffff" opacity="0.92">FURNITURE MART</text>
 </svg>

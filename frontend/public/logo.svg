@@ -1,34 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 86" width="260" height="86">
-  <!-- Talle Furniture Mart — primary brand logo.
-       Premium chair mark + bold TALLE wordmark. No subtitle text —
-       subtitles render as illegible scratch at navbar sizes, and
-       premium furniture brands (Herman Miller, Steelcase, Knoll,
-       Vitra) all use wordmark-only logos for exactly this reason.
-       FURNITURE MART context comes from the surrounding copy in
-       footer / invoice / page meta titles. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 88" width="280" height="88">
+  <!-- Talle Furniture Mart — primary logo (dark wordmark on light bg).
+       Uses Arial Black + Arial Bold because when the SVG is loaded via
+       <img>, browsers can NOT reach the page's Google Fonts — Poppins
+       falls back to a thin default, which made the FURNITURE MART
+       sub-line look broken at navbar size. Arial Black is on every
+       OS so the proportions stay reliable. -->
 
-  <!-- Mark: rounded charcoal square, flush to left edge -->
-  <rect x="0" y="0" width="86" height="86" rx="14" fill="#111827"/>
+  <!-- Mark: rounded charcoal square (flush to the left edge) -->
+  <rect x="0" y="0" width="86" height="86" rx="12" fill="#111827"/>
 
-  <!-- Single-line architectural chair drawing in white -->
-  <g fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="square" stroke-linejoin="miter">
-    <!-- chair back -->
-    <line x1="30" y1="22" x2="30" y2="62"/>
-    <!-- seat -->
-    <line x1="30" y1="54" x2="58" y2="54"/>
-    <!-- front leg -->
-    <line x1="58" y1="54" x2="58" y2="70"/>
+  <!-- Single-line chair drawing in white, geometric, no shading -->
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <line x1="30" y1="20" x2="30" y2="60"/>
+    <line x1="30" y1="52" x2="56" y2="52"/>
+    <line x1="56" y1="52" x2="56" y2="68"/>
   </g>
-  <!-- Red accent dot — single brand-colour touch -->
-  <circle cx="30" cy="17" r="4" fill="#e53935"/>
+  <!-- Red accent dot — the brand colour as a single precise mark -->
+  <circle cx="30" cy="16" r="3.5" fill="#e53935"/>
 
-  <!-- TALLE wordmark — Arial Black at 56pt is the visual hero now.
-       Letter-spacing 1 (was 4) packs the letters into a tight,
-       declarative block. Renders cleanly at any navbar size. -->
-  <text x="100" y="62"
+  <!-- TALLE wordmark — heavyweight, tracked. Arial Black is bundled
+       with every Windows / macOS / Android install so the SVG renders
+       the same on every device. -->
+  <text x="102" y="48"
         font-family="'Arial Black', 'Helvetica Black', Arial, sans-serif"
-        font-size="56"
+        font-size="34"
         font-weight="900"
-        letter-spacing="1"
+        letter-spacing="2"
         fill="#111827">TALLE</text>
+
+  <!-- FURNITURE MART rule + sub-line — now bumped to 14pt with
+       Arial Bold and 2.5px letter-spacing so it's legible even when
+       the whole logo is scaled down to 40 px tall in the navbar. -->
+  <line x1="104" y1="58" x2="262" y2="58" stroke="#111827" stroke-width="1.5"/>
+  <text x="104" y="78"
+        font-family="'Arial', 'Helvetica', sans-serif"
+        font-size="14"
+        font-weight="700"
+        letter-spacing="2.5"
+        fill="#374151">FURNITURE MART</text>
 </svg>
