@@ -27,6 +27,10 @@ export default {
       },
       fontFamily: {
         sans: ['Poppins', 'system-ui', 'sans-serif'],
+        // Editorial display serif used by the homepage hero headlines
+        // and any other 'magazine cover' style copy that needs to feel
+        // crafted rather than utilitarian.
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
     },
   },
