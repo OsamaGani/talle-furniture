@@ -40,10 +40,8 @@ export default function ShippingLabel() {
       <div className="max-w-md mx-auto bg-white border-2 border-black shadow-lg print:shadow-none print:border-2 print:border-black">
         {/* Header strip */}
         <div className="bg-black text-white px-3 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <span className="text-xl font-extrabold text-primary-500">Talle</span>
-            <span className="text-xl font-extrabold text-white">Furniture</span>
-          </div>
+          {/* Light variant — shipping label header strip is solid black. */}
+          <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-9 w-auto" />
           {isCOD && (
             <span className="bg-yellow-400 text-black px-3 py-1 text-sm font-extrabold rounded">COD ₹{order.totalPrice.toFixed(2)}</span>
           )}

@@ -38,9 +38,9 @@ export default function ForgotPassword() {
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden">
           {/* Header band with brand + page title. Padding scales on sm+. */}
           <div className="bg-gradient-to-r from-primary-500 to-pink-500 px-5 sm:px-8 py-6 sm:py-8 text-center text-white">
-            <Link to="/" className="inline-flex items-center gap-1 mb-2 sm:mb-3">
-              <span className="text-xl sm:text-2xl font-extrabold">Talle</span>
-              <span className="text-xl sm:text-2xl font-extrabold">Furniture</span>
+            {/* Light variant — sits on the red/pink gradient header band. */}
+            <Link to="/" className="inline-flex items-center mb-2 sm:mb-3" aria-label="Talle Furniture Mart — home">
+              <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-9 sm:h-10 w-auto" />
             </Link>
             <h1 className="text-xl sm:text-2xl font-bold">Forgot password?</h1>
             <p className="text-xs sm:text-sm text-white/85 mt-1">

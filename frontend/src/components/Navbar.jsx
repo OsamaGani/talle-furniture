@@ -229,9 +229,16 @@ export default function Navbar() {
           wide displays. */}
       <div className="border-b">
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-4 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
-          <Link to="/" className="flex items-center gap-1 flex-shrink-0">
-            <span className={`font-extrabold text-primary-500 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Talle</span>
-            <span className={`font-extrabold text-gray-900 transition-all ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>Furniture</span>
+          {/* Brand logo — SVG wordmark + architectural chair mark. Height
+              shrinks slightly when the page is scrolled so the sticky nav
+              stays compact without re-flowing the row. The SVG itself
+              keeps its 3.75:1 aspect ratio so width follows the height. */}
+          <Link to="/" className="flex items-center flex-shrink-0" aria-label="Talle Furniture Mart — home">
+            <img
+              src="/logo.svg"
+              alt="Talle Furniture Mart"
+              className={`w-auto transition-all ${scrolled ? 'h-9 sm:h-10' : 'h-10 sm:h-12'}`}
+            />
           </Link>
 
           {/* Search fills the entire middle grid column — no max-width cap

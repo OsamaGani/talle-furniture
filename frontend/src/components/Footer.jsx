@@ -15,9 +15,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         {/* Brand column — full width on mobile, single column on desktop */}
         <div className="col-span-2 md:col-span-1">
-          <div className="flex items-center gap-1 mb-3">
-            <span className="text-2xl font-extrabold text-primary-500">Talle</span>
-            <span className="text-2xl font-extrabold text-white">Furniture</span>
+          {/* Brand logo — light variant for the dark footer background. */}
+          <div className="mb-4">
+            <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-12 w-auto" />
           </div>
           <p className="text-sm">Mumbai's trusted chair specialist — manufacturing, retail and expert repair. Comfort, durability and style in every seat.</p>
           <div className="mt-5">

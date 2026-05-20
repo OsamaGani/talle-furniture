@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" width="360" height="96">
+  <!-- Talle Furniture Mart — primary logo (dark wordmark on light bg).
+       Architectural single-line chair mark in a charcoal rounded square +
+       tracked TALLE wordmark + hairline rule + FURNITURE MART sub-line.
+       Use this on navbar, mobile brand bars, the printed invoice, and any
+       white / cream surface. Pair with /logo-light.svg on dark surfaces. -->
+
+  <!-- Mark: rounded charcoal square -->
+  <rect x="6" y="6" width="84" height="84" rx="12" fill="#111827"/>
+
+  <!-- Single-line chair drawing in white, geometric, no shading -->
+  <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <line x1="36" y1="24" x2="36" y2="64"/>
+    <line x1="36" y1="56" x2="62" y2="56"/>
+    <line x1="62" y1="56" x2="62" y2="72"/>
+  </g>
+  <!-- Red accent dot — the brand colour as a single precise mark -->
+  <circle cx="36" cy="20" r="3.5" fill="#e53935"/>
+
+  <!-- TALLE wordmark — black, tracked, geometric -->
+  <text x="108" y="50"
+        font-family="'Poppins', 'Helvetica Neue', Arial, sans-serif"
+        font-size="34"
+        font-weight="800"
+        letter-spacing="4"
+        fill="#111827">TALLE</text>
+
+  <!-- FURNITURE MART rule + sub-line, tight kerning -->
+  <line x1="110" y1="60" x2="222" y2="60" stroke="#111827" stroke-width="1.5"/>
+  <text x="110" y="78"
+        font-family="'Poppins', 'Helvetica Neue', Arial, sans-serif"
+        font-size="10"
+        font-weight="600"
+        letter-spacing="5"
+        fill="#374151">FURNITURE MART</text>
+</svg>

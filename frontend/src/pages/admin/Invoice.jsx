@@ -35,10 +35,8 @@ export default function Invoice() {
         {/* Header — stacks on mobile, side-by-side on tablet+ */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 border-b-4 border-primary-500 pb-4 mb-6 print:flex-row print:gap-0">
           <div>
-            <div className="flex items-center gap-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-primary-500">Talle</span>
-              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">Furniture</span>
-            </div>
+            {/* Dark logo variant — invoice prints on white paper. */}
+            <img src="/logo.svg" alt="Talle Furniture Mart" className="h-12 sm:h-14 w-auto" />
             <p className="text-xs text-gray-600 mt-1">Shop No. 5, D'Souza Sadan, near Peninsula Grand Hotel</p>
             <p className="text-xs text-gray-600">Sainath Wadi, Lokmanya Tilak Nagar, Saki Naka</p>
             <p className="text-xs text-gray-600">Mumbai — 400072, Maharashtra, India</p>

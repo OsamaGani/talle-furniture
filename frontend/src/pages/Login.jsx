@@ -36,9 +36,9 @@ export default function Login() {
         <span className="absolute top-1/2 right-24 text-4xl lg:text-5xl opacity-30 animate-float hidden lg:inline" style={{ animationDelay: '1s' }}>💼</span>
 
         <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-1">
-            <span className="text-2xl lg:text-3xl font-extrabold">Talle</span>
-            <span className="text-2xl lg:text-3xl font-extrabold">Furniture</span>
+          {/* Light variant — sits on the red/pink gradient panel. */}
+          <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
+            <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-11 lg:h-12 w-auto" />
           </Link>
         </div>
 
@@ -80,9 +80,9 @@ export default function Login() {
         <div className="md:hidden text-center mb-6 sm:mb-8">
           <div className="inline-block">
             <div className="h-1 w-12 bg-gradient-to-r from-primary-500 to-pink-500 rounded-full mx-auto mb-3" />
-            <Link to="/" className="inline-flex items-center gap-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-primary-500">Talle</span>
-              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">Furniture</span>
+            {/* Dark variant — mobile-only screen on white background. */}
+            <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
+              <img src="/logo.svg" alt="Talle Furniture Mart" className="h-11 sm:h-12 w-auto" />
             </Link>
           </div>
         </div>
