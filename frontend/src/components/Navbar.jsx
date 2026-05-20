@@ -209,7 +209,7 @@ export default function Navbar() {
       </div>
       {/* Top bar — hides when scrolled */}
       <div className={`bg-gray-900 text-white text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-2 flex justify-between items-center">
+        <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-2 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Delivery over ₹2,999</span>
             <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 93261 66875</span>
@@ -228,7 +228,7 @@ export default function Navbar() {
           generous side padding so it doesn't kiss the screen edges on
           wide displays. */}
       <div className="border-b">
-        <div className={`w-full px-4 sm:px-6 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-4 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
+        <div className={`w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 grid grid-cols-[auto_1fr_auto] items-center gap-4 sm:gap-6 transition-all duration-300 ${scrolled ? 'py-2' : 'py-2.5 sm:py-3'}`}>
           {/* Brand logo — SVG wordmark + architectural chair mark. Height
               steps up on tablet/desktop because the navbar has plenty of
               horizontal space to fill. Shrinks slightly when the page is
@@ -421,7 +421,7 @@ export default function Navbar() {
 
       {/* Categories nav — simple centred flex row. */}
       <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
-        <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
           <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap justify-center">
             <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
             <NavItem to="/shop" label="All Chairs" />
