@@ -41,11 +41,10 @@ const heroSlides = [
     primaryLink: '/shop?category=Premium',
     secondaryCta: 'OUR STORY',
     secondaryLink: '/about',
-    // Same wide interior lifestyle shot as slide 1 — keeps the carousel
-    // visually cohesive so each slide reads as the same furniture line,
-    // only the copy + CTA change between them. The previous close-up
-    // chair photo here had been 404'ing from Unsplash anyway.
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=85&auto=format&fit=crop',
+    // Wide interior lifestyle shot (different from slide 1) — same
+    // magazine-style "furniture in a home setting" vibe, so the
+    // carousel feels cohesive without repeating the exact photo.
+    image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=1920&q=85&auto=format&fit=crop',
   },
   {
     eyebrow: 'TALLE SPECIALTY',
