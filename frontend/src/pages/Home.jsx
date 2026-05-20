@@ -41,7 +41,11 @@ const heroSlides = [
     primaryLink: '/shop?category=Premium',
     secondaryCta: 'OUR STORY',
     secondaryLink: '/about',
-    image: 'https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=1920&q=85&auto=format&fit=crop',
+    // Previous photo (1505843490701) got removed from Unsplash and 404'd
+    // — the slide showed pure-black because the <img> failed to load and
+    // only the dark gradient overlay remained. Swapped to the executive-
+    // chair shot we already use elsewhere in the catalogue.
+    image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1920&q=85&auto=format&fit=crop',
   },
   {
     eyebrow: 'TALLE SPECIALTY',
@@ -236,14 +240,25 @@ export default function Home() {
                 className={`absolute inset-0 transition-opacity duration-700 ease-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                 aria-hidden={!isActive}
               >
+                {/* Brand-coloured gradient fallback that sits BEHIND the
+                    photo. If the Unsplash URL ever 404s (an image gets
+                    removed from the CDN, a network blocks the host, etc.)
+                    the slide falls back to this warm gradient instead of
+                    rendering as a black box. Same gradient used for sale
+                    callouts elsewhere so the slide stays on-brand. */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-700 via-orange-600 to-primary-500" />
+
                 {/* Background lifestyle photo. Slow-zoom on the active
                     slide gives a subtle Ken-Burns feel without being
                     distracting. eager-load only the first slide so LCP
-                    isn't blocked by lazy decoding on the rest. */}
+                    isn't blocked by lazy decoding on the rest. onError
+                    hides the broken <img> so the gradient underneath
+                    becomes visible — never falls back to pure black. */}
                 <img
                   src={slide_.image}
                   alt={slide_.title}
                   loading={i === 0 ? 'eager' : 'lazy'}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[8000ms] ease-out ${
                     isActive ? 'scale-105' : 'scale-100'
                   }`}
