@@ -120,7 +120,7 @@ export default function QuickAddModal({ open, onClose, onSaved, collection, coll
 
           <div>
             <label className="label">Product Name *</label>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. LEGO City Police Station" required autoFocus />
+            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Talle Aero Executive High-Back Chair" required autoFocus />
           </div>
 
           <div className="grid grid-cols-3 gap-3">

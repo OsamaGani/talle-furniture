@@ -99,7 +99,7 @@ export default function AdminActionToys() {
             🔧 Service & Spare Parts
           </h1>
           <p className="text-sm text-gray-500">
-            Manage Talle-branded repair, service and spare-part listings shown on the <Link to="/action-toys" className="text-primary-500 hover:underline">Chair Repair</Link> page.
+            Manage Talle-branded repair, service and spare-part listings shown on the <Link to="/chair-repair" className="text-primary-500 hover:underline">Chair Repair</Link> page.
             Category is locked to <span className="font-semibold">{SERVICE_BRAND}</span>.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function AdminActionToys() {
             <FiPackage /> Bulk Add
           </Link>
           <Link
-            to={`/admin/products/new?brand=${encodeURIComponent(SERVICE_BRAND)}&from=/admin/action-toys`}
+            to={`/admin/products/new?brand=${encodeURIComponent(SERVICE_BRAND)}&from=/admin/chair-repair`}
             className="btn-primary inline-flex items-center gap-2"
           >
             <FiPlus /> Add Service Item
@@ -250,7 +250,7 @@ export default function AdminActionToys() {
                         <FiEye />
                       </Link>
                       <Link
-                        to={`/admin/products/${p._id}/edit?from=/admin/action-toys`}
+                        to={`/admin/products/${p._id}/edit?from=/admin/chair-repair`}
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                         title="Edit"
                       >
@@ -277,7 +277,7 @@ export default function AdminActionToys() {
                         : 'No service items yet.'}
                     </p>
                     <Link
-                      to={`/admin/products/new?brand=${encodeURIComponent(SERVICE_BRAND)}&from=/admin/action-toys`}
+                      to={`/admin/products/new?brand=${encodeURIComponent(SERVICE_BRAND)}&from=/admin/chair-repair`}
                       className="text-primary-500 hover:underline text-sm mt-2 inline-flex items-center gap-1"
                     >
                       <FiZap /> Add your first service item

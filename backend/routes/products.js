@@ -8,7 +8,7 @@ const { audit } = require('../utils/audit');
 const router = express.Router();
 
 // Look up a product by either Mongo ObjectId or its SEO slug.
-// Old links like /product/65f1...  keep working; new links use /product/lego-classic-bricks.
+// Old links like /product/65f1...  keep working; new links use /product/talle-aero-executive-chair.
 async function findProductByIdOrSlug(idOrSlug) {
   if (mongoose.isValidObjectId(idOrSlug)) {
     const byId = await Product.findById(idOrSlug);

@@ -45,9 +45,9 @@ const productSchema = new mongoose.Schema(
       // Optional per-colour name + description overrides. Empty string
       // (default) falls back to the product-level name / description.
       // Useful when each colour is essentially its own edition — e.g.
-      // "Hot Wheels Red Racer" vs "Hot Wheels Blue Cruiser" — without
-      // splitting the listing into two products and losing the shared
-      // SEO authority of one URL.
+      // "Talle Aero Executive Black" vs "Talle Aero Executive Tan" —
+      // without splitting the listing into two products and losing the
+      // shared SEO authority of one URL.
       name: { type: String, default: '' },
       description: { type: String, default: '' },
     }],

@@ -114,6 +114,11 @@ export default function App() {
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
+            {/* /admin/chair-repair is the canonical admin URL for the
+                repair / spare-parts workshop catalog. /admin/action-toys
+                is kept as a legacy alias so any bookmarked admin URL or
+                inbound link still works after the chair rebrand. */}
+            <Route path="/admin/chair-repair" element={<AdminActionToys />} />
             <Route path="/admin/action-toys" element={<AdminActionToys />} />
             <Route path="/admin/products/bulk" element={<AdminBulkAdd />} />
             <Route path="/admin/products/new" element={<AdminProductForm />} />
