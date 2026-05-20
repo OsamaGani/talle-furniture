@@ -250,12 +250,13 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Search bar — capped width so it doesn't stretch awkwardly
-              across full-screen-width navbars. mx-auto centres it inside
-              the 1fr grid column, so on ultra-wide displays it sits in
-              the middle with equal space on either side instead of
-              ballooning into a 1000+ px wide input. */}
-          <form onSubmit={handleSearch} className="hidden md:flex w-full max-w-2xl mx-auto relative">
+          {/* Search bar — fills the middle 1fr column entirely so it sits
+              flush between the logo and the wishlist/login/cart cluster.
+              The navbar's outer padding (px-12 → px-24 on desktop) keeps
+              both ends off the screen edge, so the search bar feels
+              integrated with the row instead of floating in a centred
+              max-width box. */}
+          <form onSubmit={handleSearch} className="hidden md:flex w-full relative">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
