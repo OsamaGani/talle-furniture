@@ -114,12 +114,12 @@ export default function Contact() {
           </Reveal>
 
           <Reveal direction="left" delay={400}>
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-5 flex items-center justify-between gap-3">
+            <div className="bg-emerald-600 text-white rounded-xl p-5 flex items-center justify-between gap-3">
               <div>
-                <p className="font-bold flex items-center gap-2"><FaWhatsapp /> WhatsApp us</p>
-                <p className="text-sm opacity-90 mt-1">Quickest way to reach us</p>
+                <p className="font-bold flex items-center gap-2"><FaWhatsapp size={18} /> WhatsApp us</p>
+                <p className="text-sm text-white/85 mt-1">Quickest way to reach us</p>
               </div>
-              <a href={waLink()} target="_blank" rel="noopener noreferrer" className="bg-white text-green-600 font-bold px-4 py-2 rounded-md hover:bg-gray-100">Chat now</a>
+              <a href={waLink()} target="_blank" rel="noopener noreferrer" className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold text-sm px-4 py-2 rounded-md transition active:scale-[0.99]">Chat now</a>
             </div>
           </Reveal>
         </div>

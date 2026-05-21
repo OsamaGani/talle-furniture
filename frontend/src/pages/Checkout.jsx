@@ -537,7 +537,7 @@ export default function Checkout() {
                 <button
                   type="submit"
                   disabled={submitting || !selectedAddress || (formMode !== 'closed' && !formValid)}
-                  className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2"
+                  className="w-full bg-gray-900 hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold text-sm py-3 rounded-lg transition flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
                   {submitting ? 'Placing Order…'
                     : paymentMethod === 'COD' ? <>Place Order · ₹{total.toFixed(2)}</>

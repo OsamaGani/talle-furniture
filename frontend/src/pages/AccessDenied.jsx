@@ -18,25 +18,21 @@ export default function AccessDenied() {
   };
 
   return (
-    <div className="relative overflow-hidden min-h-[80vh] flex items-center">
-      {/* decorative background */}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-br from-red-50 via-white to-amber-50" />
-      <div aria-hidden className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-red-200/40 blur-3xl -z-10" />
-      <div aria-hidden className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-amber-200/40 blur-3xl -z-10" />
-
+    <div className="relative min-h-[80vh] flex items-center bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 py-12 text-center w-full">
-        {/* lock icon with pulse */}
-        <div className="relative inline-block mb-6">
-          <div className="absolute inset-0 bg-red-400/30 rounded-full blur-xl animate-pulse" />
-          <div className="relative w-24 h-24 mx-auto bg-gradient-to-br from-red-500 to-rose-600 text-white rounded-full flex items-center justify-center shadow-2xl">
-            <FiLock size={44} />
+        {/* Quiet lock icon — single solid colour, no candy gradient or
+            pulsing blur halo. Premium error pages stay calm. */}
+        <div className="inline-block mb-6">
+          <div className="w-20 h-20 mx-auto bg-red-50 ring-1 ring-red-100 text-red-600 rounded-full flex items-center justify-center">
+            <FiLock size={36} />
           </div>
         </div>
 
-        <h1 className="text-7xl md:text-8xl font-black tracking-tighter bg-gradient-to-r from-red-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">
-          403
+        <p className="text-[10px] uppercase tracking-[3px] text-red-600 font-bold mb-3">Forbidden · 403</p>
+        <h1 className="font-display font-medium text-5xl md:text-6xl tracking-tighter text-gray-900">
+          Access denied
         </h1>
-        <p className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-2">
+        <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 hidden">
           Access Denied
         </p>
         <p className="text-gray-600 mt-3 max-w-lg mx-auto">

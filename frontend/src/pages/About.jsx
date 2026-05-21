@@ -69,13 +69,15 @@ export default function About() {
         </Reveal>
       </section>
 
-      {/* Stats */}
-      <section className="bg-gradient-to-r from-primary-500 to-pink-500 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      {/* Stats — charcoal band with amber accent on the numbers, no
+          candy gradient. Premium brand-stat band same colour family as
+          the auth pages. */}
+      <section className="bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-10 sm:py-12 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {stats.map((s) => (
             <div key={s.label}>
-              <p className="text-3xl md:text-4xl font-extrabold">{s.num}</p>
-              <p className="opacity-90 text-sm mt-1">{s.label}</p>
+              <p className="text-3xl md:text-4xl font-extrabold text-amber-300">{s.num}</p>
+              <p className="text-white/75 text-xs sm:text-sm mt-1 uppercase tracking-[2px] font-semibold">{s.label}</p>
             </div>
           ))}
         </div>
@@ -108,21 +110,23 @@ export default function About() {
       <section className="bg-gray-50 border-y">
         <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-6">
           <Reveal direction="left">
-            <Link to="/contact" className="bg-gradient-to-r from-purple-600 to-primary-500 text-white rounded-xl p-8 hover:shadow-xl transition flex items-center justify-between">
+            <Link to="/contact" className="bg-white border border-gray-200 hover:border-primary-500 text-gray-900 rounded-xl p-8 hover:shadow-lg transition-all flex items-center justify-between group">
               <div>
+                <p className="text-[10px] uppercase tracking-[2.5px] text-primary-500 font-bold mb-1.5">B2B</p>
                 <h3 className="text-2xl font-extrabold">Outfitting an office?</h3>
-                <p className="opacity-90 mt-1">Request a custom-manufacturing quote</p>
+                <p className="text-gray-600 text-sm mt-1">Request a custom-manufacturing quote</p>
               </div>
-              <FiArrowRight size={28} />
+              <FiArrowRight size={24} className="text-gray-400 group-hover:text-primary-500 group-hover:translate-x-1 transition" />
             </Link>
           </Reveal>
           <Reveal direction="right" delay={150}>
-            <Link to="/contact" className="bg-gray-900 text-white rounded-xl p-8 hover:shadow-xl transition flex items-center justify-between">
+            <Link to="/contact" className="bg-gray-900 text-white rounded-xl p-8 hover:bg-black transition-all flex items-center justify-between group">
               <div>
+                <p className="text-[10px] uppercase tracking-[2.5px] text-amber-300 font-bold mb-1.5">Service</p>
                 <h3 className="text-2xl font-extrabold">Need a repair quote?</h3>
-                <p className="opacity-90 mt-1">Visit our Sakinaka workshop or call +91 93261 66875</p>
+                <p className="text-white/80 text-sm mt-1">Visit our Sakinaka workshop or call +91 93261 66875</p>
               </div>
-              <FiArrowRight size={28} />
+              <FiArrowRight size={24} className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition" />
             </Link>
           </Reveal>
         </div>

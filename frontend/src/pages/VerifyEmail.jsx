@@ -91,7 +91,7 @@ export default function VerifyEmail() {
   if (!user) return null;
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-10 bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-10 bg-gray-50">
       <div className="w-full max-w-md bg-white border rounded-2xl shadow-lg p-8 animate-scaleIn">
         <Link to="/" className="text-sm text-gray-500 hover:text-primary-500 inline-flex items-center gap-1 mb-4"><FiArrowLeft /> Back</Link>
 

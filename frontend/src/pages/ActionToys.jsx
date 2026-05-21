@@ -7,8 +7,9 @@ import Reveal from '../components/Reveal';
 import SEO from '../components/SEO';
 import {
   FiFilter, FiX, FiArrowRight, FiShield, FiTruck, FiAward, FiTool,
-  FiZap, FiStar, FiPhone, FiMapPin, FiHelpCircle, FiChevronDown,
+  FiZap, FiStar, FiPhone, FiMapPin, FiHelpCircle, FiChevronDown, FiCheck,
 } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { PHONE_PRIMARY_DISPLAY, PHONE_PRIMARY_TEL, waLink } from '../config/contact';
 
 // Areas we serve — fuel for "chair repair in <neighborhood>" searches.
@@ -277,57 +278,59 @@ export default function ActionToys() {
         keywords="chair repair near me, chair repair sakinaka, chair repair andheri, chair repair powai, chair repair mumbai, office chair repair shop sakinaka, hydraulic chair replacement mumbai, chair reupholstery mumbai, doorstep chair repair, revolving chair repair sakinaka, gas lift replacement chair, chair workshop mumbai, talle furniture mart repair, abdul rab chair repair"
         jsonLd={seoJsonLd}
       />
-      {/* Hero banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-600 via-orange-700 to-red-800 text-white">
+      {/* Hero — premium editorial treatment. Real workshop photo with a
+          dark charcoal overlay (was amber-orange-red gradient + floating
+          blur orbs). Amber-on-charcoal eyebrow + serif headline matches
+          the auth + home pages so the brand reads cohesively. */}
+      <section className="relative overflow-hidden text-white">
         <img
-          src="https://images.unsplash.com/photo-1592078615290-033ee584e267?w=1600"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay"
+          src="https://images.unsplash.com/photo-1592078615290-033ee584e267?w=1600&q=85&auto=format&fit=crop"
+          alt="Talle Furniture Mart chair repair workshop in Saki Naka, Mumbai"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute -top-20 -right-10 w-80 h-80 bg-yellow-300/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-24 -left-10 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/40" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 md:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
           {/* Breadcrumb */}
-          <nav className="text-xs sm:text-sm text-white/80 mb-3 sm:mb-4 flex items-center gap-2">
-            <Link to="/" className="hover:underline">Home</Link>
+          <nav className="text-xs sm:text-sm text-white/70 mb-4 flex items-center gap-2">
+            <Link to="/" className="hover:text-white transition">Home</Link>
             <span>/</span>
-            <span className="text-white font-semibold">Chair Repair & Service</span>
+            <span className="text-white font-semibold">Chair Repair</span>
           </nav>
 
-          <span className="inline-block w-fit bg-yellow-300 text-gray-900 text-[10px] sm:text-xs font-extrabold px-3 py-1.5 rounded-full mb-3 tracking-wide shadow">
-            🔧 #1 CHAIR REPAIR SHOP · SAKI NAKA, MUMBAI
-          </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight drop-shadow-lg max-w-3xl">
-            Chair Repair Near You — Saki Naka, Andheri, Powai & all Mumbai
+          <p className="text-[10px] sm:text-xs uppercase tracking-[3px] text-amber-300 font-bold mb-4">
+            Chair Repair · Saki Naka, Mumbai
+          </p>
+          <h1 className="font-display font-medium text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.05] drop-shadow-md max-w-3xl">
+            Chair repair, at your door.
           </h1>
-          <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-xl text-white/95 max-w-2xl">
-            Mumbai's go-to chair repair shop since 2009 — hydraulic replacement,
-            reupholstery, wheel & base fix and full chair refurbishing. Doorstep pickup
+          <p className="mt-4 sm:mt-5 text-sm sm:text-base md:text-lg text-white/85 max-w-2xl leading-relaxed">
+            Mumbai's go-to chair repair workshop since 2009 — hydraulic replacement,
+            reupholstery, wheel &amp; base fix and full refurbishing. Doorstep pickup
             across Saki Naka, Andheri, Powai, Kurla, BKC, Bandra, Lower Parel and Thane.
           </p>
 
-          <div className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-7 text-xs sm:text-sm">
-            <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full font-semibold">✓ BIFMA-Grade Parts</span>
-            <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full font-semibold">✓ Doorstep Pickup</span>
-            <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full font-semibold">✓ 7-Day Turnaround</span>
-            <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full font-semibold">✓ 6-Month Warranty</span>
-          </div>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 mt-6 sm:mt-7 text-xs sm:text-sm text-white/85">
+            <li className="flex items-center gap-1.5"><FiCheck size={14} className="text-amber-300" /> BIFMA-grade parts</li>
+            <li className="flex items-center gap-1.5"><FiCheck size={14} className="text-amber-300" /> Doorstep pickup</li>
+            <li className="flex items-center gap-1.5"><FiCheck size={14} className="text-amber-300" /> 7-day turnaround</li>
+            <li className="flex items-center gap-1.5"><FiCheck size={14} className="text-amber-300" /> 6-month warranty</li>
+          </ul>
 
-          <div className="flex flex-wrap gap-3 mt-6">
+          <div className="flex flex-wrap gap-3 mt-7 sm:mt-8">
             <a
               href={`tel:${PHONE_PRIMARY_TEL}`}
-              className="inline-flex items-center gap-2 bg-white text-amber-700 hover:bg-yellow-300 font-bold px-6 py-3 rounded-full shadow-lg transition"
+              className="inline-flex items-center gap-2 bg-white text-gray-900 hover:bg-amber-300 font-semibold text-sm px-5 py-3 rounded-lg transition active:scale-[0.99]"
             >
-              <FiPhone /> Call {PHONE_PRIMARY_DISPLAY}
+              <FiPhone size={16} /> Call {PHONE_PRIMARY_DISPLAY}
             </a>
             <a
               href={waLink('Hi Talle! I need a chair repair quote.')}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-full shadow-lg transition"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-3 rounded-lg transition active:scale-[0.99]"
             >
-              💬 WhatsApp Quote
+              <FaWhatsapp size={16} /> WhatsApp Quote
             </a>
           </div>
         </div>

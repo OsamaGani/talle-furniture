@@ -146,16 +146,20 @@ export default function Help() {
         </div>
       </div>
 
-      {/* Quick contact cards */}
-      <section className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Quick contact cards — clean white cards with single accent
+          colour per channel (WhatsApp green, Call neutral charcoal,
+          Email primary-red) instead of three loud candy gradients.
+          Premium pattern: colour belongs to the icon, not the
+          background. */}
+      <section className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Reveal direction="left" delay={0}>
-          <ContactCard icon={<FaWhatsapp />} title="WhatsApp" desc="Chat with us instantly" cta="Open chat" link={waLink()} color="bg-gradient-to-br from-green-500 to-emerald-600" />
+          <ContactCard icon={<FaWhatsapp />} title="WhatsApp" desc="Chat with us instantly" cta="Open chat" link={waLink()} accentClass="text-emerald-600 bg-emerald-50" />
         </Reveal>
         <Reveal direction="up" delay={120}>
-          <ContactCard icon={<FiPhone />} title="Call Us" desc={PHONE_PRIMARY_DISPLAY} cta="Call now" link={`tel:${PHONE_PRIMARY_TEL}`} color="bg-gradient-to-br from-blue-500 to-indigo-600" />
+          <ContactCard icon={<FiPhone />} title="Call us" desc={PHONE_PRIMARY_DISPLAY} cta="Call now" link={`tel:${PHONE_PRIMARY_TEL}`} accentClass="text-gray-700 bg-gray-100" />
         </Reveal>
         <Reveal direction="right" delay={240}>
-          <ContactCard icon={<FiMail />} title="Email Us" desc={EMAIL_PRIMARY} cta="Send email" link={mailtoLink()} color="bg-gradient-to-br from-primary-500 to-pink-600" />
+          <ContactCard icon={<FiMail />} title="Email us" desc={EMAIL_PRIMARY} cta="Send email" link={mailtoLink()} accentClass="text-primary-600 bg-primary-50" />
         </Reveal>
       </section>
 
@@ -202,13 +206,15 @@ export default function Help() {
         )}
       </section>
 
-      {/* Still need help */}
-      <section className="bg-gradient-to-r from-primary-500 to-pink-500 text-white">
-        <div className="max-w-3xl mx-auto px-4 py-10 text-center">
-          <FiMessageCircle className="mx-auto mb-3" size={40} />
-          <h2 className="text-2xl md:text-3xl font-extrabold">Still need help?</h2>
-          <p className="mt-2 opacity-95">Our team usually replies within one business day.</p>
-          <Link to="/contact" className="inline-block mt-5 bg-white text-primary-500 hover:bg-yellow-300 hover:text-gray-900 font-bold px-6 py-3 rounded-lg shadow-lg transition">
+      {/* Still need help — charcoal band with amber eyebrow, matches the
+          About + ResetPassword pattern. White CTA on dark for high
+          contrast without resorting to a candy gradient. */}
+      <section className="bg-gray-900 text-white">
+        <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+          <p className="text-[10px] uppercase tracking-[3px] text-amber-300 font-bold mb-3">Talk to us</p>
+          <h2 className="font-display font-medium text-2xl md:text-3xl leading-tight">Still need help?</h2>
+          <p className="mt-2 text-white/75 text-sm">Our team usually replies within one business day.</p>
+          <Link to="/contact" className="inline-flex items-center gap-2 mt-6 bg-white hover:bg-amber-300 text-gray-900 font-semibold text-sm px-6 py-3 rounded-lg transition active:scale-[0.99]">
             Contact Support
           </Link>
         </div>
@@ -217,19 +223,24 @@ export default function Help() {
   );
 }
 
-const ContactCard = ({ icon, title, desc, cta, link, color }) => {
+// Clean white contact card with a tinted icon disc (channel-specific
+// accent colour) — the gradient backgrounds were the loudest tiles on
+// the help page and reading as discount badges instead of contact
+// channels. This treatment is the same pattern Apple / Pottery Barn
+// support pages use.
+const ContactCard = ({ icon, title, desc, cta, link, accentClass = 'text-gray-700 bg-gray-100' }) => {
   const isExternal = link.startsWith('http') || link.startsWith('mailto:') || link.startsWith('tel:');
   const Wrapper = isExternal ? 'a' : Link;
   const props = isExternal ? { href: link, target: link.startsWith('http') ? '_blank' : undefined, rel: 'noopener noreferrer' } : { to: link };
   return (
-    <Wrapper {...props} className={`${color} text-white rounded-2xl p-5 shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center gap-4`}>
-      <div className="bg-white/20 backdrop-blur w-12 h-12 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+    <Wrapper {...props} className="group bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.99]">
+      <div className={`${accentClass} w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0`}>
         {icon}
       </div>
-      <div className="flex-1">
-        <p className="font-bold">{title}</p>
-        <p className="text-xs opacity-90">{desc}</p>
-        <p className="text-xs font-semibold mt-1">{cta} →</p>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-sm text-gray-900">{title}</p>
+        <p className="text-xs text-gray-600 truncate">{desc}</p>
+        <p className="text-[11px] font-semibold mt-1 text-primary-500 group-hover:text-primary-600">{cta} →</p>
       </div>
     </Wrapper>
   );

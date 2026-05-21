@@ -438,17 +438,18 @@ function PayNowBanner({ orderId, total, onPaid }) {
     }
   };
   return (
-    <div className="mt-5 bg-gradient-to-r from-primary-500 to-pink-500 text-white rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg">
+    <div className="mt-5 bg-gray-900 text-white rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-md ring-1 ring-black/5">
       <div className="flex-1">
-        <p className="font-extrabold text-lg flex items-center gap-2">💳 Complete your payment</p>
-        <p className="text-sm text-white/90 mt-1">
-          Your order is reserved but unpaid. Pay <strong>₹{total.toFixed(2)}</strong> securely via Razorpay to confirm.
+        <p className="text-[10px] uppercase tracking-[2px] text-amber-300 font-bold mb-1">Payment pending</p>
+        <p className="font-bold text-base sm:text-lg">Complete your payment</p>
+        <p className="text-sm text-white/80 mt-1">
+          Your order is reserved but unpaid. Pay <strong className="text-white">₹{total.toFixed(2)}</strong> securely via Razorpay to confirm.
         </p>
       </div>
       <button
         onClick={handleRetry}
         disabled={loading}
-        className="bg-white text-primary-600 hover:bg-yellow-300 hover:text-gray-900 font-bold px-5 py-3 rounded-lg shadow disabled:opacity-60 disabled:cursor-not-allowed transition whitespace-nowrap"
+        className="bg-white text-gray-900 hover:bg-amber-300 font-semibold text-sm px-5 py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition whitespace-nowrap active:scale-[0.99]"
       >
         {loading ? 'Loading…' : 'Pay Now →'}
       </button>
