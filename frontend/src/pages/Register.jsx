@@ -4,12 +4,17 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import PasswordInput, { scorePassword } from '../components/PasswordInput';
 import {
-  FiUser, FiMail, FiArrowRight, FiCheck, FiX,
+  FiMail, FiArrowRight, FiCheck, FiX,
   FiGift, FiTag, FiTruck, FiZap,
 } from 'react-icons/fi';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const MIN_PASSWORD_SCORE = 3;
+
+// Premium two-panel sign-up. Same design language as Login.jsx for
+// pattern continuity: editorial photo + charcoal overlay on the left,
+// clean white form with charcoal CTA on the right. No candy gradients,
+// no floating emojis.
 
 export default function Register() {
   const { register, loading } = useAuth();
@@ -52,76 +57,72 @@ export default function Register() {
 
   return (
     <div className="min-h-[calc(100vh-160px)] grid md:grid-cols-2 bg-white">
-      {/* ========== LEFT — Brand showcase ==========
-          Visible from md (768px+) so tablets get the split view too.
-          Perks list shrinks on md (2 perks) and shows all 4 from lg. */}
-      <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-600 via-pink-500 to-primary-500 text-white p-8 md:p-10 lg:p-12">
-        {/* Decorative blobs */}
-        <div className="absolute -top-32 -left-20 w-72 lg:w-96 h-72 lg:h-96 bg-yellow-300/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-32 -right-20 w-72 lg:w-96 h-72 lg:h-96 bg-white/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
-        {/* Floating chair emojis */}
-        <span className="absolute top-16 right-10 text-5xl lg:text-6xl opacity-30 animate-float" style={{ animationDelay: '0.5s' }}>🛋</span>
-        <span className="absolute bottom-28 left-10 text-6xl lg:text-7xl opacity-25 animate-float" style={{ animationDelay: '2s' }}>🪑</span>
-        <span className="absolute top-1/2 right-24 text-4xl lg:text-5xl opacity-30 animate-float hidden lg:inline" style={{ animationDelay: '1s' }}>💼</span>
-        <span className="absolute top-1/3 left-8 text-4xl lg:text-5xl opacity-25 animate-float hidden lg:inline" style={{ animationDelay: '2.5s' }}>🎮</span>
+      {/* ========== LEFT — Editorial brand panel ==========
+          Real chair lifestyle photo + dark charcoal overlay. Different
+          photo than Login (interior workspace vs ergonomic chair detail)
+          so returning visitors don't see the exact same view. */}
+      <div className="relative hidden md:flex flex-col justify-between overflow-hidden p-8 md:p-10 lg:p-12 text-white">
+        <img
+          src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=85&auto=format&fit=crop"
+          alt="Mumbai workspace with rows of Talle office chairs"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/85 via-gray-900/70 to-gray-900/40" />
 
+        {/* Top: logo */}
         <div className="relative z-10">
-          {/* Light variant — sits on the purple/pink/red gradient panel. */}
           <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
             <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-11 lg:h-12 w-auto" />
           </Link>
         </div>
 
+        {/* Middle: editorial pitch */}
         <div className="relative z-10 max-w-md">
-          <span className="inline-block bg-yellow-300 text-gray-900 text-[10px] lg:text-xs font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-full mb-4 lg:mb-5">
-            🎉 Join free
-          </span>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-tight drop-shadow-lg">
-            Better seating. Built by craftsmen.
+          <p className="text-[11px] uppercase tracking-[3px] text-amber-300 font-semibold mb-3 lg:mb-4">
+            Join the Talle family
+          </p>
+          <h2 className="font-display font-medium text-3xl lg:text-4xl xl:text-5xl leading-[1.1] drop-shadow-md">
+            Built by craftsmen.<br/>For people who sit.
           </h2>
-          <p className="mt-3 lg:mt-4 text-base lg:text-lg text-white/90 leading-relaxed">
-            Create your account and unlock special perks reserved for the Talle family.
+          <p className="mt-4 lg:mt-5 text-sm lg:text-base text-white/85 leading-relaxed max-w-sm">
+            Create an account in under a minute and unlock perks reserved for members of the workshop.
           </p>
 
-          {/* Perks list — show 2 on md (compact), all 4 from lg+ where
-              the panel has room for the full pitch. */}
-          <div className="mt-6 lg:mt-10 space-y-3 lg:space-y-4">
-            <Perk icon={<FiGift />}  text="10% off your first order" />
-            <Perk icon={<FiTag />}   text="Early access to new arrivals & sales" />
-            <div className="hidden lg:block space-y-3 lg:space-y-4">
-              <Perk icon={<FiTruck />} text="Free Mumbai delivery on ₹2,999+" />
-              <Perk icon={<FiZap />}   text="Faster checkout — saved addresses" />
-            </div>
-          </div>
+          {/* Perks list — restrained, no candy backgrounds. */}
+          <ul className="mt-8 lg:mt-10 space-y-3.5">
+            <PerkRow icon={<FiGift  size={16} />} text="10% off your first order" />
+            <PerkRow icon={<FiTag   size={16} />} text="Early access to new arrivals & sales" />
+            <li className="hidden lg:block">
+              <PerkRow icon={<FiTruck size={16} />} text="Free Mumbai delivery on orders ₹2,999+" />
+            </li>
+            <li className="hidden lg:block">
+              <PerkRow icon={<FiZap   size={16} />} text="Faster checkout with saved addresses" />
+            </li>
+          </ul>
         </div>
 
-        <div className="relative z-10 text-xs lg:text-sm text-white/75">
-          © {new Date().getFullYear()} Talle Furniture Mart · Sakinaka, Mumbai
+        {/* Bottom: copyright */}
+        <div className="relative z-10 text-xs text-white/60">
+          © {new Date().getFullYear()} Talle Furniture Mart · Saki Naka, Mumbai
         </div>
       </div>
 
-      {/* ========== RIGHT — Form ==========
-          Smoother responsive padding: cramped-but-readable on phone,
-          generous on tablet+, no awkward huge gaps at xl. */}
-      <div className="flex flex-col justify-center px-5 sm:px-8 md:px-10 lg:px-14 xl:px-20 py-8 sm:py-10 lg:py-12 bg-white min-h-[calc(100vh-160px)]">
-        {/* Mobile-only brand bar with a small accent rule above it so
-            the otherwise text-only mobile screen has visual identity. */}
-        <div className="md:hidden text-center mb-6">
-          <div className="inline-block">
-            <div className="h-1 w-12 bg-gradient-to-r from-purple-500 via-pink-500 to-primary-500 rounded-full mx-auto mb-3" />
-            {/* Dark variant — mobile-only screen on white background. */}
-            <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
-              <img src="/logo.svg" alt="Talle Furniture Mart" className="h-11 sm:h-12 w-auto" />
-            </Link>
-          </div>
+      {/* ========== RIGHT — Sign-up form ========== */}
+      <div className="flex flex-col justify-center px-5 sm:px-8 md:px-10 lg:px-14 xl:px-20 py-10 sm:py-12 lg:py-16 bg-white min-h-[calc(100vh-160px)]">
+        {/* Mobile-only brand bar — clean logo only, no gradient pill. */}
+        <div className="md:hidden text-center mb-8">
+          <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
+            <img src="/logo.svg" alt="Talle Furniture Mart" className="h-11 sm:h-12 w-auto" />
+          </Link>
         </div>
 
         <div className="w-full max-w-md mx-auto">
-          <div className="mb-6">
-            <h1 className="text-3xl font-extrabold text-gray-900">Create account</h1>
-            <p className="mt-2 text-gray-600">
+          <div className="mb-8">
+            <p className="text-[10px] uppercase tracking-[2.5px] text-gray-500 font-bold mb-2">New customer</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Create your account</h1>
+            <p className="mt-2 text-sm text-gray-600">
               Already a member?{' '}
-              <Link to="/login" className="font-semibold text-primary-500 hover:underline">
+              <Link to="/login" className="font-semibold text-primary-500 hover:text-primary-600 underline-offset-2 hover:underline">
                 Sign in
               </Link>
             </p>
@@ -129,7 +130,7 @@ export default function Register() {
 
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="label">Full Name</label>
+              <label className="label">Full name</label>
               <input
                 className="input py-3"
                 value={form.name}
@@ -144,11 +145,11 @@ export default function Register() {
               <label className="label">
                 Email{' '}
                 <span className="text-xs text-gray-500 font-normal">
-                  (we'll send a 6-digit code to verify)
+                  (we'll send a 6-digit verification code)
                 </span>
               </label>
               <div className="relative">
-                <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   type="email"
                   className={`input pl-10 py-3 ${emailError ? 'border-red-400 focus:ring-red-400' : ''}`}
@@ -173,7 +174,7 @@ export default function Register() {
             />
 
             <div>
-              <label className="label">Confirm Password</label>
+              <label className="label">Confirm password</label>
               <PasswordInput
                 value={form.confirm}
                 onChange={(e) => setForm({ ...form, confirm: e.target.value })}
@@ -195,19 +196,19 @@ export default function Register() {
             <button
               type="submit"
               disabled={submitting || loading || !pwStrongEnough || !passwordsMatch}
-              className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group"
+              className="w-full bg-gray-900 hover:bg-black text-white font-semibold text-sm py-3.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.99]"
             >
               {submitting
                 ? 'Creating…'
-                : (<>Create Account <FiArrowRight className="group-hover:translate-x-1 transition" /></>)}
+                : (<>Create Account <FiArrowRight size={14} className="group-hover:translate-x-1 transition" /></>)}
             </button>
           </form>
 
           <p className="mt-6 text-xs text-gray-400 text-center">
             By creating an account you agree to our{' '}
-            <Link to="/terms-of-service" className="hover:text-primary-500 hover:underline">Terms</Link>
-            {' '}&{' '}
-            <Link to="/privacy-policy" className="hover:text-primary-500 hover:underline">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="text-gray-500 hover:text-primary-500 hover:underline">Terms</Link>
+            {' '}and{' '}
+            <Link to="/privacy-policy"   className="text-gray-500 hover:text-primary-500 hover:underline">Privacy Policy</Link>.
           </p>
         </div>
       </div>
@@ -215,13 +216,14 @@ export default function Register() {
   );
 }
 
-function Perk({ icon, text }) {
+// Mirrors Login.jsx PerkRow — same restraint, brand-cohesive amber accent.
+function PerkRow({ icon, text }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="bg-white/20 backdrop-blur w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white">
+    <li className="flex items-center gap-3 text-sm text-white/90">
+      <span className="w-8 h-8 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-amber-300 flex-shrink-0">
         {icon}
-      </div>
-      <p className="font-medium text-white/95">{text}</p>
-    </div>
+      </span>
+      <span className="leading-snug">{text}</span>
+    </li>
   );
 }

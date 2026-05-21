@@ -4,6 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
 import { FiMail, FiArrowRight, FiTruck, FiShield, FiHeart, FiPackage } from 'react-icons/fi';
 
+// Premium two-panel sign-in. Left: real chair lifestyle photo with a
+// dark charcoal overlay (no candy gradients, no floating emojis). Right:
+// clean white form with editorial typography and a solid charcoal CTA.
+// Mirrors the auth pattern used by Apple ID / J. Crew / Pottery Barn /
+// Cassina rather than flash-sale marketplaces.
+
 export default function Login() {
   const { login, loading } = useAuth();
   const navigate = useNavigate();
@@ -22,77 +28,76 @@ export default function Login() {
 
   return (
     <div className="min-h-[calc(100vh-160px)] grid md:grid-cols-2 bg-white">
-      {/* ========== LEFT — Brand showcase ==========
-          Visible from md (768px+) so tablets also get the nice split view
-          instead of a lonely full-width form with empty whitespace. Padding
-          and feature grid scale down on md, full treatment from lg+. */}
-      <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-500 via-pink-500 to-fuchsia-600 text-white p-8 md:p-10 lg:p-12">
-        {/* Decorative blobs */}
-        <div className="absolute -top-32 -left-20 w-72 lg:w-96 h-72 lg:h-96 bg-yellow-300/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-32 -right-20 w-72 lg:w-96 h-72 lg:h-96 bg-white/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
-        {/* Floating chair emojis */}
-        <span className="absolute top-16 right-10 text-5xl lg:text-6xl opacity-30 animate-float" style={{ animationDelay: '0.5s' }}>🛋</span>
-        <span className="absolute bottom-28 left-10 text-6xl lg:text-7xl opacity-25 animate-float" style={{ animationDelay: '2s' }}>🪑</span>
-        <span className="absolute top-1/2 right-24 text-4xl lg:text-5xl opacity-30 animate-float hidden lg:inline" style={{ animationDelay: '1s' }}>💼</span>
+      {/* ========== LEFT — Editorial brand panel ==========
+          Real ergonomic-chair lifestyle photo + dark charcoal overlay.
+          Replaces the previous pink/fuchsia gradient + floating 🛋🪑💼
+          emojis which read as a flash-sale marketplace. */}
+      <div className="relative hidden md:flex flex-col justify-between overflow-hidden p-8 md:p-10 lg:p-12 text-white">
+        {/* Background photo — kept low-saturation so text overlay reads.
+            object-cover so the photo fills the panel at every height. */}
+        <img
+          src="https://images.unsplash.com/photo-1505843490701-5be5d1b31f8f?w=1600&q=85&auto=format&fit=crop"
+          alt="Talle ergonomic office chair in a daylit workspace"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Charcoal-to-transparent overlay for text legibility — same
+            recipe the home hero uses, brand-cohesive. */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/85 via-gray-900/70 to-gray-900/40" />
 
+        {/* Top: logo */}
         <div className="relative z-10">
-          {/* Light variant — sits on the red/pink gradient panel. */}
           <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
             <img src="/logo-light.svg" alt="Talle Furniture Mart" className="h-11 lg:h-12 w-auto" />
           </Link>
         </div>
 
+        {/* Middle: editorial pitch */}
         <div className="relative z-10 max-w-md">
-          <span className="inline-block bg-white/20 backdrop-blur text-[10px] lg:text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4 lg:mb-5">
+          <p className="text-[11px] uppercase tracking-[3px] text-amber-300 font-semibold mb-3 lg:mb-4">
             Welcome back
-          </span>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-tight drop-shadow-lg">
-            Better seating, built to last.
+          </p>
+          <h2 className="font-display font-medium text-3xl lg:text-4xl xl:text-5xl leading-[1.1] drop-shadow-md">
+            Sign in to continue.
           </h2>
-          <p className="mt-3 lg:mt-4 text-base lg:text-lg text-white/90 leading-relaxed">
-            Sign in to track orders, save favourites, and get exclusive member-only offers.
+          <p className="mt-4 lg:mt-5 text-sm lg:text-base text-white/85 leading-relaxed max-w-sm">
+            Pick up where you left off — your cart, wishlist and saved addresses are right where you need them.
           </p>
 
-          {/* Feature grid — hidden on md (saves vertical space on tablet),
-              shown from lg+ where the panel has more breathing room. */}
-          <div className="mt-8 lg:mt-10 hidden lg:grid grid-cols-2 gap-4">
-            <Feature icon={<FiTruck />}   title="Free Mumbai delivery" desc="On orders ₹2,999+" />
-            <Feature icon={<FiShield />}  title="BIFMA-grade parts"    desc="Genuine components" />
-            <Feature icon={<FiPackage />} title="Doorstep repair"      desc="Pickup & drop in Mumbai" />
-            <Feature icon={<FiHeart />}   title="Wishlist"             desc="Save for later" />
-          </div>
+          {/* Member-perk list — restrained vertical list, no candy cards.
+              Visible from lg+ where the panel has the height for it. */}
+          <ul className="mt-8 lg:mt-10 hidden lg:block space-y-3.5">
+            <PerkRow icon={<FiTruck   size={16} />} text="Free Mumbai delivery on orders above ₹2,999" />
+            <PerkRow icon={<FiShield  size={16} />} text="BIFMA-grade hydraulics, 6-month warranty" />
+            <PerkRow icon={<FiPackage size={16} />} text="Doorstep pickup and drop for repairs" />
+            <PerkRow icon={<FiHeart   size={16} />} text="Save favourites across devices" />
+          </ul>
         </div>
 
-        <div className="relative z-10 text-xs lg:text-sm text-white/75">
-          © {new Date().getFullYear()} Talle Furniture Mart · Sakinaka, Mumbai
+        {/* Bottom: copyright */}
+        <div className="relative z-10 text-xs text-white/60">
+          © {new Date().getFullYear()} Talle Furniture Mart · Saki Naka, Mumbai
         </div>
       </div>
 
-      {/* ========== RIGHT — Form ==========
-          Padding scales: tight on phone (px-5), generous on tablet+ without
-          getting cramped at xl. min-h ensures form is vertically centred
-          even when content is short. */}
-      <div className="flex flex-col justify-center px-5 sm:px-8 md:px-10 lg:px-14 xl:px-20 py-8 sm:py-10 lg:py-12 bg-white min-h-[calc(100vh-160px)]">
-        {/* Mobile-only brand bar — has a subtle gradient bar above the
-            wordmark so the otherwise-text-only mobile screen has some
-            visual identity. Hidden from md+ where the brand panel takes
-            over on the left. */}
-        <div className="md:hidden text-center mb-6 sm:mb-8">
-          <div className="inline-block">
-            <div className="h-1 w-12 bg-gradient-to-r from-primary-500 to-pink-500 rounded-full mx-auto mb-3" />
-            {/* Dark variant — mobile-only screen on white background. */}
-            <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
-              <img src="/logo.svg" alt="Talle Furniture Mart" className="h-11 sm:h-12 w-auto" />
-            </Link>
-          </div>
+      {/* ========== RIGHT — Sign-in form ========== */}
+      <div className="flex flex-col justify-center px-5 sm:px-8 md:px-10 lg:px-14 xl:px-20 py-10 sm:py-12 lg:py-16 bg-white min-h-[calc(100vh-160px)]">
+        {/* Mobile-only brand bar — clean, just the logo. The previous
+            tri-tone gradient pill above it was visual noise. */}
+        <div className="md:hidden text-center mb-8">
+          <Link to="/" className="inline-flex items-center" aria-label="Talle Furniture Mart — home">
+            <img src="/logo.svg" alt="Talle Furniture Mart" className="h-11 sm:h-12 w-auto" />
+          </Link>
         </div>
 
         <div className="w-full max-w-md mx-auto">
+          {/* Headline + secondary CTA in the same hierarchy as Apple ID,
+              Pottery Barn, J. Crew sign-in pages. */}
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-gray-900">Sign in</h1>
-            <p className="mt-2 text-gray-600">
-              New here?{' '}
-              <Link to="/register" className="font-semibold text-primary-500 hover:underline">
+            <p className="text-[10px] uppercase tracking-[2.5px] text-gray-500 font-bold mb-2">Account</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Sign in</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              New to Talle?{' '}
+              <Link to="/register" className="font-semibold text-primary-500 hover:text-primary-600 underline-offset-2 hover:underline">
                 Create an account
               </Link>
             </p>
@@ -102,7 +107,7 @@ export default function Login() {
             <div>
               <label htmlFor="login-email" className="label">Email address</label>
               <div className="relative">
-                <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   id="login-email"
                   type="email"
@@ -117,9 +122,9 @@ export default function Login() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="login-password" className="label mb-0">Password</label>
-                <Link to="/forgot-password" className="text-sm text-primary-500 hover:underline font-medium">
+                <Link to="/forgot-password" className="text-xs text-primary-500 hover:text-primary-600 hover:underline font-medium underline-offset-2">
                   Forgot password?
                 </Link>
               </div>
@@ -137,22 +142,24 @@ export default function Login() {
               Keep me signed in on this device
             </label>
 
+            {/* Solid charcoal CTA — premium pattern. The pink-gradient
+                glow-shadow button was the loudest element on the page. */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group"
+              className="w-full bg-gray-900 hover:bg-black text-white font-semibold text-sm py-3.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.99]"
             >
               {loading
                 ? 'Signing in…'
-                : (<>Sign in <FiArrowRight className="group-hover:translate-x-1 transition" /></>)}
+                : (<>Sign In <FiArrowRight size={14} className="group-hover:translate-x-1 transition" /></>)}
             </button>
           </form>
 
           <p className="mt-8 text-xs text-gray-400 text-center">
             By signing in you agree to our{' '}
-            <Link to="/terms-of-service" className="hover:text-primary-500 hover:underline">Terms</Link>
-            {' '}&{' '}
-            <Link to="/privacy-policy" className="hover:text-primary-500 hover:underline">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="text-gray-500 hover:text-primary-500 hover:underline">Terms</Link>
+            {' '}and{' '}
+            <Link to="/privacy-policy"   className="text-gray-500 hover:text-primary-500 hover:underline">Privacy Policy</Link>.
           </p>
         </div>
       </div>
@@ -160,16 +167,16 @@ export default function Login() {
   );
 }
 
-function Feature({ icon, title, desc }) {
+// Restrained perk row — icon in a subtle circle, single line of text.
+// Replaces the candy-card "Feature" component with a chair-brand-appropriate
+// list style (think Cassina / Carl Hansen feature lists).
+function PerkRow({ icon, text }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="bg-white/20 backdrop-blur w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 text-white">
+    <li className="flex items-center gap-3 text-sm text-white/90">
+      <span className="w-8 h-8 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-amber-300 flex-shrink-0">
         {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="font-bold text-sm">{title}</p>
-        <p className="text-xs text-white/80">{desc}</p>
-      </div>
-    </div>
+      </span>
+      <span className="leading-snug">{text}</span>
+    </li>
   );
 }
