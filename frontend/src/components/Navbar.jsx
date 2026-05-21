@@ -563,38 +563,46 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Mobile slide-in drawer — always mounted so open AND close animate smoothly */}
+      {/* Mobile slide-in drawer — premium animation treatment:
+           - 500 ms slide with easeOutExpo curve (iOS-style swoosh, lands soft)
+           - Stronger backdrop blur for theatre-curtain feel
+           - Drawer items cascade in with a 40 ms-per-item stagger
+           - Clean white header with the brand logo (no candy gradient)
+           Always mounted so open AND close animate. */}
       <div
-        className={`md:hidden fixed inset-0 z-50 ${openMenu ? '' : 'pointer-events-none'}`}
+        className={`md:hidden fixed inset-0 z-50 ${openMenu ? 'drawer-open' : 'pointer-events-none'}`}
         aria-hidden={!openMenu}
       >
         {/* Backdrop — tap anywhere outside the drawer to close */}
         <div
           onClick={closeMobileMenu}
-          className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-[400ms] ease-out ${
             openMenu ? 'opacity-100' : 'opacity-0'
           }`}
         />
 
-        {/* Drawer panel — slides in from the right */}
+        {/* Drawer panel — slides in from the right with easeOutExpo
+            (cubic-bezier(0.16, 1, 0.3, 1)) for that satisfying premium
+            swoosh-and-settle feel. */}
         <aside
           role="dialog"
           aria-modal="true"
           aria-label="Site menu"
-          className={`absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out ${
+          className={`absolute right-0 top-0 bottom-0 w-[88vw] sm:w-96 max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             openMenu ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          {/* Drawer header */}
-          <div className="flex items-center justify-between p-4 border-b shrink-0 bg-gradient-to-r from-primary-50 to-pink-50">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-gray-500">Browse</p>
-              <p className="text-lg font-extrabold text-gray-900">Talle Furniture Menu</p>
-            </div>
+          {/* Drawer header — clean white, brand logo, soft border. The
+              previous candy primary-to-pink gradient header was the
+              flash-sale-marketplace look we're moving away from. */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0 bg-white">
+            <Link to="/" onClick={closeMobileMenu} aria-label="Talle Furniture Mart — home">
+              <img src="/logo.svg" alt="Talle Furniture Mart" className="h-10 w-auto" />
+            </Link>
             <button
               onClick={closeMobileMenu}
               aria-label="Close menu"
-              className="p-2 rounded-full hover:bg-white/80 text-gray-700 transition"
+              className="p-2 rounded-full hover:bg-gray-100 active:scale-95 text-gray-600 transition-all duration-200"
             >
               <FiX size={22} />
             </button>
@@ -620,9 +628,9 @@ export default function Navbar() {
                   className="w-full flex items-center justify-between py-2.5 px-2 rounded font-semibold border-t hover:bg-gray-50 transition"
                 >
                   <span>Categories</span>
-                  <FiChevronDown size={18} className={`transition-transform duration-300 ease-out ${openMobileSection === 'categories' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
+                  <FiChevronDown size={18} className={`transition-transform duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'categories' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
                 </button>
-                <div className={`grid transition-all duration-300 ease-out ${openMobileSection === 'categories' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`grid transition-all duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'categories' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden pl-2 space-y-3 pt-1">
                     {departments.map((d) => (
                       <div key={d.slug}>
@@ -662,9 +670,9 @@ export default function Navbar() {
                   className="w-full flex items-center justify-between py-2.5 px-2 rounded font-semibold border-t hover:bg-gray-50 transition"
                 >
                   <span>Our Clients</span>
-                  <FiChevronDown size={18} className={`transition-transform duration-300 ease-out ${openMobileSection === 'clients' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
+                  <FiChevronDown size={18} className={`transition-transform duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'clients' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
                 </button>
-                <div className={`grid transition-all duration-300 ease-out ${openMobileSection === 'clients' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`grid transition-all duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'clients' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <ul className="overflow-hidden pl-2 grid grid-cols-2 gap-1">
                     {clients.map((c) => (
                       <li key={c.name}>
@@ -691,9 +699,9 @@ export default function Navbar() {
                   className="w-full flex items-center justify-between py-2.5 px-2 rounded font-semibold border-t hover:bg-gray-50 transition"
                 >
                   <span>Shop by Material</span>
-                  <FiChevronDown size={18} className={`transition-transform duration-300 ease-out ${openMobileSection === 'materials' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
+                  <FiChevronDown size={18} className={`transition-transform duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'materials' ? 'rotate-180 text-primary-500' : 'text-gray-500'}`} />
                 </button>
-                <div className={`grid transition-all duration-300 ease-out ${openMobileSection === 'materials' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`grid transition-all duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${openMobileSection === 'materials' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <ul className="overflow-hidden pl-2 grid grid-cols-2 gap-1">
                     {materialList.map((m) => (
                       <li key={m.name}>
