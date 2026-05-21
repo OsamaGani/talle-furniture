@@ -123,11 +123,10 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Copyright + legal sub-line */}
+      {/* Copyright bar */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
-          <p>© {new Date().getFullYear()} {STORE_NAME}. All rights reserved.</p>
-          <p>Made in Saki Naka, Mumbai · GSTIN 27AAAAA0000A1Z5</p>
+        <div className="max-w-7xl mx-auto px-4 py-4 text-xs text-gray-400 text-center">
+          © {new Date().getFullYear()} {STORE_NAME}. All rights reserved.
         </div>
       </div>
     </footer>
