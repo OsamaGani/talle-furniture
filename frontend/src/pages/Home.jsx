@@ -675,10 +675,13 @@ function Section({ title, subtitle, link, products, bg = '', loading = false }) 
             <Link to={link} className="text-primary-500 hover:underline text-sm font-medium">View All →</Link>
           </div>
         </Reveal>
+        {/* Product grid — bumped to 5 columns on xl and 6 on 2xl so each
+            card stays a reasonable size in the wider container. Below
+            xl the original 2/3/4 ladder still applies. */}
         {loading && (!products || products.length === 0) ? (
           <ProductRowSkeleton count={4} />
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
             {products.map((p, i) => (
               <Reveal key={p._id} delay={i * 80}>
                 <ProductCard product={p} />
