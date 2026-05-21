@@ -10,6 +10,7 @@ import AntiCopyGuard from './components/AntiCopyGuard';
 import ScrollToTop from './components/ScrollToTop';
 import RouteLoader from './components/RouteLoader';
 import FloatingActions from './components/FloatingActions';
+import CookieBanner from './components/CookieBanner';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Loader from './components/Loader';
@@ -141,6 +142,7 @@ export default function App() {
       {!isInvoice && <Footer />}
       {!isInvoice && <FloatingActions />}
       {!isInvoice && <BottomNav />}
+      {!isInvoice && <CookieBanner />}
     </div>
   );
 }

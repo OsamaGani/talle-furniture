@@ -9,6 +9,7 @@ import { FiShoppingCart, FiHeart, FiStar, FiTruck, FiShield, FiRefreshCw, FiChev
 import { FaWhatsapp } from 'react-icons/fa';
 import { useWishlist } from '../context/WishlistContext';
 import { resolveImage } from '../utils/imageUrl';
+import { formatPrice } from '../utils/formatPrice';
 import toast from 'react-hot-toast';
 import SEO, { SITE_URL, SITE_NAME } from '../components/SEO';
 import { addRecentlyViewed } from '../utils/recentlyViewed';
@@ -25,6 +26,15 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Sticky add-to-cart bar (mobile only) — shows once the user has
+  // scrolled past the in-page CTA so the buy buttons are always one
+  // tap away. Premium-pattern same as Pepperfry / Wakefit / Amazon.
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowStickyCTA(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
@@ -229,7 +239,10 @@ export default function ProductDetail() {
       url: `${SITE_URL}/product/${product.slug || product._id}`,
       priceCurrency: 'INR',
       price: final.toFixed(2),
-      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      // priceValidUntil intentionally omitted — previous code set it to a
+      // hardcoded +365 days from page-load which Google flags as a
+      // low-quality / made-up signal. Re-add only when real promotions
+      // have a real end date to communicate.
       availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
       seller: { '@type': 'Organization', name: SITE_NAME },
@@ -243,6 +256,46 @@ export default function ProductDetail() {
         worstRating: '1',
       },
     } : {}),
+    // Surface up to 8 individual reviews to Google so per-review snippets
+    // can appear in SERPs alongside the aggregate star rating.
+    ...(Array.isArray(product.reviews) && product.reviews.length > 0 ? {
+      review: product.reviews.slice(0, 8).map((r) => ({
+        '@type': 'Review',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: Number(r.rating || 0),
+          bestRating: '5',
+          worstRating: '1',
+        },
+        author: { '@type': 'Person', name: r.name || 'Verified Buyer' },
+        ...(r.comment ? { reviewBody: String(r.comment).slice(0, 500) } : {}),
+        ...(r.createdAt ? { datePublished: new Date(r.createdAt).toISOString().slice(0, 10) } : {}),
+      })),
+    } : {}),
+  };
+
+  // BreadcrumbList JSON-LD — Google uses this to render the breadcrumb
+  // trail (Home › Shop › Category › Product) directly in SERP snippets
+  // instead of the long URL. Mirrors the visible breadcrumb in the page.
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE_URL}/shop` },
+      ...(product.category ? [{
+        '@type': 'ListItem',
+        position: 3,
+        name: product.category,
+        item: `${SITE_URL}/shop?category=${encodeURIComponent(product.category)}`,
+      }] : []),
+      {
+        '@type': 'ListItem',
+        position: product.category ? 4 : 3,
+        name: effectiveName,
+        item: `${SITE_URL}/product/${product.slug || product._id}`,
+      },
+    ],
   };
 
   return (
@@ -255,6 +308,10 @@ export default function ProductDetail() {
         type="product"
         jsonLd={productJsonLd}
       />
+      {/* BreadcrumbList JSON-LD — emitted directly because the SEO
+          component only accepts a single jsonLd entity. Google reads
+          multiple <script type="application/ld+json"> blocks fine. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <nav className="text-xs sm:text-sm text-gray-500 mb-4 flex items-center gap-1.5 flex-wrap">
         <Link to="/" className="hover:text-primary-500">Home</Link>
         <span>›</span>
@@ -389,17 +446,17 @@ export default function ProductDetail() {
               above; they fall back cleanly to the product-level values. */}
           <div className="mt-3">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">₹{final.toFixed(0)}</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">{formatPrice(final)}</span>
               {effectiveDiscount > 0 && (
                 <>
-                  <span className="text-sm text-gray-400 line-through">₹{effectiveBasePrice.toFixed(0)}</span>
+                  <span className="text-sm text-gray-400 line-through">{formatPrice(effectiveBasePrice)}</span>
                   <span className="text-xs sm:text-sm font-bold text-emerald-600">{effectiveDiscount}% off</span>
                 </>
               )}
             </div>
             {effectiveDiscount > 0 && (
               <p className="text-xs text-emerald-700 font-semibold mt-0.5">
-                You save ₹{(effectiveBasePrice - final).toFixed(0)}
+                You save {formatPrice(effectiveBasePrice - final)}
               </p>
             )}
             {hasVariantOverride && selectedColor && (
@@ -652,6 +709,43 @@ export default function ProductDetail() {
           viewAllHref="/shop?bestSeller=true"
           accent="amber"
         />
+      )}
+
+      {/* Sticky mobile-only add-to-cart bar — slides up from the bottom
+          when the user has scrolled past the main CTA. Sits above the
+          BottomNav (which lives at z-40) by stacking at bottom-14. Buy
+          Now is the primary CTA since this bar's whole job is conversion
+          friction reduction. */}
+      {product && product.stock > 0 && (
+        <div
+          className={`sm:hidden fixed bottom-14 left-0 right-0 z-30 bg-white border-t shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            showStickyCTA ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <img
+              src={resolveImage(productImages[0])}
+              alt={effectiveName}
+              className="w-11 h-11 rounded border border-gray-200 object-cover flex-shrink-0 bg-white"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-gray-600 truncate leading-tight">{effectiveName}</p>
+              <p className="text-sm font-extrabold text-gray-900 leading-tight">{formatPrice(final)}</p>
+            </div>
+            <button
+              onClick={() => addToCart(product, qty, selectedColor || '')}
+              className="bg-white border border-primary-500 text-primary-500 hover:bg-primary-50 text-xs font-bold px-3 py-2 rounded-lg shrink-0 transition active:scale-95"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => { addToCart(product, qty, selectedColor || ''); navigate('/checkout'); }}
+              className="bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg shrink-0 transition active:scale-95"
+            >
+              Buy Now
+            </button>
+          </div>
+        </div>
       )}
 
     </div>

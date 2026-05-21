@@ -93,8 +93,31 @@ export default function Help() {
     questions: c.questions.filter(({ q, a }) => matches(q, a)),
   })).filter((c) => c.questions.length > 0);
 
+  // FAQPage JSON-LD — every Q&A on this page surfaced to Google so the
+  // Help page can earn "People also ask" + rich-result accordion
+  // placements in SERPs for chair-repair / delivery / payment queries.
+  // Categories' HTML-entity'd titles (&amp;) are unescaped for clean
+  // schema text; HTML in answers is stripped to plain text.
+  const stripHtml = (s = '') => String(s).replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').trim();
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    'mainEntity': categories.flatMap((c) =>
+      c.questions.map((qa) => ({
+        '@type': 'Question',
+        'name': stripHtml(qa.q),
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': stripHtml(qa.a),
+        },
+      }))
+    ),
+  };
+
   return (
     <div>
+      {/* Surface every FAQ to Google as a FAQPage rich result. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <PageHeader
         title="How Can We Help?"
         subtitle="Most questions about orders, delivery, payments, and returns are answered below. Still stuck? Tap any of the contact options at the bottom — we reply within a working day."

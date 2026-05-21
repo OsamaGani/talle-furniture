@@ -3,6 +3,7 @@ import { FiShoppingCart, FiStar, FiHeart, FiTruck, FiEye } from 'react-icons/fi'
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { resolveImage, PLACEHOLDER } from '../utils/imageUrl';
+import { formatPrice } from '../utils/formatPrice';
 
 // Matches the CartContext + Shipping Policy + every other shipping
 // mention on the site. Backend orders.js uses the same value when
@@ -113,16 +114,16 @@ export default function ProductCard({ product }) {
         {/* Price block */}
         <div className="mt-1">
           <div className="flex items-baseline gap-1 flex-wrap">
-            <span className="text-[13px] sm:text-sm font-bold text-gray-900">₹{final.toFixed(0)}</span>
+            <span className="text-[13px] sm:text-sm font-bold text-gray-900">{formatPrice(final)}</span>
             {product.discount > 0 && (
               <>
-                <span className="text-[10px] text-gray-400 line-through">₹{product.price.toFixed(0)}</span>
+                <span className="text-[10px] text-gray-400 line-through">{formatPrice(product.price)}</span>
                 <span className="text-[9px] text-emerald-600 font-bold">{product.discount}% off</span>
               </>
             )}
           </div>
           {saved > 0 && (
-            <p className="text-[9px] text-gray-500 leading-tight">Save ₹{saved.toFixed(0)}</p>
+            <p className="text-[9px] text-gray-500 leading-tight">Save {formatPrice(saved)}</p>
           )}
         </div>
 
