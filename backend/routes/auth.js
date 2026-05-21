@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
-const { validateEmailFormat, generateOTP, sendVerificationOTP, sendEmail } = require('../utils/email');
+const { validateEmailFormat, generateOTP, sendVerificationOTP, sendEmail, maskEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -320,7 +320,7 @@ router.post(
 
     try {
       await sendEmail({ to: user.email, subject, html, text });
-      console.log(`🔑 Password reset link sent to ${user.email}`);
+      console.log(`🔑 Password reset link sent to ${maskEmail(user.email)}`);
     } catch (err) {
       console.error('Reset email send failed:', err.message);
       // Don't expose the email failure to the user — they'd see different
@@ -364,7 +364,7 @@ router.post(
     user.resetPasswordExpiresAt = undefined;
     await user.save();
 
-    console.log(`🔑 Password reset for ${user.email}`);
+    console.log(`🔑 Password reset for ${maskEmail(user.email)}`);
     res.json({ message: 'Password reset successfully. You can now sign in with your new password.' });
   })
 );

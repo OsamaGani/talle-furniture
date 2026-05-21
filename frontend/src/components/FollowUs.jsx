@@ -5,6 +5,13 @@ import {
   PHONE_PRIMARY_WHATSAPP, mailtoLink,
 } from '../config/contact';
 
+// Hide any social icon whose URL is still a bare homepage / placeholder
+// (e.g. https://youtube.com without a channel handle). Keeps the user
+// from landing on YouTube's front page if they click. Update the URL
+// in config/contact.js when a real channel exists and it auto-shows.
+const isPlaceholder = (url) =>
+  /^https?:\/\/(www\.)?(youtube|facebook|instagram|twitter|x|tiktok|linkedin|pinterest|threads)\.com\/?$/i.test(url);
+
 // All URLs/handles come from config/contact.js so updating Instagram /
 // Facebook / YouTube / WhatsApp / email in one place updates the
 // footer, contact page, and every other social-icon set on the site.
@@ -14,7 +21,7 @@ const socials = [
   { Icon: FiInstagram,  href: INSTAGRAM_URL,                        label: 'Instagram' },
   { Icon: FaWhatsapp,   href: `https://wa.me/${PHONE_PRIMARY_WHATSAPP}`, label: 'WhatsApp' },
   { Icon: FiYoutube,    href: YOUTUBE_URL,                          label: 'YouTube' },
-];
+].filter((s) => !isPlaceholder(s.href));
 
 export default function FollowUs({ dark = false }) {
   return (

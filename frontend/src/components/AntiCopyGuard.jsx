@@ -67,6 +67,8 @@ export default function AntiCopyGuard() {
   // sets a clear paper trail for trademark / DMCA action later if needed.
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // Production-only — no need to spam dev console while building locally.
+    if (!import.meta.env.PROD) return;
     if (window.__talleWarned) return;
     window.__talleWarned = true;
     const big = 'font-size:18px;font-weight:bold;color:#e53935;';
@@ -79,8 +81,8 @@ export default function AntiCopyGuard() {
       'The frontend code, design, and content on this site are © Talle Furniture Mart and ' +
       'protected under the Indian Copyright Act, 1957. Copying, scraping, or ' +
       'cloning the site is illegal and we will pursue trademark + DMCA action.\n\n' +
-      'If you found a bug or security issue: please email security@tallefurnituremart.com.\n' +
-      'We pay bug bounties for genuine reports.',
+      'If you found a bug or security issue: please email abdulrab2411@gmail.com.\n' +
+      'We respond to genuine reports.',
       note
     );
   }, []);

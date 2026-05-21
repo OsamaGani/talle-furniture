@@ -41,7 +41,16 @@ export default function Invoice() {
             <p className="text-xs text-gray-600">Sainath Wadi, Lokmanya Tilak Nagar, Saki Naka</p>
             <p className="text-xs text-gray-600">Mumbai — 400072, Maharashtra, India</p>
             <p className="text-xs text-gray-600">+91 93261 66875 · abdulrab2411@gmail.com</p>
-            <p className="text-xs text-gray-600">Proprietor: Abdul Rab · GSTIN: 27AAAAA0000A1Z5</p>
+            {/* GSTIN only printed when a real one is configured at build
+                time via VITE_GSTIN. Was hardcoded as the well-known
+                placeholder 27AAAAA0000A1Z5 — that's a dummy GST number
+                and would have appeared on every real customer invoice
+                until a real GSTIN is registered. */}
+            {import.meta.env.VITE_GSTIN ? (
+              <p className="text-xs text-gray-600">Proprietor: Abdul Rab · GSTIN: {import.meta.env.VITE_GSTIN}</p>
+            ) : (
+              <p className="text-xs text-gray-600">Proprietor: Abdul Rab</p>
+            )}
           </div>
           <div className="sm:text-right print:text-right">
             <h1 className="text-2xl sm:text-3xl font-extrabold uppercase text-gray-900">Invoice</h1>
@@ -161,7 +170,7 @@ export default function Invoice() {
           <div className="w-full sm:w-72 space-y-1 text-sm">
             <Row label="Subtotal" value={`₹${order.itemsPrice.toFixed(2)}`} />
             <Row label="Shipping" value={order.shippingPrice === 0 ? 'FREE' : `₹${order.shippingPrice.toFixed(2)}`} />
-            <Row label="Tax (5%)" value={`₹${order.taxPrice.toFixed(2)}`} />
+            <Row label="GST (18%)" value={`₹${order.taxPrice.toFixed(2)}`} />
             <hr className="my-2" />
             <div className="flex justify-between text-base sm:text-lg font-bold bg-primary-500 text-white p-2 rounded">
               <span>TOTAL</span><span>₹{order.totalPrice.toFixed(2)}</span>

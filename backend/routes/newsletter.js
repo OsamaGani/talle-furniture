@@ -1,7 +1,7 @@
 const express = require('express');
 const asyncHandler = require('express-async-handler');
 const Subscriber = require('../models/Subscriber');
-const { sendEmail, validateEmailFormat } = require('../utils/email');
+const { sendEmail, validateEmailFormat, maskEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -118,9 +118,9 @@ router.post(
           sendOk = true;
           subscriber.welcomeSent = true;
           await subscriber.save();
-          console.log(`📧 Newsletter welcome email -> ${cleanEmail}`);
+          console.log(`📧 Newsletter welcome email -> ${maskEmail(cleanEmail)}`);
         } else if (result.dev) {
-          console.log(`📧 Newsletter welcome email (dev mode log only) -> ${cleanEmail}`);
+          console.log(`📧 Newsletter welcome email (dev mode log only) -> ${maskEmail(cleanEmail)}`);
         } else {
           console.error(`Newsletter welcome to ${cleanEmail} failed:`, result.error || 'unknown');
         }

@@ -15,7 +15,9 @@ const STATIC_PATHS = [
   { path: '',                  changefreq: 'daily',   priority: '1.0' },
   { path: '/shop',             changefreq: 'daily',   priority: '0.9' },
   { path: '/chair-repair',     changefreq: 'weekly',  priority: '0.9' },
-  { path: '/action-toys',      changefreq: 'weekly',  priority: '0.6' }, // legacy alias
+  // (legacy /action-toys route still resolves for old inbound links but
+  // is intentionally NOT in the sitemap — we don't want Google to index
+  // a URL literally named "action-toys" for a chair business.)
   { path: '/about',            changefreq: 'monthly', priority: '0.5' },
   { path: '/contact',          changefreq: 'monthly', priority: '0.5' },
   { path: '/help',             changefreq: 'monthly', priority: '0.4' },

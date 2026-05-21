@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 const { protect, admin } = require('../middleware/auth');
 const { sendStatusEmail } = require('../utils/orderEmails');
+const { maskEmail } = require('../utils/email');
 const { audit } = require('../utils/audit');
 
 const router = express.Router();
@@ -126,7 +127,7 @@ router.post('/', protect, asyncHandler(async (req, res) => {
     try {
       if (req.user?.email) {
         await sendStatusEmail(order, req.user.email, req.user.name);
-        console.log(`📧 Order placed email -> ${req.user.email}`);
+        console.log(`📧 Order placed email -> ${maskEmail(req.user.email)}`);
       }
     } catch (err) { console.error('Order email error:', err.message); }
 
@@ -363,7 +364,7 @@ router.put('/:id/status', protect, admin, asyncHandler(async (req, res) => {
       const customer = await User.findById(order.user);
       if (customer && customer.email) {
         emailResult = await sendStatusEmail(updated, customer.email, customer.name, note);
-        console.log(`📧 Status email -> ${customer.email}: ${newStatus} (${emailResult.sent ? 'sent' : (emailResult.dev ? 'dev-log' : 'failed')})`);
+        console.log(`📧 Status email -> ${maskEmail(customer.email)}: ${newStatus} (${emailResult.sent ? 'sent' : (emailResult.dev ? 'dev-log' : 'failed')})`);
       }
     } catch (err) {
       console.error('Status email error:', err.message);

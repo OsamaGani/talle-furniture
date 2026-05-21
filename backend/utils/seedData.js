@@ -33,7 +33,7 @@ const categories = [
   { name: 'Table Bases',                    image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=600' },
 ];
 
-// Talle does its own manufacturing â€” no resold brands.
+// Talle does its own manufacturing — no resold brands.
 // "Other" is kept as a fallback so the quick-add flow can still drop
 // products without forcing the admin to pick a brand.
 const brands = [
@@ -222,7 +222,7 @@ const products = [
   },
 ];
 
-// Chair-shop sub-categories â€” mirrors frontend/src/config/departments.js.
+// Chair-shop sub-categories — mirrors frontend/src/config/departments.js.
 // Each item is a sub-category Product.category can match. Kept here so the
 // backend can upsert them as Category records without importing frontend code.
 const CHAIR_SUBCATEGORIES = [
@@ -248,7 +248,7 @@ async function ensureDefaults() {
   // Upsert each chair-style sub-category so admin sees the full list in
   // /admin/categories and the dropdowns. Only inserts what's missing.
   // IMPORTANT: insertMany() skips pre('save') hooks, so we set slug explicitly
-  // â€” otherwise every new doc has slug=undefined and the unique index rejects
+  // — otherwise every new doc has slug=undefined and the unique index rejects
   // the second insert with E11000 (which crashes backend startup).
   const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -270,7 +270,7 @@ async function ensureDefaults() {
     }
     await Category.updateOne({ _id: doc._id }, { $set: { slug: unique } });
   }
-  if (broken.length) console.log(`ðŸ”§ Backfilled slugs on ${broken.length} category record(s)`);
+  if (broken.length) console.log(`🔧 Backfilled slugs on ${broken.length} category record(s)`);
 
   const existing = new Set(
     (await Category.find({ name: { $in: CHAIR_SUBCATEGORIES } }).select('name')).map((c) => c.name)
@@ -282,39 +282,59 @@ async function ensureDefaults() {
         toAdd.map((name) => ({ name, slug: slugify(name) })),
         { ordered: false } // keep going if a single doc collides on an existing slug
       );
-      console.log(`ðŸŒ± Added ${toAdd.length} new sub-categories`);
+      console.log(`🌱 Added ${toAdd.length} new sub-categories`);
     } catch (err) {
-      // Don't bring the server down for a seed hiccup â€” log and move on.
-      console.warn('âš ï¸  Sub-category seed had conflicts, continuing:', err.message);
+      // Don't bring the server down for a seed hiccup — log and move on.
+      console.warn('⚠️   Sub-category seed had conflicts, continuing:', err.message);
     }
   }
 
   // One-time backfill: any COD order that's already been marked delivered but
-  // somehow stayed isPaid=false should be flipped â€” without this the revenue
+  // somehow stayed isPaid=false should be flipped — without this the revenue
   // dashboard would forever underreport on existing orders.
   const codBackfill = await Order.updateMany(
     { paymentMethod: 'COD', status: 'delivered', isPaid: false },
     [{ $set: { isPaid: true, paidAt: { $ifNull: ['$deliveredAt', '$$NOW'] } } }]
   );
   if (codBackfill.modifiedCount > 0) {
-    console.log(`ðŸ’° Backfilled isPaid on ${codBackfill.modifiedCount} delivered COD order(s)`);
+    console.log(`💰 Backfilled isPaid on ${codBackfill.modifiedCount} delivered COD order(s)`);
   }
 
 }
 
-// Idempotent helpers â€” each one only inserts what's missing. Safe to run on
+// Idempotent helpers — each one only inserts what's missing. Safe to run on
 // every server startup, even on a partially-seeded database.
 
 async function seedDefaultUsersIfMissing() {
-  const adminEmail = 'admin@tallefurnituremart.com';
-  const customerEmail = 'customer@tallefurnituremart.com';
-  if (!(await User.findOne({ email: adminEmail }))) {
-    await User.create({ name: 'Admin', email: adminEmail, password: 'admin123', isAdmin: true, emailVerified: true });
-    console.log('ðŸŒ± Created admin user (admin@tallefurnituremart.com / admin123)');
+  // Admin credentials MUST come from env vars in production. The previous
+  // hardcoded 'admin123' password was a real security hole — anyone who
+  // saw this repo could log in. Now:
+  //   - Production (NODE_ENV=production): admin only seeded if ADMIN_EMAIL
+  //     and ADMIN_PASSWORD are both set. If missing, log a loud warning
+  //     and skip — never create a default admin with a guessable password.
+  //   - Dev (no NODE_ENV / 'development'): fall back to admin/admin123 so
+  //     a fresh local install still has a working admin to log in with.
+  const isProd = process.env.NODE_ENV === 'production';
+  const adminEmail = process.env.ADMIN_EMAIL || (isProd ? null : 'admin@tallefurnituremart.com');
+  const adminPassword = process.env.ADMIN_PASSWORD || (isProd ? null : 'admin123');
+
+  if (adminEmail && adminPassword) {
+    if (!(await User.findOne({ email: adminEmail }))) {
+      await User.create({ name: 'Admin', email: adminEmail, password: adminPassword, isAdmin: true, emailVerified: true });
+      const masked = adminPassword.replace(/./g, '•');
+      console.log(`🌱 Created admin user (${adminEmail} / ${masked})`);
+    }
+  } else if (isProd) {
+    console.warn('⚠️  ADMIN_EMAIL or ADMIN_PASSWORD env var missing — skipping admin seed. Set both on Render to bootstrap an admin account.');
   }
-  if (!(await User.findOne({ email: customerEmail }))) {
-    await User.create({ name: 'Demo Customer', email: customerEmail, password: 'customer123', emailVerified: true });
-    console.log('ðŸŒ± Created demo customer (customer@tallefurnituremart.com / customer123)');
+
+  // Demo customer is dev-only. Never seeded in production.
+  if (!isProd) {
+    const customerEmail = 'customer@tallefurnituremart.com';
+    if (!(await User.findOne({ email: customerEmail }))) {
+      await User.create({ name: 'Demo Customer', email: customerEmail, password: 'customer123', emailVerified: true });
+      console.log('🌱 Created demo customer (customer@tallefurnituremart.com / customer123)');
+    }
   }
 }
 
@@ -324,11 +344,11 @@ async function seedCategoriesIfMissing() {
   for (const c of categories) {
     if (!existingNames.has(c.name)) {
       try { await Category.create(c); added++; } catch (err) {
-        console.warn(`âš ï¸  Could not insert category "${c.name}": ${err.message}`);
+        console.warn(`⚠️   Could not insert category "${c.name}": ${err.message}`);
       }
     }
   }
-  if (added) console.log(`ðŸŒ± Added ${added} legacy categories`);
+  if (added) console.log(`🌱 Added ${added} legacy categories`);
 }
 
 async function seedBrandsIfMissing() {
@@ -337,24 +357,24 @@ async function seedBrandsIfMissing() {
   for (const b of brands) {
     if (!existingNames.has(b.name)) {
       try { await Brand.create(b); added++; } catch (err) {
-        console.warn(`âš ï¸  Could not insert brand "${b.name}": ${err.message}`);
+        console.warn(`⚠️   Could not insert brand "${b.name}": ${err.message}`);
       }
     }
   }
-  if (added) console.log(`ðŸŒ± Added ${added} brands`);
+  if (added) console.log(`🌱 Added ${added} brands`);
 }
 
 async function seedProductsIfMissing() {
   const productCount = await Product.countDocuments();
   if (productCount > 0) return;
-  console.log(`ðŸŒ± No products found â€” seeding ${products.length} demo products...`);
+  console.log(`🌱 No products found — seeding ${products.length} demo products...`);
   let added = 0;
   for (const p of products) {
     try { await Product.create(p); added++; } catch (err) {
-      console.warn(`âš ï¸  Could not insert product "${p.name}": ${err.message}`);
+      console.warn(`⚠️   Could not insert product "${p.name}": ${err.message}`);
     }
   }
-  console.log(`ðŸŒ± Added ${added}/${products.length} demo products`);
+  console.log(`🌱 Added ${added}/${products.length} demo products`);
 }
 
 async function seedIfEmpty() {
@@ -363,7 +383,7 @@ async function seedIfEmpty() {
   await seedCategoriesIfMissing();
   await seedBrandsIfMissing();
   await seedProductsIfMissing();
-  console.log('âœ… Seed checks complete');
+  console.log('✅ Seed checks complete');
   return true;
 }
 

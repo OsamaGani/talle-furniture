@@ -31,6 +31,17 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+// Mask an email address for log-safe printing: foo.bar@gmail.com → f******@gmail.com.
+// Keeps the first character + the domain so logs are still useful for debugging,
+// but never writes the full email to disk — which would be a real PII leak in
+// Render's persistent log storage, accessible to anyone with dashboard access.
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return '<no email>';
+  const [local = '', domain = ''] = email.split('@');
+  if (!domain) return '***';
+  return `${local.charAt(0)}${'*'.repeat(Math.max(1, local.length - 1))}@${domain}`;
+}
+
 async function sendEmail({ to, subject, html, text, replyTo, headers }) {
   // If real SMTP is configured (SMTP_HOST), use nodemailer
   if (process.env.SMTP_HOST && process.env.SMTP_USER) {
@@ -112,4 +123,4 @@ async function sendVerificationOTP(email, otp, name = '') {
   return sendEmail({ to: email, subject, html, text });
 }
 
-module.exports = { validateEmailFormat, generateOTP, sendEmail, sendVerificationOTP };
+module.exports = { validateEmailFormat, generateOTP, sendEmail, sendVerificationOTP, maskEmail };
