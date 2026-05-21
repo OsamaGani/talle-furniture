@@ -180,44 +180,26 @@ export default function Navbar() {
 
   return (
     <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? 'shadow-xl' : 'shadow-sm'}`}>
-      {/* Scrolling announcements strip — hides when scrolled, pauses on hover */}
-      <div className={`overflow-hidden transition-all duration-300 bg-gradient-to-r from-purple-600 via-pink-600 to-primary-500 text-white text-[11px] sm:text-xs font-semibold ${scrolled ? 'max-h-0' : 'max-h-9'}`}>
-        <div className="relative flex w-full overflow-hidden py-2 group">
-          {/* Two identical tracks placed side-by-side; together they animate from
-              translateX(0) to translateX(-50%) which lines copy #2 up exactly
-              where copy #1 started — producing a seamless infinite loop. */}
-          {[0, 1].map((copy) => (
-            <ul
-              key={copy}
-              aria-hidden={copy === 1}
-              className="flex shrink-0 items-center gap-8 pr-8 whitespace-nowrap animate-marquee group-hover:[animation-play-state:paused]"
-            >
-              {announcements.map((a, i) => (
-                <li key={`${copy}-${i}`} className="flex items-center gap-8">
-                  <Link
-                    to={a.href}
-                    className="hover:underline hover:text-yellow-200 transition"
-                  >
-                    {a.text}
-                  </Link>
-                  <span className="opacity-50" aria-hidden>•</span>
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </div>
-      {/* Top bar — hides when scrolled */}
-      <div className={`bg-gray-900 text-white text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-10'}`}>
-        <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-2 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span className="hidden sm:flex items-center gap-1"><FiTruck /> Free Delivery over ₹2,999</span>
-            <span className="hidden md:flex items-center gap-1"><FiPhone /> +91 93261 66875</span>
+      {/* Single thin utility bar — quiet charcoal strip with phone +
+          delivery promise on the left and support links on the right.
+          Replaces the loud scrolling gradient marquee + duplicate dark
+          bar combo. Reads like Herman Miller / Knoll / Vitra — premium
+          chair brand identity instead of flash-sale marketplace. Hides
+          on scroll so the sticky nav stays compact while reading. */}
+      <div className={`bg-gray-900 text-gray-300 text-[11px] sm:text-xs overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0' : 'max-h-9'}`}>
+        <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-1.5 flex justify-between items-center">
+          <div className="flex items-center gap-5">
+            <a href="tel:+919326166875" className="flex items-center gap-1.5 hover:text-white transition">
+              <FiPhone size={11} /> <span>+91 93261 66875</span>
+            </a>
+            <span className="hidden sm:flex items-center gap-1.5">
+              <FiTruck size={11} /> Free Mumbai delivery on ₹2,999+
+            </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/orders" className="hover:text-primary-500">Track Order</Link>
-            <span className="hidden sm:inline opacity-50">|</span>
-            <Link to="/help" className="hidden sm:inline hover:text-primary-500">Help</Link>
+            <Link to="/orders" className="hover:text-white transition">Track Order</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/help"   className="hover:text-white transition">Help</Link>
           </div>
         </div>
       </div>
@@ -256,15 +238,20 @@ export default function Navbar() {
               both ends off the screen edge, so the search bar feels
               integrated with the row instead of floating in a centred
               max-width box. */}
+          {/* Search bar — quieter premium treatment. 1 px neutral border
+              at rest, primary-red only on focus. Charcoal submit button
+              keeps the visual weight on the brand-red dot in the logo
+              instead of competing with it. Same kind of search bar you
+              see on Knoll, Cassina, Vitra. */}
           <form onSubmit={handleSearch} className="hidden md:flex w-full relative">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs, brands, materials..."
-              className="w-full border-2 border-primary-500 rounded-full pl-5 pr-14 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              className="w-full border border-gray-300 rounded-full pl-5 pr-12 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
             />
-            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 hover:bg-primary-600 text-white p-2.5 rounded-full transition">
-              <FiSearch />
+            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 hover:bg-primary-500 text-white p-2 rounded-full transition">
+              <FiSearch size={16} />
             </button>
           </form>
 
@@ -382,58 +369,53 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile search */}
+        {/* Mobile search — same quiet treatment as desktop. */}
         <div className="md:hidden px-4 pb-2.5">
           <form onSubmit={handleSearch} className="relative">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs..."
-              className="w-full border-2 border-primary-500 rounded-full pl-4 pr-12 py-2 focus:outline-none"
+              className="w-full border border-gray-300 rounded-full pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
             />
-            <button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-full">
+            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 text-white p-1.5 rounded-full">
               <FiSearch size={14} />
             </button>
           </form>
         </div>
 
-        {/* Mobile-only horizontal category strip — quick shortcuts under
-            the search bar so phone users don't have to open the hamburger
-            for the most common destinations. Mirrors the Flipkart /
-            Myntra / Meesho mobile pattern. Hidden on md+ where the full
-            categories nav is visible. */}
-        <nav className="md:hidden border-t bg-gradient-to-r from-primary-50 via-pink-50 to-amber-50">
+        {/* Mobile quick-link strip — short, focused list of 5 destinations
+            under the search bar. Neutral white background (was a candy
+            tri-tone gradient) and clean text chips (no emojis) to match
+            the premium navbar treatment. */}
+        <nav className="md:hidden border-t bg-white">
           <div
-            className="flex items-center gap-1 overflow-x-auto px-3 py-2 [&::-webkit-scrollbar]:hidden"
+            className="flex items-center gap-1.5 overflow-x-auto px-3 py-2 [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
             aria-label="Quick categories"
           >
-            <MobileChip to="/shop?discount=true" highlight>🔥 50% Off</MobileChip>
-            <MobileChip to="/shop?bestSeller=true">⭐ Best Sellers</MobileChip>
-            <MobileChip to="/shop?newArrival=true">✨ New</MobileChip>
-            <MobileChip to="/chair-repair">🔧 Repair</MobileChip>
-            <MobileChip to="/shop?category=Executive">💼 Executive</MobileChip>
-            <MobileChip to="/shop?category=Ergonomic">🪑 Ergonomic</MobileChip>
-            <MobileChip to="/shop?category=Premium">✨ Premium</MobileChip>
-            <MobileChip to="/shop?category=Gaming">🎮 Gaming</MobileChip>
+            <MobileChip to="/shop?discount=true" highlight>Sale</MobileChip>
+            <MobileChip to="/chair-repair">Repair</MobileChip>
+            <MobileChip to="/shop?category=Executive">Executive</MobileChip>
+            <MobileChip to="/shop?category=Ergonomic">Ergonomic</MobileChip>
+            <MobileChip to="/shop?category=Premium">Premium</MobileChip>
           </div>
         </nav>
       </div>
 
-      {/* Categories nav — simple centred flex row. */}
-      <nav className="hidden md:block border-b bg-gray-50 relative" onMouseLeave={() => setOpenDropdown(null)}>
+      {/* Category nav — slimmed from 10 to 6 focused items. No emoji
+          clutter, neutral white background. Premium-brand approach:
+          dropdowns (Category / Material / Clients) handle deep browsing,
+          linear links handle the most-clicked destinations. */}
+      <nav className="hidden md:block border-b bg-white relative" onMouseLeave={() => setOpenDropdown(null)}>
         <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
-          <ul className="flex items-center gap-1 text-sm font-semibold flex-nowrap justify-center">
-            <NavItem to="/" label={<span className="inline-flex items-center gap-1"><FiHome size={14} /> Home</span>} end />
-            <NavItem to="/shop" label="All Chairs" />
-            <NavItem to="/chair-repair" label="🔧 Repair" />
-            <NavItem to="/shop?discount=true" label="🔥 50% Off" highlight />
-            <DropdownTrigger label="Clients" active={openDropdown === 'clients'} onHover={() => setOpenDropdown('clients')} />
+          <ul className="flex items-center gap-2 text-sm font-semibold flex-nowrap justify-center">
+            <NavItem to="/shop" label="Shop" />
+            <NavItem to="/chair-repair" label="Repair" />
             <DropdownTrigger label="Category" active={openDropdown === 'category'} onHover={() => setOpenDropdown('category')} />
             <DropdownTrigger label="Material" active={openDropdown === 'material'} onHover={() => setOpenDropdown('material')} />
-            <NavItem to="/shop?category=Premium" label="Premium" />
-            <NavItem to="/shop?bestSeller=true" label="⭐ Best Sellers" />
-            <NavItem to="/shop?newArrival=true" label="✨ New Arrivals" />
+            <DropdownTrigger label="Clients" active={openDropdown === 'clients'} onHover={() => setOpenDropdown('clients')} />
+            <NavItem to="/shop?discount=true" label="Sale" highlight />
           </ul>
         </div>
 
