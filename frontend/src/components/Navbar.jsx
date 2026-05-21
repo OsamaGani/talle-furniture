@@ -258,13 +258,8 @@ export default function Navbar() {
             <button type="submit" className="sr-only">Search</button>
           </form>
 
-          {/* Right-side action cluster. On true mobile (< 640 px) only the
-              hamburger is visible — the bottom nav (Home / Shop / Wishlist
-              / Cart / Account) handles the rest, so the top stays clean
-              like an Apple Store header. From sm+ the icon trio appears
-              because the bottom nav is hidden at that breakpoint. */}
           <div className="flex items-center gap-3 sm:gap-5 justify-self-end">
-            <Link to="/wishlist" className="relative hidden sm:flex flex-col items-center text-xs text-gray-700 hover:text-primary-500 transition">
+            <Link to="/wishlist" className="relative hidden sm:flex flex-col items-center text-xs hover:text-primary-500">
               <FiHeart size={22} className={wishCount > 0 ? 'fill-current text-primary-500' : ''} />
               <span>Wishlist</span>
               {wishCount > 0 && (
@@ -274,10 +269,8 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Account / Login — sm+ only on the top bar; on mobile the
-                bottom-nav "Sign In" / "Account" tab handles this flow. */}
-            <div className="relative hidden sm:block" ref={userRef}>
-              <button onClick={() => setOpenUser(!openUser)} className="flex flex-col items-center text-xs text-gray-700 hover:text-primary-500 transition">
+            <div className="relative" ref={userRef}>
+              <button onClick={() => setOpenUser(!openUser)} className="flex flex-col items-center text-xs hover:text-primary-500">
                 <FiUser size={22} />
                 <span>{user ? user.name.split(' ')[0] : 'Login'}</span>
               </button>
@@ -363,10 +356,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Cart — sm+ only on the top bar (bottom-nav "Cart" tab
-                handles it on mobile). Stays a labelled icon-stack like
-                Wishlist/Account so the trio reads as one cohesive cluster. */}
-            <Link to="/cart" className="relative hidden sm:flex flex-col items-center text-xs text-gray-700 hover:text-primary-500 transition">
+            <Link to="/cart" className="relative flex flex-col items-center text-xs hover:text-primary-500">
               <FiShoppingCart size={22} />
               <span>Cart</span>
               {itemCount > 0 && (
@@ -376,15 +366,7 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Hamburger — phone + tablet only (md:hidden). On mobile this is
-                the only top-right control; bottom nav handles everything else.
-                Round tap-target with active scale feedback for a premium feel. */}
-            <button
-              className="md:hidden p-2 -mr-2 rounded-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 text-gray-800 transition-all duration-200"
-              onClick={() => setOpenMenu(!openMenu)}
-              aria-label={openMenu ? 'Close menu' : 'Open menu'}
-              aria-expanded={openMenu}
-            >
+            <button className="md:hidden" onClick={() => setOpenMenu(!openMenu)}>
               {openMenu ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
           </div>
