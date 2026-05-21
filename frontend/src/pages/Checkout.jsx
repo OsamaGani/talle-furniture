@@ -357,7 +357,7 @@ export default function Checkout() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-4 sm:py-6">
         <div className="mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">Secure Checkout</h1>
           <Stepper steps={steps} />

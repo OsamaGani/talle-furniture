@@ -151,7 +151,7 @@ export default function Help() {
           Email primary-red) instead of three loud candy gradients.
           Premium pattern: colour belongs to the icon, not the
           background. */}
-      <section className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Reveal direction="left" delay={0}>
           <ContactCard icon={<FaWhatsapp />} title="WhatsApp" desc="Chat with us instantly" cta="Open chat" link={waLink()} accentClass="text-emerald-600 bg-emerald-50" />
         </Reveal>

@@ -56,7 +56,7 @@ export default function Contact() {
         breadcrumbs={[{ label: 'Contact' }]}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-12 grid lg:grid-cols-[1fr_1.2fr] gap-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12 grid lg:grid-cols-[1fr_1.2fr] gap-8">
         {/* Info — each card slides in from the left, staggered, as it
             scrolls into view. The form (right column) slides from the right. */}
         <div className="space-y-4">
@@ -177,7 +177,7 @@ export default function Contact() {
       {/* Map — embedded Google Maps centered on the Talle Furniture Mart pin, with
           quick-action buttons for directions and full Maps view. */}
       <Reveal direction="scale">
-      <section className="max-w-7xl mx-auto px-4 pb-12">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 pb-12">
         <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">

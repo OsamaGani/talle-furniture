@@ -181,7 +181,7 @@ export default function Category() {
       </section>
 
       {/* Filters + grid */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-6 sm:py-8">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
           <div>
             <h2 className="text-lg sm:text-2xl font-extrabold">{cat.name}</h2>
@@ -257,7 +257,7 @@ export default function Category() {
       {/* Related sub-categories from same department */}
       {siblings.length > 0 && (
         <section className="bg-gray-50 border-t">
-          <div className="max-w-7xl mx-auto px-4 py-10">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-10">
             <h2 className="text-lg sm:text-xl font-extrabold mb-4">More from {dept.name}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {siblings.map((s) => (

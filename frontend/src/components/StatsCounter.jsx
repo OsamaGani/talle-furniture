@@ -11,8 +11,8 @@ const stats = [
 export default function StatsCounter() {
   const [ref, visible] = useReveal();
   return (
-    <section ref={ref} className="bg-gradient-to-r from-primary-500 via-pink-500 to-purple-600 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <section ref={ref} className="bg-gray-900 text-white">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12 grid grid-cols-2 md:grid-cols-4 gap-6">
         {stats.map((s, i) => (
           <Stat key={s.label} {...s} start={visible} delay={i * 120} />
         ))}

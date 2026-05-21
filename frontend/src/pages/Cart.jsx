@@ -23,7 +23,7 @@ export default function Cart() {
   const progressPct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">Shopping Cart ({items.length})</h1>
 
       {/* Free shipping progress */}

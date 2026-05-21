@@ -387,7 +387,7 @@ export default function Home() {
 
       {/* USP strip — Amazon/Flipkart style trust signals right under hero */}
       <section className="border-b bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5 grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-4 sm:py-5 grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
           <Reveal direction="up" delay={0}>
             <UspBadge icon={<FiTruck />}      title="D2D Mumbai · Pan-India" desc="Door-to-door + free over ₹2,999" color="bg-blue-50 text-blue-600" />
           </Reveal>
@@ -410,7 +410,7 @@ export default function Home() {
       <BrandMarquee />
 
       {/* Shop by Category */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12">
         <Reveal>
           <div className="flex justify-between items-end mb-6">
             <div>
@@ -471,7 +471,7 @@ export default function Home() {
 
       {/* Custom Manufacturing promo banner — Talle offers made-to-order
           and B2B custom manufacturing on enquiry. */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12">
         <Link to="/contact" className="block relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-700 via-orange-600 to-primary-500 text-white p-8 md:p-12 hover:shadow-2xl transition group">
           <div className="grid md:grid-cols-2 gap-6 items-center relative z-10">
             <div>
@@ -498,7 +498,7 @@ export default function Home() {
       </section>
 
       {/* Multi-card promo section (main + 2 side cards) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-8 sm:py-12">
         <div className="grid lg:grid-cols-3 gap-3 sm:gap-4">
           {/* Main big card */}
           <Reveal direction="left" className="lg:col-span-2">
@@ -555,7 +555,7 @@ export default function Home() {
 
       {/* Our Clients — companies we manufacture chairs for */}
       <section className="bg-gradient-to-b from-white to-gray-50 border-t">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-10 sm:py-14">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-10 sm:py-14">
           <Reveal>
             <div className="text-center mb-8">
               <span className="inline-block bg-primary-100 text-primary-600 text-xs font-bold px-3 py-1 rounded-full mb-2 tracking-wide">🤝 OUR CLIENTS</span>
@@ -588,7 +588,7 @@ export default function Home() {
 
       {/* Newsletter + Follow us */}
       <section className="bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-10 items-center">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Join the Talle Family</h2>
             <p className="text-gray-600 mb-4">Subscribe and get 10% off your first order plus exclusive deals on chairs &amp; service.</p>
@@ -665,7 +665,7 @@ function Section({ title, subtitle, link, products, bg = '', loading = false }) 
   if (!loading && !products?.length) return null;
   return (
     <section className={bg}>
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12">
         <Reveal>
           <div className="flex justify-between items-end mb-6">
             <div>

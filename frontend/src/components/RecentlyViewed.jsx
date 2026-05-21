@@ -19,7 +19,7 @@ export default function RecentlyViewed() {
 
   return (
     <section className="py-8 sm:py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
         <div className="flex items-end justify-between mb-4 sm:mb-5">
           <div>
             <p className="text-[11px] sm:text-xs font-bold text-primary-500 uppercase tracking-wider flex items-center gap-1.5">

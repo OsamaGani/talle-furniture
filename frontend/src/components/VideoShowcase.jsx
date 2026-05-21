@@ -32,7 +32,7 @@ export default function VideoShowcase() {
 
   return (
     <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-16">
         <Reveal>
           <div className="text-center mb-10">
             <span className="inline-block bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">▶ WATCH IN ACTION</span>

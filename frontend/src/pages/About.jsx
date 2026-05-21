@@ -73,7 +73,7 @@ export default function About() {
           candy gradient. Premium brand-stat band same colour family as
           the auth pages. */}
       <section className="bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-10 sm:py-12 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-10 sm:py-12 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {stats.map((s) => (
             <div key={s.label}>
               <p className="text-3xl md:text-4xl font-extrabold text-amber-300">{s.num}</p>
@@ -84,7 +84,7 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="max-w-7xl mx-auto px-4 py-14">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-14">
         <Reveal>
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-extrabold">How We Run the Workshop</h2>
@@ -108,7 +108,7 @@ export default function About() {
 
       {/* CTAs */}
       <section className="bg-gray-50 border-y">
-        <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-6">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-12 grid md:grid-cols-2 gap-6">
           <Reveal direction="left">
             <Link to="/contact" className="bg-white border border-gray-200 hover:border-primary-500 text-gray-900 rounded-xl p-8 hover:shadow-lg transition-all flex items-center justify-between group">
               <div>

@@ -20,7 +20,7 @@ const MATERIALS = [
 export default function ShopByAge() {
   return (
     <section className="py-10 sm:py-14 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
         <div className="text-center mb-6 sm:mb-8">
           <p className="text-xs sm:text-sm font-bold text-primary-500 uppercase tracking-widest mb-1">Choose what fits</p>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">Shop by Material</h2>

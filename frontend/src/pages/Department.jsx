@@ -200,7 +200,7 @@ export default function Department() {
 
       {/* Sub-category chips */}
       <section className="border-b sticky top-[57px] md:top-0 z-30 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 overflow-x-auto no-scrollbar">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-3 overflow-x-auto no-scrollbar">
           <div className="flex gap-2 sm:gap-3 min-w-max">
             <Chip active={!sub} onClick={() => updateParam('sub', '')}>
               <span>🎯</span> All {dept.name}
@@ -215,7 +215,7 @@ export default function Department() {
       </section>
 
       {/* Filters + grid */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-6 sm:py-8">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
           <div>
             <h2 className="text-lg sm:text-2xl font-extrabold">

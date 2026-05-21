@@ -104,7 +104,7 @@ export default function Shop() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-4 sm:py-6">
       <SEO
         title={seoTitle}
         description={seoDescription}
