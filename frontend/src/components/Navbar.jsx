@@ -366,8 +366,17 @@ export default function Navbar() {
               )}
             </Link>
 
-            <button className="md:hidden" onClick={() => setOpenMenu(!openMenu)}>
-              {openMenu ? <FiX size={24} /> : <FiMenu size={24} />}
+            {/* Hamburger menu — given the same shape as the Login + Cart
+                buttons (icon size 22, flex-col, text-xs label below) so
+                all three sit visually aligned on the mobile top bar. */}
+            <button
+              className="md:hidden flex flex-col items-center text-xs text-gray-700 hover:text-primary-500 transition"
+              onClick={() => setOpenMenu(!openMenu)}
+              aria-label={openMenu ? 'Close menu' : 'Open menu'}
+              aria-expanded={openMenu}
+            >
+              {openMenu ? <FiX size={22} /> : <FiMenu size={22} />}
+              <span>Menu</span>
             </button>
           </div>
         </div>
