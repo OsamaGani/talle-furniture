@@ -238,21 +238,24 @@ export default function Navbar() {
               both ends off the screen edge, so the search bar feels
               integrated with the row instead of floating in a centred
               max-width box. */}
-          {/* Search bar — quieter premium treatment. 1 px neutral border
-              at rest, primary-red only on focus. Charcoal submit button
-              keeps the visual weight on the brand-red dot in the logo
-              instead of competing with it. Same kind of search bar you
-              see on Knoll, Cassina, Vitra. */}
-          <form onSubmit={handleSearch} className="hidden md:flex w-full relative">
+          {/* Search bar — Apple / Pepperfry / Urban Ladder premium pattern.
+              Soft gray fill at rest (bg-gray-50), search icon on the LEFT
+              acting as a visual anchor, no loud submit button on the right
+              (form submits on Enter — that's the convention everyone knows).
+              On focus: background turns white, soft primary-red ring appears.
+              Cleaner, calmer, doesn't compete with the logo for attention. */}
+          <form onSubmit={handleSearch} className="hidden md:flex w-full max-w-2xl mx-auto relative">
+            <FiSearch
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              size={18}
+            />
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs, brands, materials..."
-              className="w-full border border-gray-300 rounded-full pl-5 pr-12 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-11 pr-4 py-2.5 text-sm placeholder:text-gray-500 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition"
             />
-            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 hover:bg-primary-500 text-white p-2 rounded-full transition">
-              <FiSearch size={16} />
-            </button>
+            <button type="submit" className="sr-only">Search</button>
           </form>
 
           <div className="flex items-center gap-3 sm:gap-5 justify-self-end">
@@ -369,18 +372,20 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile search — same quiet treatment as desktop. */}
+        {/* Mobile search — same Apple-style treatment as desktop. */}
         <div className="md:hidden px-4 pb-2.5">
           <form onSubmit={handleSearch} className="relative">
+            <FiSearch
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              size={16}
+            />
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Search chairs..."
-              className="w-full border border-gray-300 rounded-full pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 transition"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-gray-500 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition"
             />
-            <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-900 text-white p-1.5 rounded-full">
-              <FiSearch size={14} />
-            </button>
+            <button type="submit" className="sr-only">Search</button>
           </form>
         </div>
 
