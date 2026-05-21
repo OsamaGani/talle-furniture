@@ -47,7 +47,7 @@ export default function Contact() {
       <SEO
         title={`Contact — Talle Furniture Mart, Saki Naka Mumbai | ${PHONE_PRIMARY_DISPLAY}`}
         description={`Chair orders, custom-manufacturing enquiries or repair quotes — call ${PHONE_PRIMARY_DISPLAY}, WhatsApp us, or visit our Saki Naka workshop. Open 24×7. Doorstep service across Mumbai.`}
-        keywords="contact talle furniture mart, chair shop sakinaka phone, chair manufacturer mumbai contact, chair repair quote mumbai, abdul rab talle furniture, chair workshop sakinaka address"
+        keywords="contact talle furniture mart, chair shop sakinaka phone, chair shop near andheri powai kurla bkc lower parel bandra, chair manufacturer mumbai contact, chair manufacturer phone number mumbai, chair repair quote mumbai whatsapp, abdul rab talle furniture, chair workshop sakinaka address, chair shop 400072, lokmanya tilak nagar furniture, saki naka furniture market, talle furniture mart address google maps"
         path="/contact"
       />
       <PageHeader

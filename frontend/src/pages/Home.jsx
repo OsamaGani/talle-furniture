@@ -238,10 +238,10 @@ export default function Home() {
   return (
     <div>
       <SEO
-        title="Talle Furniture Mart — Office Chair Manufacturer & Repair, Mumbai"
-        description="Mumbai chair manufacturer & repair workshop in Saki Naka. Office, ergonomic, banquet, dining, sofas & tables — custom orders, doorstep repair, reupholstery. Trusted by WeWork & 200+ Mumbai businesses."
+        title="Office Chair Manufacturer & Repair, Mumbai — Executive, Ergonomic, Premium, Gaming"
+        description="Talle Furniture Mart — Mumbai's own-manufactured chair brand. Executive, ergonomic, premium, designer, gaming, study, tandem & cafeteria chairs from our Saki Naka workshop. Expert chair repair, reupholstery & doorstep service across Mumbai. Trusted by WeWork, Roller Bearing, Upstep Academy. Free Mumbai delivery on ₹2,999+."
         path="/"
-        keywords="office chair manufacturer mumbai, chair repair sakinaka, chair manufacturer mumbai, ergonomic chair manufacturer, executive chair supplier mumbai, bulk office chairs mumbai, chair reupholstery mumbai, banquet chair manufacturer, restaurant chair supplier, customised office chair, wooden dining table mumbai, conference table supplier, talle furniture mart, b2b chair supplier mumbai, hydraulic chair replacement, coworking chair supplier, training room chair, tandem seating supplier, d2d chair service mumbai"
+        keywords="office chair manufacturer mumbai, chair repair near me, chair shop sakinaka andheri powai kurla bkc, ergonomic chair mumbai, executive chair supplier mumbai, premium chair mumbai, designer chair mumbai, gaming chair mumbai, study chair india, tandem seating airport bench supplier, cafeteria chair supplier india, training room chair manufacturer mumbai, boardroom chair mumbai, bulk office chairs mumbai, wholesale office chairs mumbai, customised office chair manufacturer, chair reupholstery mumbai cost, hydraulic cylinder replacement chair mumbai, best office chair india, buy office chair online india, ergohuman chair mumbai dealer, talle furniture mart, wework chair supplier, coworking chair supplier, cod office chair mumbai, free delivery chair mumbai, GST invoice chair supplier"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',

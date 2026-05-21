@@ -25,7 +25,7 @@ export default function About() {
         title="About Us — Chair Manufacturer & Repair Workshop, Saki Naka Mumbai"
         description="Talle Furniture Mart is a family-run chair manufacturer & repair workshop in Saki Naka, Mumbai. 15+ years, 4.9★ Google rating (213 reviews), founded by Abdul Rab. Office, banquet, restaurant chairs + D2D repair."
         path="/about"
-        keywords="talle furniture mart, abdul rab chair manufacturer, chair manufacturer sakinaka, chair repair mumbai, office chair workshop mumbai, ergonomic chair maker india, banquet chair manufacturer, family run furniture workshop mumbai, chair reupholstery sakinaka, d2d chair service mumbai"
+        keywords="talle furniture mart, abdul rab chair manufacturer, chair manufacturer sakinaka mumbai, chair factory mumbai, office chair workshop mumbai, made in india chairs, BIFMA certified chair manufacturer india, family run furniture workshop mumbai, chair reupholstery sakinaka, d2d chair service mumbai, wework chair supplier mumbai, coworking chair supplier, roller bearing furniture vendor, upstep academy chair supplier, b2b chair manufacturer mumbai, corporate chair supplier, GST invoice chair manufacturer mumbai"
       />
       <PageHeader
         title="Specialist in Office Chairs & Repairs — Mumbai"

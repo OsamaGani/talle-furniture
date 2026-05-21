@@ -8,6 +8,7 @@ import {
   EMAIL_PRIMARY, waLink, mailtoLink,
 } from '../config/contact';
 import Reveal from '../components/Reveal';
+import SEO from '../components/SEO';
 
 const categories = [
   {
@@ -116,6 +117,12 @@ export default function Help() {
 
   return (
     <div>
+      <SEO
+        title="Help & FAQs — Chair Orders, Repair, Delivery, Returns | Talle Mumbai"
+        description="Frequently asked questions about ordering chairs from Talle Furniture Mart Mumbai — delivery time, payment, COD, returns, warranty, office chair repair, hydraulic replacement, reupholstery cost."
+        path="/help"
+        keywords="chair shop FAQ Mumbai, office chair return policy India, COD chair delivery Mumbai, chair warranty India, hydraulic cylinder replacement cost, office chair repair cost Mumbai, chair reupholstery price, talle furniture mart help, chair order cancellation, free delivery threshold Mumbai chairs"
+      />
       {/* Surface every FAQ to Google as a FAQPage rich result. */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <PageHeader

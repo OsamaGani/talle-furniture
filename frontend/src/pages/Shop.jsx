@@ -105,7 +105,26 @@ export default function Shop() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-      <SEO title={seoTitle} description={seoDescription} path="/shop" />
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        path="/shop"
+        keywords={[
+          category && `${category.toLowerCase()} mumbai`,
+          category && `buy ${category.toLowerCase()} online india`,
+          category && `wholesale ${category.toLowerCase()} mumbai`,
+          material && `${material.toLowerCase()} chair mumbai`,
+          keyword && `${keyword.toLowerCase()} mumbai`,
+          'office chair mumbai',
+          'chair manufacturer saki naka',
+          'best office chair india',
+          'ergonomic chair mumbai',
+          'chair price list mumbai',
+          'bulk office chairs mumbai',
+          'chair shop near me',
+          'cod office chair mumbai',
+        ].filter(Boolean).join(', ')}
+      />
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold truncate max-w-full">{headerLabel}</h1>
         <div className="flex items-center gap-2 sm:gap-3">

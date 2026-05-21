@@ -156,6 +156,19 @@ export default function Department() {
         title={seoTitle}
         description={seoDescription}
         path={`/dept/${slug}${activeSub ? `?sub=${activeSub.slug}` : ''}`}
+        keywords={[
+          `${dept.name.toLowerCase()} mumbai`,
+          `${dept.name.toLowerCase()} manufacturer india`,
+          `wholesale ${dept.name.toLowerCase()} mumbai`,
+          `bulk ${dept.name.toLowerCase()} supplier`,
+          `${dept.name.toLowerCase()} for office`,
+          `buy ${dept.name.toLowerCase()} online india`,
+          'chair manufacturer saki naka',
+          'office chair mumbai',
+          'ergonomic chair mumbai',
+          'cod chair delivery mumbai',
+          'talle furniture mart',
+        ].join(', ')}
       />
       {/* Hero */}
       <section className={`relative overflow-hidden bg-gradient-to-br ${dept.color} text-white`}>

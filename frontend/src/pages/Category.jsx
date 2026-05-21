@@ -138,6 +138,18 @@ export default function Category() {
         title={`${cat.name} — Mumbai Manufacturer · Talle`}
         description={`Buy ${cat.name.toLowerCase()} — own-manufactured by Talle Furniture Mart in Saki Naka, Mumbai. ${cat.tagline || ''} Free Mumbai delivery on ₹2,999+, COD, 6-month warranty.`.trim()}
         path={`/category/${slug}`}
+        keywords={[
+          `${cat.name.toLowerCase()} mumbai`,
+          `${cat.name.toLowerCase()} manufacturer mumbai`,
+          `buy ${cat.name.toLowerCase()} online india`,
+          `wholesale ${cat.name.toLowerCase()} mumbai`,
+          `bulk ${cat.name.toLowerCase()} for office`,
+          `${cat.name.toLowerCase()} price mumbai`,
+          `best ${cat.name.toLowerCase()} india`,
+          `${cat.name.toLowerCase()} supplier andheri powai saki naka`,
+          `${cat.name.toLowerCase()} cod mumbai`,
+          'talle furniture mart',
+        ].join(', ')}
       />
       {/* Hero */}
       <section className={`relative overflow-hidden bg-gradient-to-br ${dept?.color || 'from-primary-500 to-pink-600'} text-white`}>
