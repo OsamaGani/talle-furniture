@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiPhone, FiTruck, FiChevronDown, FiHeart, FiHome, FiPackage, FiSettings, FiLogOut, FiHelpCircle, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -281,72 +281,97 @@ export default function Navbar() {
                     className="sm:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-fadeIn"
                     onClick={() => setOpenUser(false)}
                   />
-                  <div className="fixed sm:absolute right-2 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1rem)] sm:w-72 max-w-sm bg-white rounded-2xl shadow-2xl z-50 animate-fadeIn ring-1 ring-black/5 overflow-hidden">
+                  {/* Premium user dropdown — clean white card with subtle
+                      shadow + ring. No candy gradients, no hand-wave emoji,
+                      no rainbow buttons. Mirrors the Apple ID / Pottery
+                      Barn / J. Crew account menu pattern. */}
+                  <div className="fixed sm:absolute right-2 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1rem)] sm:w-80 max-w-sm bg-white rounded-2xl shadow-2xl z-50 animate-fadeIn ring-1 ring-black/5 overflow-hidden">
                   {user ? (
                     <>
-                      {/* Logged-in header with avatar circle */}
-                      <div className="px-5 py-4 bg-gradient-to-br from-primary-500 via-pink-500 to-fuchsia-600 text-white">
+                      {/* Logged-in identity block — quiet charcoal initial
+                          avatar instead of a gradient candy header. */}
+                      <div className="px-5 pt-5 pb-4 border-b border-gray-100">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur ring-2 ring-white/40 flex items-center justify-center text-xl font-extrabold flex-shrink-0">
-                            {user.name?.[0]?.toUpperCase() || '👤'}
+                          <div className="w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center text-base font-extrabold flex-shrink-0">
+                            {user.name?.[0]?.toUpperCase() || 'U'}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-bold text-sm truncate">{user.name}</p>
-                            <p className="text-xs text-white/85 truncate">{user.email}</p>
+                            <p className="font-bold text-sm text-gray-900 truncate">{user.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-2">
-                        <DropdownLink to="/profile" onClick={() => setOpenUser(false)} icon="👤" label="My Profile" />
-                        <DropdownLink to="/orders"  onClick={() => setOpenUser(false)} icon="📦" label="My Orders" />
-                        <DropdownLink to="/wishlist" onClick={() => setOpenUser(false)} icon="❤" label="My Wishlist" />
+                      {/* Account menu — react-icons instead of emojis. Each
+                          row a generous tap-target with subtle hover. */}
+                      <div className="py-2">
+                        <DropdownLink to="/profile"  onClick={() => setOpenUser(false)} icon={<FiUser size={16} />}    label="My Profile" />
+                        <DropdownLink to="/orders"   onClick={() => setOpenUser(false)} icon={<FiPackage size={16} />} label="My Orders" />
+                        <DropdownLink to="/wishlist" onClick={() => setOpenUser(false)} icon={<FiHeart size={16} />}   label="My Wishlist" />
                         {user.isAdmin && (
                           <>
-                            <div className="my-1.5 border-t border-gray-100" />
+                            <div className="my-1 mx-3 border-t border-gray-100" />
                             <DropdownLink
                               to="/admin"
                               onClick={() => setOpenUser(false)}
-                              icon="⚙"
+                              icon={<FiSettings size={16} />}
                               label="Admin Dashboard"
                               accent
                             />
                           </>
                         )}
-                        <div className="my-1.5 border-t border-gray-100" />
+                      </div>
+
+                      {/* Sign-out — separated, lower visual weight than the
+                          account links above it. */}
+                      <div className="border-t border-gray-100 py-2">
                         <button
                           onClick={() => { logout(); setOpenUser(false); }}
-                          className="flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-lg hover:bg-red-50 text-sm font-medium text-red-600 transition active:scale-[0.98]"
+                          className="flex items-center gap-3 w-full text-left px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition active:scale-[0.99]"
                         >
-                          <span className="text-lg">🚪</span>
-                          <span>Logout</span>
+                          <FiLogOut size={16} className="text-gray-400" />
+                          <span>Sign out</span>
                         </button>
                       </div>
                     </>
                   ) : (
                     <>
-                      {/* Logged-out header */}
-                      <div className="px-5 py-5 bg-gradient-to-br from-primary-500 via-pink-500 to-fuchsia-600 text-white text-center">
-                        <div className="w-14 h-14 mx-auto rounded-full bg-white/25 backdrop-blur ring-2 ring-white/40 flex items-center justify-center text-2xl mb-2">
-                          👋
-                        </div>
-                        <p className="font-bold text-base">Welcome to Talle Furniture Mart</p>
-                        <p className="text-xs text-white/85 mt-0.5">Sign in for orders, wishlist & deals</p>
+                      {/* Logged-out — Apple ID / Pottery Barn pattern: clean
+                          white, single primary CTA (charcoal solid, not
+                          gradient), secondary "create account" as a text
+                          link, helpful footer with track-order + help. */}
+                      <div className="px-5 pt-5">
+                        <p className="text-[10px] uppercase tracking-[2px] text-gray-500 font-bold mb-2">Account</p>
+                        <h3 className="text-lg font-bold text-gray-900 leading-tight">Sign in to your account</h3>
+                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                          Track orders, save favourites, and check out faster next time.
+                        </p>
                       </div>
-                      <div className="p-3 space-y-2">
+
+                      <div className="px-5 pt-4 pb-4">
                         <Link
                           to="/login"
                           onClick={() => setOpenUser(false)}
-                          className="block w-full text-center bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white font-bold py-2.5 rounded-lg shadow-md hover:shadow-lg transition active:scale-[0.98]"
+                          className="flex items-center justify-center gap-2 w-full bg-gray-900 hover:bg-black text-white font-semibold text-sm py-2.5 rounded-lg transition active:scale-[0.98]"
                         >
-                          Sign In
+                          Sign In <FiArrowRight size={14} />
                         </Link>
-                        <Link
-                          to="/register"
-                          onClick={() => setOpenUser(false)}
-                          className="block w-full text-center border-2 border-gray-200 hover:border-primary-500 hover:text-primary-500 font-semibold py-2.5 rounded-lg transition active:scale-[0.98]"
-                        >
-                          Create Account
+                        <p className="text-xs text-gray-500 text-center mt-3">
+                          New to Talle?{' '}
+                          <Link to="/register" onClick={() => setOpenUser(false)} className="text-primary-500 hover:text-primary-600 font-semibold">
+                            Create an account
+                          </Link>
+                        </p>
+                      </div>
+
+                      {/* Footer help links — sit on a soft gray strip so the
+                          dropdown reads as two zones: action above, help below. */}
+                      <div className="bg-gray-50 border-t border-gray-100 px-5 py-3 grid grid-cols-2 gap-2 text-xs">
+                        <Link to="/orders" onClick={() => setOpenUser(false)} className="flex items-center gap-1.5 text-gray-600 hover:text-primary-500 transition">
+                          <FiPackage size={13} className="text-gray-400" /> Track Order
+                        </Link>
+                        <Link to="/help" onClick={() => setOpenUser(false)} className="flex items-center gap-1.5 text-gray-600 hover:text-primary-500 transition">
+                          <FiHelpCircle size={13} className="text-gray-400" /> Help
                         </Link>
                       </div>
                     </>
@@ -829,16 +854,16 @@ function DropdownLink({ to, onClick, icon, label, accent }) {
     <Link
       to={to}
       onClick={onClick}
-      className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition active:scale-[0.98] ${
+      className={`group flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition active:scale-[0.99] ${
         accent
-          ? 'text-primary-600 bg-primary-50/70 hover:bg-primary-100'
-          : 'text-gray-700 hover:bg-gray-50'
+          ? 'text-primary-600 hover:bg-primary-50'
+          : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
       }`}
     >
-      <span className="text-lg w-6 text-center">{icon}</span>
+      <span className={`w-5 flex items-center justify-center ${accent ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-600'} transition`}>{icon}</span>
       <span className="flex-1">{label}</span>
       <FiChevronDown
-        size={14}
+        size={13}
         className="-rotate-90 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition"
       />
     </Link>
